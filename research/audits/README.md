@@ -545,3 +545,70 @@ writes the corrected `codes/` documents of the refuted entries in the shape
 of the circuit refutation binding (issue #4723): the refuted sides lowered to
 the verified fault sets at `upper_bound`, the rest of the circuit block
 untouched, and a sentence naming the refuter appended to `provenance.notes`.
+
+## What a second circuit search would cost and find: `sisyphus_circuit_sweep.py`
+
+The gate's circuit search (`circuit_tools.ris_dem`) cannot test a `d_circ`
+claim on a large detector error model: above about 50,000 mechanisms it gets
+a few hundred trials and its lightest fault set is far above any claim.
+Sisyphus (`sisyphus-qec`, github.com/varunmenon1310/sisyphus) reaches those
+claims, and the first seven it undercut were corrected in PRs #7266 to
+#7272. PR #7264 proposes it as a second searcher in the gate, and the review
+there asked for its cost on the whole board first. This script produces
+that: it runs the search over the committed circuits outside the gate, in a
+process group of its own, and records per basis the outcome (`ok`,
+`refuted`, `rejected`, `crash`, `timeout`), set-up time apart from search
+time, when the search first held a fault set at the claim and below it, and
+the peak memory of the whole group (on Linux the sum of proportional set
+sizes, since forked workers share pages). A lighter fault set counts as
+`refuted` only after `verify/circuit_tools.witness_errors` accepts it.
+Nothing here edits `codes/` or `circuits/`.
+
+Sisyphus is not a dependency of the repository, so it is named on the
+command line, and the record keeps the version that ran:
+
+```
+uv run --frozen --extra research --with sisyphus-qec==0.2.1 \
+    python research/audits/sisyphus_circuit_sweep.py sweep \
+    --min-mechanisms 50000 --seconds 60 --shard 0/4 --out sisyphus_circuit_sweep-<date>-0.json
+uv run --frozen python research/audits/sisyphus_circuit_sweep.py report sisyphus_circuit_sweep-<date>-*.json
+```
+
+`--shard I/N` takes every Nth entry, largest circuits first, so several
+machines can split the board evenly; a record is resumable. The timings mean
+what they say only on a machine shaped like the one they are meant to
+predict, which for the gate is the CI runner (4 cores, 16 GB). `report --out`
+writes several records merged into one.
+
+The record of 2026-11-25 (`sisyphus_circuit_sweep-2026-11-25.json`) covers
+the 349 circuit-tier entries whose X-memory detector error model has 50,000
+mechanisms or more, both bases, 698 searches of 60 s each with Sisyphus
+0.2.1, seed 0, and 4 workers. It ran on four GCP `n2d-standard-4` machines
+(4 cores of an AMD EPYC 7B13, 15.6 GB, Linux) and took 14.4 machine-hours.
+
+- No search crashed, timed out, or returned a proposal the witness check
+  refused.
+- Set-up took a median of 12.5 s, 21.1 s at the 90th percentile, and 68.8 s
+  at most. The largest figures are first calls, which also compile the
+  kernels: 50 to 69 s on the four largest models against 29 to 37 s for
+  their second basis.
+- Peak memory of the process group was 1.18 GB at the median, 1.83 GB at the
+  90th percentile, and 3.38 GB at most, on the 13,720 by 125,244 models of
+  196-2-14-b and 196-2-14-c.
+- 97 searches, on 59 entries, ended with a fault set lighter than the claim,
+  each accepted by `verify/circuit_tools.witness_errors`. The first lighter
+  set appeared after a median of 0.42 s, 32.4 s at the 90th percentile, and
+  59.0 s at most, so some of these would be missed by a shorter search and
+  nothing here says how many more a longer one would find.
+- 596 searches ended at the claimed weight, and 5 ended above it: the X
+  memories of 42-16-6, 63-20-7, 63-21-7 and 64-21-7 (claims of 5, lightest
+  found 6 to 8) and of 182-6-18 (13 against 14). The search is randomized
+  and does not always recover a fault set that is known to exist.
+- By schedule, as the circuit block's notes name it: 16 of the 22 unflagged
+  interleaved two-block extractions were refuted (the other 6 had been
+  corrected the same day in #7266 to #7272, where 160-2-17 was the seventh),
+  11 of 18 Johnson-coil sequential, 5 of 6 generic sequential two-block, 20
+  of 220 Johnson-coil flagged interleaved, 4 of 75 Johnson-coil with 4 span
+  flags, and 3 of the remaining 8.
+
+The entries below 50,000 mechanisms are not in this record.

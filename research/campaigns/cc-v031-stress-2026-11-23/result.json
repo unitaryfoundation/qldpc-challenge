@@ -1,0 +1,5934 @@
+{
+ "cc": "/Users/mathysrennela/GitHub/code-calculus-dev",
+ "args": {
+  "arm": "all",
+  "limit": 24,
+  "n_lo": 10,
+  "n_hi": 120,
+  "order": "n",
+  "steps": 4,
+  "budget": 64,
+  "trials": 8000,
+  "gate_cap": 12,
+  "cap": 20,
+  "max_w": 10,
+  "open_prs": true,
+  "out": "research/campaigns/cc-v031-stress-2026-11-23/result.json"
+ },
+ "started": "2026-11-23T17:03:58",
+ "pairpartition": {
+  "derived": 38,
+  "connected": 20,
+  "staged": 20,
+  "gate_passed": 20,
+  "board_advancing": 20,
+  "records": [
+   {
+    "label": "pp-p9-L4-all0-all0",
+    "constructor": "L-PAIR-PARTITION",
+    "connected": false,
+    "blocks": 9,
+    "block_sizes": [
+     4,
+     4,
+     4,
+     4,
+     4,
+     4,
+     4,
+     4,
+     4
+    ],
+    "n": 36,
+    "k": 18,
+    "w": 4
+   },
+   {
+    "label": "pp-p9-L4-all0-identity",
+    "constructor": "L-PAIR-PARTITION",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "pp-p9-L4-all0-alternating",
+    "constructor": "L-PAIR-PARTITION",
+    "connected": true,
+    "blocks": 1,
+    "block_sizes": [
+     36
+    ],
+    "n": 36,
+    "k": 18,
+    "w": 4,
+    "gate_passed": true,
+    "board_advancing": true,
+    "dominated_by": [],
+    "d_only_gain": false,
+    "cell": [
+     "weight-4",
+     "unrestricted"
+    ],
+    "dedup_exact": 0,
+    "dedup_wl": 0,
+    "d_witness": 2,
+    "path": "/Users/mathysrennela/GitHub/qldpc-challenge/research/candidates/20261123-170406-Mathyss-MacBook-Air-12541/36-18-2-pp-p9-L4-all0-alternatin.json",
+    "tanner_connected": true
+   },
+   {
+    "label": "pp-p9-L4-all0-pairwise",
+    "constructor": "L-PAIR-PARTITION",
+    "connected": true,
+    "blocks": 1,
+    "block_sizes": [
+     36
+    ],
+    "n": 36,
+    "k": 18,
+    "w": 4,
+    "gate_passed": true,
+    "board_advancing": true,
+    "dominated_by": [],
+    "d_only_gain": false,
+    "cell": [
+     "weight-4",
+     "unrestricted"
+    ],
+    "dedup_exact": 0,
+    "dedup_wl": 1,
+    "d_witness": 2,
+    "path": "/Users/mathysrennela/GitHub/qldpc-challenge/research/candidates/20261123-170416-Mathyss-MacBook-Air-12541/36-18-2-pp-p9-L4-all0-pairwise.json",
+    "tanner_connected": true
+   },
+   {
+    "label": "pp-p9-L4-all0-reverse",
+    "constructor": "L-PAIR-PARTITION",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "pp-p9-L4-identity-all0",
+    "constructor": "L-PAIR-PARTITION",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "pp-p9-L4-identity-identity",
+    "constructor": "L-PAIR-PARTITION",
+    "connected": false,
+    "blocks": 9,
+    "block_sizes": [
+     4,
+     4,
+     4,
+     4,
+     4,
+     4,
+     4,
+     4,
+     4
+    ],
+    "n": 36,
+    "k": 18,
+    "w": 4
+   },
+   {
+    "label": "pp-p9-L4-identity-alternating",
+    "constructor": "L-PAIR-PARTITION",
+    "connected": true,
+    "blocks": 1,
+    "block_sizes": [
+     36
+    ],
+    "n": 36,
+    "k": 18,
+    "w": 4,
+    "gate_passed": true,
+    "board_advancing": true,
+    "dominated_by": [],
+    "d_only_gain": false,
+    "cell": [
+     "weight-4",
+     "unrestricted"
+    ],
+    "dedup_exact": 0,
+    "dedup_wl": 2,
+    "d_witness": 2,
+    "path": "/Users/mathysrennela/GitHub/qldpc-challenge/research/candidates/20261123-170424-Mathyss-MacBook-Air-12541/36-18-2-pp-p9-L4-identity-altern.json",
+    "tanner_connected": true
+   },
+   {
+    "label": "pp-p9-L4-identity-pairwise",
+    "constructor": "L-PAIR-PARTITION",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "pp-p9-L4-identity-reverse",
+    "constructor": "L-PAIR-PARTITION",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "pp-p9-L4-alternating-all0",
+    "constructor": "L-PAIR-PARTITION",
+    "connected": true,
+    "blocks": 1,
+    "block_sizes": [
+     36
+    ],
+    "n": 36,
+    "k": 18,
+    "w": 4,
+    "gate_passed": true,
+    "board_advancing": true,
+    "dominated_by": [],
+    "d_only_gain": false,
+    "cell": [
+     "weight-4",
+     "unrestricted"
+    ],
+    "dedup_exact": 0,
+    "dedup_wl": 3,
+    "d_witness": 2,
+    "path": "/Users/mathysrennela/GitHub/qldpc-challenge/research/candidates/20261123-170433-Mathyss-MacBook-Air-12541/36-18-2-pp-p9-L4-alternating-all.json",
+    "tanner_connected": true
+   },
+   {
+    "label": "pp-p9-L4-alternating-identity",
+    "constructor": "L-PAIR-PARTITION",
+    "connected": true,
+    "blocks": 1,
+    "block_sizes": [
+     36
+    ],
+    "n": 36,
+    "k": 18,
+    "w": 4,
+    "gate_passed": true,
+    "board_advancing": true,
+    "dominated_by": [],
+    "d_only_gain": false,
+    "cell": [
+     "weight-4",
+     "unrestricted"
+    ],
+    "dedup_exact": 0,
+    "dedup_wl": 4,
+    "d_witness": 2,
+    "path": "/Users/mathysrennela/GitHub/qldpc-challenge/research/candidates/20261123-170441-Mathyss-MacBook-Air-12541/36-18-2-pp-p9-L4-alternating-ide.json",
+    "tanner_connected": true
+   },
+   {
+    "label": "pp-p9-L4-alternating-alternating",
+    "constructor": "L-PAIR-PARTITION",
+    "connected": false,
+    "blocks": 9,
+    "block_sizes": [
+     4,
+     4,
+     4,
+     4,
+     4,
+     4,
+     4,
+     4,
+     4
+    ],
+    "n": 36,
+    "k": 18,
+    "w": 4
+   },
+   {
+    "label": "pp-p9-L4-alternating-pairwise",
+    "constructor": "L-PAIR-PARTITION",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "pp-p9-L4-alternating-reverse",
+    "constructor": "L-PAIR-PARTITION",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "pp-p9-L4-pairwise-all0",
+    "constructor": "L-PAIR-PARTITION",
+    "connected": true,
+    "blocks": 1,
+    "block_sizes": [
+     36
+    ],
+    "n": 36,
+    "k": 18,
+    "w": 4,
+    "gate_passed": true,
+    "board_advancing": true,
+    "dominated_by": [],
+    "d_only_gain": false,
+    "cell": [
+     "weight-4",
+     "unrestricted"
+    ],
+    "dedup_exact": 0,
+    "dedup_wl": 5,
+    "d_witness": 2,
+    "path": "/Users/mathysrennela/GitHub/qldpc-challenge/research/candidates/20261123-170448-Mathyss-MacBook-Air-12541/36-18-2-pp-p9-L4-pairwise-all0.json",
+    "tanner_connected": true
+   },
+   {
+    "label": "pp-p9-L4-pairwise-identity",
+    "constructor": "L-PAIR-PARTITION",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "pp-p9-L4-pairwise-alternating",
+    "constructor": "L-PAIR-PARTITION",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "pp-p9-L4-pairwise-pairwise",
+    "constructor": "L-PAIR-PARTITION",
+    "connected": false,
+    "blocks": 9,
+    "block_sizes": [
+     4,
+     4,
+     4,
+     4,
+     4,
+     4,
+     4,
+     4,
+     4
+    ],
+    "n": 36,
+    "k": 18,
+    "w": 4
+   },
+   {
+    "label": "pp-p9-L4-pairwise-reverse",
+    "constructor": "L-PAIR-PARTITION",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "pp-p9-L4-reverse-all0",
+    "constructor": "L-PAIR-PARTITION",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "pp-p9-L4-reverse-identity",
+    "constructor": "L-PAIR-PARTITION",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "pp-p9-L4-reverse-alternating",
+    "constructor": "L-PAIR-PARTITION",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "pp-p9-L4-reverse-pairwise",
+    "constructor": "L-PAIR-PARTITION",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "pp-p9-L4-reverse-reverse",
+    "constructor": "L-PAIR-PARTITION",
+    "connected": false,
+    "blocks": 9,
+    "block_sizes": [
+     4,
+     4,
+     4,
+     4,
+     4,
+     4,
+     4,
+     4,
+     4
+    ],
+    "n": 36,
+    "k": 18,
+    "w": 4
+   },
+   {
+    "label": "pp-p9-L6-all0-all0",
+    "constructor": "L-PAIR-PARTITION",
+    "connected": false,
+    "blocks": 9,
+    "block_sizes": [
+     6,
+     6,
+     6,
+     6,
+     6,
+     6,
+     6,
+     6,
+     6
+    ],
+    "n": 54,
+    "k": 36,
+    "w": 6
+   },
+   {
+    "label": "pp-p9-L6-all0-identity",
+    "constructor": "L-PAIR-PARTITION",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "pp-p9-L6-all0-alternating",
+    "constructor": "L-PAIR-PARTITION",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "pp-p9-L6-all0-pairwise",
+    "constructor": "L-PAIR-PARTITION",
+    "connected": true,
+    "blocks": 1,
+    "block_sizes": [
+     54
+    ],
+    "n": 54,
+    "k": 36,
+    "w": 6,
+    "gate_passed": true,
+    "board_advancing": true,
+    "dominated_by": [],
+    "d_only_gain": false,
+    "cell": [
+     "weight-6",
+     "unrestricted"
+    ],
+    "dedup_exact": 0,
+    "dedup_wl": 0,
+    "d_witness": 2,
+    "path": "/Users/mathysrennela/GitHub/qldpc-challenge/research/candidates/20261123-170500-Mathyss-MacBook-Air-12541/54-36-2-pp-p9-L6-all0-pairwise.json",
+    "tanner_connected": true
+   },
+   {
+    "label": "pp-p9-L6-all0-reverse",
+    "constructor": "L-PAIR-PARTITION",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "pp-p9-L6-identity-all0",
+    "constructor": "L-PAIR-PARTITION",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "pp-p9-L6-identity-identity",
+    "constructor": "L-PAIR-PARTITION",
+    "connected": false,
+    "blocks": 9,
+    "block_sizes": [
+     6,
+     6,
+     6,
+     6,
+     6,
+     6,
+     6,
+     6,
+     6
+    ],
+    "n": 54,
+    "k": 36,
+    "w": 6
+   },
+   {
+    "label": "pp-p9-L6-identity-alternating",
+    "constructor": "L-PAIR-PARTITION",
+    "connected": true,
+    "blocks": 1,
+    "block_sizes": [
+     54
+    ],
+    "n": 54,
+    "k": 36,
+    "w": 6,
+    "gate_passed": true,
+    "board_advancing": true,
+    "dominated_by": [],
+    "d_only_gain": false,
+    "cell": [
+     "weight-6",
+     "unrestricted"
+    ],
+    "dedup_exact": 0,
+    "dedup_wl": 1,
+    "d_witness": 2,
+    "path": "/Users/mathysrennela/GitHub/qldpc-challenge/research/candidates/20261123-170512-Mathyss-MacBook-Air-12541/54-36-2-pp-p9-L6-identity-altern.json",
+    "tanner_connected": true
+   },
+   {
+    "label": "pp-p9-L6-identity-pairwise",
+    "constructor": "L-PAIR-PARTITION",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "pp-p9-L6-identity-reverse",
+    "constructor": "L-PAIR-PARTITION",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "pp-p9-L6-alternating-all0",
+    "constructor": "L-PAIR-PARTITION",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "pp-p9-L6-alternating-identity",
+    "constructor": "L-PAIR-PARTITION",
+    "connected": true,
+    "blocks": 1,
+    "block_sizes": [
+     54
+    ],
+    "n": 54,
+    "k": 36,
+    "w": 6,
+    "gate_passed": true,
+    "board_advancing": true,
+    "dominated_by": [],
+    "d_only_gain": false,
+    "cell": [
+     "weight-6",
+     "unrestricted"
+    ],
+    "dedup_exact": 0,
+    "dedup_wl": 2,
+    "d_witness": 2,
+    "path": "/Users/mathysrennela/GitHub/qldpc-challenge/research/candidates/20261123-170524-Mathyss-MacBook-Air-12541/54-36-2-pp-p9-L6-alternating-ide.json",
+    "tanner_connected": true
+   },
+   {
+    "label": "pp-p9-L6-alternating-alternating",
+    "constructor": "L-PAIR-PARTITION",
+    "connected": false,
+    "blocks": 9,
+    "block_sizes": [
+     6,
+     6,
+     6,
+     6,
+     6,
+     6,
+     6,
+     6,
+     6
+    ],
+    "n": 54,
+    "k": 36,
+    "w": 6
+   },
+   {
+    "label": "pp-p9-L6-alternating-pairwise",
+    "constructor": "L-PAIR-PARTITION",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "pp-p9-L6-alternating-reverse",
+    "constructor": "L-PAIR-PARTITION",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "pp-p9-L6-pairwise-all0",
+    "constructor": "L-PAIR-PARTITION",
+    "connected": true,
+    "blocks": 1,
+    "block_sizes": [
+     54
+    ],
+    "n": 54,
+    "k": 36,
+    "w": 6,
+    "gate_passed": true,
+    "board_advancing": true,
+    "dominated_by": [],
+    "d_only_gain": false,
+    "cell": [
+     "weight-6",
+     "unrestricted"
+    ],
+    "dedup_exact": 0,
+    "dedup_wl": 3,
+    "d_witness": 2,
+    "path": "/Users/mathysrennela/GitHub/qldpc-challenge/research/candidates/20261123-170535-Mathyss-MacBook-Air-12541/54-36-2-pp-p9-L6-pairwise-all0.json",
+    "tanner_connected": true
+   },
+   {
+    "label": "pp-p9-L6-pairwise-identity",
+    "constructor": "L-PAIR-PARTITION",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "pp-p9-L6-pairwise-alternating",
+    "constructor": "L-PAIR-PARTITION",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "pp-p9-L6-pairwise-pairwise",
+    "constructor": "L-PAIR-PARTITION",
+    "connected": false,
+    "blocks": 9,
+    "block_sizes": [
+     6,
+     6,
+     6,
+     6,
+     6,
+     6,
+     6,
+     6,
+     6
+    ],
+    "n": 54,
+    "k": 36,
+    "w": 6
+   },
+   {
+    "label": "pp-p9-L6-pairwise-reverse",
+    "constructor": "L-PAIR-PARTITION",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "pp-p9-L6-reverse-all0",
+    "constructor": "L-PAIR-PARTITION",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "pp-p9-L6-reverse-identity",
+    "constructor": "L-PAIR-PARTITION",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "pp-p9-L6-reverse-alternating",
+    "constructor": "L-PAIR-PARTITION",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "pp-p9-L6-reverse-pairwise",
+    "constructor": "L-PAIR-PARTITION",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "pp-p9-L6-reverse-reverse",
+    "constructor": "L-PAIR-PARTITION",
+    "connected": false,
+    "blocks": 9,
+    "block_sizes": [
+     6,
+     6,
+     6,
+     6,
+     6,
+     6,
+     6,
+     6,
+     6
+    ],
+    "n": 54,
+    "k": 36,
+    "w": 6
+   },
+   {
+    "label": "pp-p11-L4-all0-all0",
+    "constructor": "L-PAIR-PARTITION",
+    "connected": false,
+    "blocks": 11,
+    "block_sizes": [
+     4,
+     4,
+     4,
+     4,
+     4,
+     4,
+     4,
+     4,
+     4,
+     4,
+     4
+    ],
+    "n": 44,
+    "k": 22,
+    "w": 4
+   },
+   {
+    "label": "pp-p11-L4-all0-identity",
+    "constructor": "L-PAIR-PARTITION",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "pp-p11-L4-all0-alternating",
+    "constructor": "L-PAIR-PARTITION",
+    "connected": true,
+    "blocks": 1,
+    "block_sizes": [
+     44
+    ],
+    "n": 44,
+    "k": 22,
+    "w": 4,
+    "gate_passed": true,
+    "board_advancing": true,
+    "dominated_by": [],
+    "d_only_gain": false,
+    "cell": [
+     "weight-4",
+     "unrestricted"
+    ],
+    "dedup_exact": 0,
+    "dedup_wl": 0,
+    "d_witness": 2,
+    "path": "/Users/mathysrennela/GitHub/qldpc-challenge/research/candidates/20261123-170541-Mathyss-MacBook-Air-12541/44-22-2-pp-p11-L4-all0-alternati.json",
+    "tanner_connected": true
+   },
+   {
+    "label": "pp-p11-L4-all0-pairwise",
+    "constructor": "L-PAIR-PARTITION",
+    "connected": true,
+    "blocks": 1,
+    "block_sizes": [
+     44
+    ],
+    "n": 44,
+    "k": 22,
+    "w": 4,
+    "gate_passed": true,
+    "board_advancing": true,
+    "dominated_by": [],
+    "d_only_gain": false,
+    "cell": [
+     "weight-4",
+     "unrestricted"
+    ],
+    "dedup_exact": 0,
+    "dedup_wl": 1,
+    "d_witness": 2,
+    "path": "/Users/mathysrennela/GitHub/qldpc-challenge/research/candidates/20261123-170550-Mathyss-MacBook-Air-12541/44-22-2-pp-p11-L4-all0-pairwise.json",
+    "tanner_connected": true
+   },
+   {
+    "label": "pp-p11-L4-all0-reverse",
+    "constructor": "L-PAIR-PARTITION",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "pp-p11-L4-identity-all0",
+    "constructor": "L-PAIR-PARTITION",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "pp-p11-L4-identity-identity",
+    "constructor": "L-PAIR-PARTITION",
+    "connected": false,
+    "blocks": 11,
+    "block_sizes": [
+     4,
+     4,
+     4,
+     4,
+     4,
+     4,
+     4,
+     4,
+     4,
+     4,
+     4
+    ],
+    "n": 44,
+    "k": 22,
+    "w": 4
+   },
+   {
+    "label": "pp-p11-L4-identity-alternating",
+    "constructor": "L-PAIR-PARTITION",
+    "connected": true,
+    "blocks": 1,
+    "block_sizes": [
+     44
+    ],
+    "n": 44,
+    "k": 22,
+    "w": 4,
+    "gate_passed": true,
+    "board_advancing": true,
+    "dominated_by": [],
+    "d_only_gain": false,
+    "cell": [
+     "weight-4",
+     "unrestricted"
+    ],
+    "dedup_exact": 0,
+    "dedup_wl": 2,
+    "d_witness": 2,
+    "path": "/Users/mathysrennela/GitHub/qldpc-challenge/research/candidates/20261123-170557-Mathyss-MacBook-Air-12541/44-22-2-pp-p11-L4-identity-alter.json",
+    "tanner_connected": true
+   },
+   {
+    "label": "pp-p11-L4-identity-pairwise",
+    "constructor": "L-PAIR-PARTITION",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "pp-p11-L4-identity-reverse",
+    "constructor": "L-PAIR-PARTITION",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "pp-p11-L4-alternating-all0",
+    "constructor": "L-PAIR-PARTITION",
+    "connected": true,
+    "blocks": 1,
+    "block_sizes": [
+     44
+    ],
+    "n": 44,
+    "k": 22,
+    "w": 4,
+    "gate_passed": true,
+    "board_advancing": true,
+    "dominated_by": [],
+    "d_only_gain": false,
+    "cell": [
+     "weight-4",
+     "unrestricted"
+    ],
+    "dedup_exact": 0,
+    "dedup_wl": 3,
+    "d_witness": 2,
+    "path": "/Users/mathysrennela/GitHub/qldpc-challenge/research/candidates/20261123-170603-Mathyss-MacBook-Air-12541/44-22-2-pp-p11-L4-alternating-al.json",
+    "tanner_connected": true
+   },
+   {
+    "label": "pp-p11-L4-alternating-identity",
+    "constructor": "L-PAIR-PARTITION",
+    "connected": true,
+    "blocks": 1,
+    "block_sizes": [
+     44
+    ],
+    "n": 44,
+    "k": 22,
+    "w": 4,
+    "gate_passed": true,
+    "board_advancing": true,
+    "dominated_by": [],
+    "d_only_gain": false,
+    "cell": [
+     "weight-4",
+     "unrestricted"
+    ],
+    "dedup_exact": 0,
+    "dedup_wl": 4,
+    "d_witness": 2,
+    "path": "/Users/mathysrennela/GitHub/qldpc-challenge/research/candidates/20261123-170610-Mathyss-MacBook-Air-12541/44-22-2-pp-p11-L4-alternating-id.json",
+    "tanner_connected": true
+   },
+   {
+    "label": "pp-p11-L4-alternating-alternating",
+    "constructor": "L-PAIR-PARTITION",
+    "connected": false,
+    "blocks": 11,
+    "block_sizes": [
+     4,
+     4,
+     4,
+     4,
+     4,
+     4,
+     4,
+     4,
+     4,
+     4,
+     4
+    ],
+    "n": 44,
+    "k": 22,
+    "w": 4
+   },
+   {
+    "label": "pp-p11-L4-alternating-pairwise",
+    "constructor": "L-PAIR-PARTITION",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "pp-p11-L4-alternating-reverse",
+    "constructor": "L-PAIR-PARTITION",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "pp-p11-L4-pairwise-all0",
+    "constructor": "L-PAIR-PARTITION",
+    "connected": true,
+    "blocks": 1,
+    "block_sizes": [
+     44
+    ],
+    "n": 44,
+    "k": 22,
+    "w": 4,
+    "gate_passed": true,
+    "board_advancing": true,
+    "dominated_by": [],
+    "d_only_gain": false,
+    "cell": [
+     "weight-4",
+     "unrestricted"
+    ],
+    "dedup_exact": 0,
+    "dedup_wl": 5,
+    "d_witness": 2,
+    "path": "/Users/mathysrennela/GitHub/qldpc-challenge/research/candidates/20261123-170616-Mathyss-MacBook-Air-12541/44-22-2-pp-p11-L4-pairwise-all0.json",
+    "tanner_connected": true
+   },
+   {
+    "label": "pp-p11-L4-pairwise-identity",
+    "constructor": "L-PAIR-PARTITION",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "pp-p11-L4-pairwise-alternating",
+    "constructor": "L-PAIR-PARTITION",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "pp-p11-L4-pairwise-pairwise",
+    "constructor": "L-PAIR-PARTITION",
+    "connected": false,
+    "blocks": 11,
+    "block_sizes": [
+     4,
+     4,
+     4,
+     4,
+     4,
+     4,
+     4,
+     4,
+     4,
+     4,
+     4
+    ],
+    "n": 44,
+    "k": 22,
+    "w": 4
+   },
+   {
+    "label": "pp-p11-L4-pairwise-reverse",
+    "constructor": "L-PAIR-PARTITION",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "pp-p11-L4-reverse-all0",
+    "constructor": "L-PAIR-PARTITION",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "pp-p11-L4-reverse-identity",
+    "constructor": "L-PAIR-PARTITION",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "pp-p11-L4-reverse-alternating",
+    "constructor": "L-PAIR-PARTITION",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "pp-p11-L4-reverse-pairwise",
+    "constructor": "L-PAIR-PARTITION",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "pp-p11-L4-reverse-reverse",
+    "constructor": "L-PAIR-PARTITION",
+    "connected": false,
+    "blocks": 11,
+    "block_sizes": [
+     4,
+     4,
+     4,
+     4,
+     4,
+     4,
+     4,
+     4,
+     4,
+     4,
+     4
+    ],
+    "n": 44,
+    "k": 22,
+    "w": 4
+   },
+   {
+    "label": "pp-p11-L6-all0-all0",
+    "constructor": "L-PAIR-PARTITION",
+    "connected": false,
+    "blocks": 11,
+    "block_sizes": [
+     6,
+     6,
+     6,
+     6,
+     6,
+     6,
+     6,
+     6,
+     6,
+     6,
+     6
+    ],
+    "n": 66,
+    "k": 44,
+    "w": 6
+   },
+   {
+    "label": "pp-p11-L6-all0-identity",
+    "constructor": "L-PAIR-PARTITION",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "pp-p11-L6-all0-alternating",
+    "constructor": "L-PAIR-PARTITION",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "pp-p11-L6-all0-pairwise",
+    "constructor": "L-PAIR-PARTITION",
+    "connected": true,
+    "blocks": 1,
+    "block_sizes": [
+     66
+    ],
+    "n": 66,
+    "k": 44,
+    "w": 6,
+    "gate_passed": true,
+    "board_advancing": true,
+    "dominated_by": [],
+    "d_only_gain": false,
+    "cell": [
+     "weight-6",
+     "unrestricted"
+    ],
+    "dedup_exact": 0,
+    "dedup_wl": 0,
+    "d_witness": 2,
+    "path": "/Users/mathysrennela/GitHub/qldpc-challenge/research/candidates/20261123-170636-Mathyss-MacBook-Air-12541/66-44-2-pp-p11-L6-all0-pairwise.json",
+    "tanner_connected": true
+   },
+   {
+    "label": "pp-p11-L6-all0-reverse",
+    "constructor": "L-PAIR-PARTITION",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "pp-p11-L6-identity-all0",
+    "constructor": "L-PAIR-PARTITION",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "pp-p11-L6-identity-identity",
+    "constructor": "L-PAIR-PARTITION",
+    "connected": false,
+    "blocks": 11,
+    "block_sizes": [
+     6,
+     6,
+     6,
+     6,
+     6,
+     6,
+     6,
+     6,
+     6,
+     6,
+     6
+    ],
+    "n": 66,
+    "k": 44,
+    "w": 6
+   },
+   {
+    "label": "pp-p11-L6-identity-alternating",
+    "constructor": "L-PAIR-PARTITION",
+    "connected": true,
+    "blocks": 1,
+    "block_sizes": [
+     66
+    ],
+    "n": 66,
+    "k": 44,
+    "w": 6,
+    "gate_passed": true,
+    "board_advancing": true,
+    "dominated_by": [],
+    "d_only_gain": false,
+    "cell": [
+     "weight-6",
+     "unrestricted"
+    ],
+    "dedup_exact": 0,
+    "dedup_wl": 1,
+    "d_witness": 2,
+    "path": "/Users/mathysrennela/GitHub/qldpc-challenge/research/candidates/20261123-170659-Mathyss-MacBook-Air-12541/66-44-2-pp-p11-L6-identity-alter.json",
+    "tanner_connected": true
+   },
+   {
+    "label": "pp-p11-L6-identity-pairwise",
+    "constructor": "L-PAIR-PARTITION",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "pp-p11-L6-identity-reverse",
+    "constructor": "L-PAIR-PARTITION",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "pp-p11-L6-alternating-all0",
+    "constructor": "L-PAIR-PARTITION",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "pp-p11-L6-alternating-identity",
+    "constructor": "L-PAIR-PARTITION",
+    "connected": true,
+    "blocks": 1,
+    "block_sizes": [
+     66
+    ],
+    "n": 66,
+    "k": 44,
+    "w": 6,
+    "gate_passed": true,
+    "board_advancing": true,
+    "dominated_by": [],
+    "d_only_gain": false,
+    "cell": [
+     "weight-6",
+     "unrestricted"
+    ],
+    "dedup_exact": 0,
+    "dedup_wl": 2,
+    "d_witness": 2,
+    "path": "/Users/mathysrennela/GitHub/qldpc-challenge/research/candidates/20261123-170723-Mathyss-MacBook-Air-12541/66-44-2-pp-p11-L6-alternating-id.json",
+    "tanner_connected": true
+   },
+   {
+    "label": "pp-p11-L6-alternating-alternating",
+    "constructor": "L-PAIR-PARTITION",
+    "connected": false,
+    "blocks": 11,
+    "block_sizes": [
+     6,
+     6,
+     6,
+     6,
+     6,
+     6,
+     6,
+     6,
+     6,
+     6,
+     6
+    ],
+    "n": 66,
+    "k": 44,
+    "w": 6
+   },
+   {
+    "label": "pp-p11-L6-alternating-pairwise",
+    "constructor": "L-PAIR-PARTITION",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "pp-p11-L6-alternating-reverse",
+    "constructor": "L-PAIR-PARTITION",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "pp-p11-L6-pairwise-all0",
+    "constructor": "L-PAIR-PARTITION",
+    "connected": true,
+    "blocks": 1,
+    "block_sizes": [
+     66
+    ],
+    "n": 66,
+    "k": 44,
+    "w": 6,
+    "gate_passed": true,
+    "board_advancing": true,
+    "dominated_by": [],
+    "d_only_gain": false,
+    "cell": [
+     "weight-6",
+     "unrestricted"
+    ],
+    "dedup_exact": 0,
+    "dedup_wl": 3,
+    "d_witness": 2,
+    "path": "/Users/mathysrennela/GitHub/qldpc-challenge/research/candidates/20261123-170746-Mathyss-MacBook-Air-12541/66-44-2-pp-p11-L6-pairwise-all0.json",
+    "tanner_connected": true
+   }
+  ]
+ },
+ "ppscale": {
+  "derived": 20,
+  "connected": 20,
+  "staged": 20,
+  "gate_passed": 6,
+  "board_advancing": 6,
+  "records": [
+   {
+    "label": "ppscale-q(0, 0, 0, 0)(0, 0, 0, 0)-all0-identity-P7",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(0, 0, 0, 0)(0, 0, 0, 0)-all0-identity-P11",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(0, 0, 0, 0)(0, 0, 0, 0)-all0-identity-P13",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(0, 0, 0, 0)(0, 0, 0, 0)-all0-alternating-P7",
+    "constructor": "PP-SCALE",
+    "connected": true,
+    "blocks": 1,
+    "block_sizes": [
+     28
+    ],
+    "n": 28,
+    "k": 14,
+    "w": 4,
+    "dedup_exact": 2,
+    "dedup_wl": 4,
+    "gate_skipped": "exact duplicate",
+    "tanner_connected": true
+   },
+   {
+    "label": "ppscale-q(0, 0, 0, 0)(0, 0, 0, 0)-all0-alternating-P11",
+    "constructor": "PP-SCALE",
+    "connected": true,
+    "blocks": 1,
+    "block_sizes": [
+     44
+    ],
+    "n": 44,
+    "k": 22,
+    "w": 4,
+    "dedup_exact": 1,
+    "dedup_wl": 5,
+    "gate_skipped": "exact duplicate",
+    "tanner_connected": true
+   },
+   {
+    "label": "ppscale-q(0, 0, 0, 0)(0, 0, 0, 0)-all0-alternating-P13",
+    "constructor": "PP-SCALE",
+    "connected": true,
+    "blocks": 1,
+    "block_sizes": [
+     52
+    ],
+    "n": 52,
+    "k": 26,
+    "w": 4,
+    "gate_passed": true,
+    "board_advancing": true,
+    "dominated_by": [],
+    "d_only_gain": false,
+    "cell": [
+     "weight-4",
+     "unrestricted"
+    ],
+    "dedup_exact": 0,
+    "dedup_wl": 0,
+    "d_witness": 2,
+    "path": "/Users/mathysrennela/GitHub/qldpc-challenge/research/candidates/20261123-170804-Mathyss-MacBook-Air-12541/52-26-2-ppscale-q(0, 0, 0, 0)(0,.json",
+    "tanner_connected": true
+   },
+   {
+    "label": "ppscale-q(0, 0, 0, 0)(0, 0, 0, 0)-all0-pairwise-P7",
+    "constructor": "PP-SCALE",
+    "connected": true,
+    "blocks": 1,
+    "block_sizes": [
+     28
+    ],
+    "n": 28,
+    "k": 14,
+    "w": 4,
+    "dedup_exact": 2,
+    "dedup_wl": 4,
+    "gate_skipped": "exact duplicate",
+    "tanner_connected": true
+   },
+   {
+    "label": "ppscale-q(0, 0, 0, 0)(0, 0, 0, 0)-all0-pairwise-P11",
+    "constructor": "PP-SCALE",
+    "connected": true,
+    "blocks": 1,
+    "block_sizes": [
+     44
+    ],
+    "n": 44,
+    "k": 22,
+    "w": 4,
+    "dedup_exact": 1,
+    "dedup_wl": 5,
+    "gate_skipped": "exact duplicate",
+    "tanner_connected": true
+   },
+   {
+    "label": "ppscale-q(0, 0, 0, 0)(0, 0, 0, 0)-all0-pairwise-P13",
+    "constructor": "PP-SCALE",
+    "connected": true,
+    "blocks": 1,
+    "block_sizes": [
+     52
+    ],
+    "n": 52,
+    "k": 26,
+    "w": 4,
+    "gate_passed": true,
+    "board_advancing": true,
+    "dominated_by": [],
+    "d_only_gain": false,
+    "cell": [
+     "weight-4",
+     "unrestricted"
+    ],
+    "dedup_exact": 0,
+    "dedup_wl": 1,
+    "d_witness": 2,
+    "path": "/Users/mathysrennela/GitHub/qldpc-challenge/research/candidates/20261123-170818-Mathyss-MacBook-Air-12541/52-26-2-ppscale-q(0, 0, 0, 0)(0,.json",
+    "tanner_connected": true
+   },
+   {
+    "label": "ppscale-q(0, 0, 0, 0)(0, 0, 0, 0)-all0-reverse-P7",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(0, 0, 0, 0)(0, 0, 0, 0)-all0-reverse-P11",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(0, 0, 0, 0)(0, 0, 0, 0)-all0-reverse-P13",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(0, 0, 0, 0)(0, 0, 0, 0)-identity-all0-P7",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(0, 0, 0, 0)(0, 0, 0, 0)-identity-all0-P11",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(0, 0, 0, 0)(0, 0, 0, 0)-identity-all0-P13",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(0, 0, 0, 0)(0, 0, 0, 0)-identity-alternating-P7",
+    "constructor": "PP-SCALE",
+    "connected": true,
+    "blocks": 1,
+    "block_sizes": [
+     28
+    ],
+    "n": 28,
+    "k": 14,
+    "w": 4,
+    "dedup_exact": 2,
+    "dedup_wl": 4,
+    "gate_skipped": "exact duplicate",
+    "tanner_connected": true
+   },
+   {
+    "label": "ppscale-q(0, 0, 0, 0)(0, 0, 0, 0)-identity-alternating-P11",
+    "constructor": "PP-SCALE",
+    "connected": true,
+    "blocks": 1,
+    "block_sizes": [
+     44
+    ],
+    "n": 44,
+    "k": 22,
+    "w": 4,
+    "dedup_exact": 1,
+    "dedup_wl": 5,
+    "gate_skipped": "exact duplicate",
+    "tanner_connected": true
+   },
+   {
+    "label": "ppscale-q(0, 0, 0, 0)(0, 0, 0, 0)-identity-alternating-P13",
+    "constructor": "PP-SCALE",
+    "connected": true,
+    "blocks": 1,
+    "block_sizes": [
+     52
+    ],
+    "n": 52,
+    "k": 26,
+    "w": 4,
+    "gate_passed": true,
+    "board_advancing": true,
+    "dominated_by": [],
+    "d_only_gain": false,
+    "cell": [
+     "weight-4",
+     "unrestricted"
+    ],
+    "dedup_exact": 0,
+    "dedup_wl": 2,
+    "d_witness": 2,
+    "path": "/Users/mathysrennela/GitHub/qldpc-challenge/research/candidates/20261123-170833-Mathyss-MacBook-Air-12541/52-26-2-ppscale-q(0, 0, 0, 0)(0,.json",
+    "tanner_connected": true
+   },
+   {
+    "label": "ppscale-q(0, 0, 0, 0)(0, 0, 0, 0)-identity-pairwise-P7",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(0, 0, 0, 0)(0, 0, 0, 0)-identity-pairwise-P11",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(0, 0, 0, 0)(0, 0, 0, 0)-identity-pairwise-P13",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(0, 0, 0, 0)(0, 0, 0, 0)-identity-reverse-P7",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(0, 0, 0, 0)(0, 0, 0, 0)-identity-reverse-P11",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(0, 0, 0, 0)(0, 0, 0, 0)-identity-reverse-P13",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(0, 0, 0, 0)(0, 0, 0, 0)-alternating-all0-P7",
+    "constructor": "PP-SCALE",
+    "connected": true,
+    "blocks": 1,
+    "block_sizes": [
+     28
+    ],
+    "n": 28,
+    "k": 14,
+    "w": 4,
+    "dedup_exact": 2,
+    "dedup_wl": 4,
+    "gate_skipped": "exact duplicate",
+    "tanner_connected": true
+   },
+   {
+    "label": "ppscale-q(0, 0, 0, 0)(0, 0, 0, 0)-alternating-all0-P11",
+    "constructor": "PP-SCALE",
+    "connected": true,
+    "blocks": 1,
+    "block_sizes": [
+     44
+    ],
+    "n": 44,
+    "k": 22,
+    "w": 4,
+    "dedup_exact": 1,
+    "dedup_wl": 5,
+    "gate_skipped": "exact duplicate",
+    "tanner_connected": true
+   },
+   {
+    "label": "ppscale-q(0, 0, 0, 0)(0, 0, 0, 0)-alternating-all0-P13",
+    "constructor": "PP-SCALE",
+    "connected": true,
+    "blocks": 1,
+    "block_sizes": [
+     52
+    ],
+    "n": 52,
+    "k": 26,
+    "w": 4,
+    "gate_passed": true,
+    "board_advancing": true,
+    "dominated_by": [],
+    "d_only_gain": false,
+    "cell": [
+     "weight-4",
+     "unrestricted"
+    ],
+    "dedup_exact": 0,
+    "dedup_wl": 3,
+    "d_witness": 2,
+    "path": "/Users/mathysrennela/GitHub/qldpc-challenge/research/candidates/20261123-170849-Mathyss-MacBook-Air-12541/52-26-2-ppscale-q(0, 0, 0, 0)(0,.json",
+    "tanner_connected": true
+   },
+   {
+    "label": "ppscale-q(0, 0, 0, 0)(0, 0, 0, 0)-alternating-identity-P7",
+    "constructor": "PP-SCALE",
+    "connected": true,
+    "blocks": 1,
+    "block_sizes": [
+     28
+    ],
+    "n": 28,
+    "k": 14,
+    "w": 4,
+    "dedup_exact": 2,
+    "dedup_wl": 4,
+    "gate_skipped": "exact duplicate",
+    "tanner_connected": true
+   },
+   {
+    "label": "ppscale-q(0, 0, 0, 0)(0, 0, 0, 0)-alternating-identity-P11",
+    "constructor": "PP-SCALE",
+    "connected": true,
+    "blocks": 1,
+    "block_sizes": [
+     44
+    ],
+    "n": 44,
+    "k": 22,
+    "w": 4,
+    "dedup_exact": 1,
+    "dedup_wl": 5,
+    "gate_skipped": "exact duplicate",
+    "tanner_connected": true
+   },
+   {
+    "label": "ppscale-q(0, 0, 0, 0)(0, 0, 0, 0)-alternating-identity-P13",
+    "constructor": "PP-SCALE",
+    "connected": true,
+    "blocks": 1,
+    "block_sizes": [
+     52
+    ],
+    "n": 52,
+    "k": 26,
+    "w": 4,
+    "gate_passed": true,
+    "board_advancing": true,
+    "dominated_by": [],
+    "d_only_gain": false,
+    "cell": [
+     "weight-4",
+     "unrestricted"
+    ],
+    "dedup_exact": 0,
+    "dedup_wl": 4,
+    "d_witness": 2,
+    "path": "/Users/mathysrennela/GitHub/qldpc-challenge/research/candidates/20261123-170905-Mathyss-MacBook-Air-12541/52-26-2-ppscale-q(0, 0, 0, 0)(0,.json",
+    "tanner_connected": true
+   },
+   {
+    "label": "ppscale-q(0, 0, 0, 0)(0, 0, 0, 0)-alternating-pairwise-P7",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(0, 0, 0, 0)(0, 0, 0, 0)-alternating-pairwise-P11",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(0, 0, 0, 0)(0, 0, 0, 0)-alternating-pairwise-P13",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(0, 0, 0, 0)(0, 0, 0, 0)-alternating-reverse-P7",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(0, 0, 0, 0)(0, 0, 0, 0)-alternating-reverse-P11",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(0, 0, 0, 0)(0, 0, 0, 0)-alternating-reverse-P13",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(0, 0, 0, 0)(0, 0, 0, 0)-pairwise-all0-P7",
+    "constructor": "PP-SCALE",
+    "connected": true,
+    "blocks": 1,
+    "block_sizes": [
+     28
+    ],
+    "n": 28,
+    "k": 14,
+    "w": 4,
+    "dedup_exact": 2,
+    "dedup_wl": 4,
+    "gate_skipped": "exact duplicate",
+    "tanner_connected": true
+   },
+   {
+    "label": "ppscale-q(0, 0, 0, 0)(0, 0, 0, 0)-pairwise-all0-P11",
+    "constructor": "PP-SCALE",
+    "connected": true,
+    "blocks": 1,
+    "block_sizes": [
+     44
+    ],
+    "n": 44,
+    "k": 22,
+    "w": 4,
+    "dedup_exact": 1,
+    "dedup_wl": 5,
+    "gate_skipped": "exact duplicate",
+    "tanner_connected": true
+   },
+   {
+    "label": "ppscale-q(0, 0, 0, 0)(0, 0, 0, 0)-pairwise-all0-P13",
+    "constructor": "PP-SCALE",
+    "connected": true,
+    "blocks": 1,
+    "block_sizes": [
+     52
+    ],
+    "n": 52,
+    "k": 26,
+    "w": 4,
+    "gate_passed": true,
+    "board_advancing": true,
+    "dominated_by": [],
+    "d_only_gain": false,
+    "cell": [
+     "weight-4",
+     "unrestricted"
+    ],
+    "dedup_exact": 0,
+    "dedup_wl": 5,
+    "d_witness": 2,
+    "path": "/Users/mathysrennela/GitHub/qldpc-challenge/research/candidates/20261123-170920-Mathyss-MacBook-Air-12541/52-26-2-ppscale-q(0, 0, 0, 0)(0,.json",
+    "tanner_connected": true
+   },
+   {
+    "label": "ppscale-q(0, 0, 0, 0)(0, 0, 0, 0)-pairwise-identity-P7",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(0, 0, 0, 0)(0, 0, 0, 0)-pairwise-identity-P11",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(0, 0, 0, 0)(0, 0, 0, 0)-pairwise-identity-P13",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(0, 0, 0, 0)(0, 0, 0, 0)-pairwise-alternating-P7",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(0, 0, 0, 0)(0, 0, 0, 0)-pairwise-alternating-P11",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(0, 0, 0, 0)(0, 0, 0, 0)-pairwise-alternating-P13",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(0, 0, 0, 0)(0, 0, 0, 0)-pairwise-reverse-P7",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: PP-SCALE: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(0, 0, 0, 0)(0, 0, 0, 0)-pairwise-reverse-P11",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: PP-SCALE: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(0, 0, 0, 0)(0, 0, 0, 0)-pairwise-reverse-P13",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: PP-SCALE: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(0, 0, 0, 0)(0, 0, 0, 0)-reverse-all0-P7",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(0, 0, 0, 0)(0, 0, 0, 0)-reverse-all0-P11",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(0, 0, 0, 0)(0, 0, 0, 0)-reverse-all0-P13",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(0, 0, 0, 0)(0, 0, 0, 0)-reverse-identity-P7",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(0, 0, 0, 0)(0, 0, 0, 0)-reverse-identity-P11",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(0, 0, 0, 0)(0, 0, 0, 0)-reverse-identity-P13",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(0, 0, 0, 0)(0, 0, 0, 0)-reverse-alternating-P7",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(0, 0, 0, 0)(0, 0, 0, 0)-reverse-alternating-P11",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(0, 0, 0, 0)(0, 0, 0, 0)-reverse-alternating-P13",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(0, 0, 0, 0)(0, 0, 0, 0)-reverse-pairwise-P7",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: PP-SCALE: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(0, 0, 0, 0)(0, 0, 0, 0)-reverse-pairwise-P11",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: PP-SCALE: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(0, 0, 0, 0)(0, 0, 0, 0)-reverse-pairwise-P13",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: PP-SCALE: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(0, 0, 0, 0)(1, 1, 1, 1)-all0-identity-P7",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(0, 0, 0, 0)(1, 1, 1, 1)-all0-identity-P11",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(0, 0, 0, 0)(1, 1, 1, 1)-all0-identity-P13",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(0, 0, 0, 0)(1, 1, 1, 1)-all0-alternating-P7",
+    "constructor": "PP-SCALE",
+    "connected": true,
+    "blocks": 1,
+    "block_sizes": [
+     28
+    ],
+    "n": 28,
+    "k": 14,
+    "w": 4,
+    "dedup_exact": 2,
+    "dedup_wl": 4,
+    "gate_skipped": "exact duplicate",
+    "tanner_connected": true
+   },
+   {
+    "label": "ppscale-q(0, 0, 0, 0)(1, 1, 1, 1)-all0-alternating-P11",
+    "constructor": "PP-SCALE",
+    "connected": true,
+    "blocks": 1,
+    "block_sizes": [
+     44
+    ],
+    "n": 44,
+    "k": 22,
+    "w": 4,
+    "dedup_exact": 1,
+    "dedup_wl": 5,
+    "gate_skipped": "exact duplicate",
+    "tanner_connected": true
+   }
+  ]
+ },
+ "greedy": {
+  "records": [
+   {
+    "parent": "10-6-2-b",
+    "parent_n": 10,
+    "parent_k": 6,
+    "parent_d": 2,
+    "parent_w": 10,
+    "chain": [
+     {
+      "step": 0,
+      "improving": 15,
+      "search": {
+       "evaluated": 24,
+       "budget": 64,
+       "budget_used": 24,
+       "budget_declined": 40,
+       "exhausted": false,
+       "truncated": false,
+       "stop_reason": "max-depth-reached",
+       "applicability": {
+        "C-DELETE-CHECK": {
+         "enabled": true,
+         "enumerated": 4,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 0,
+         "survived": 4,
+         "improving": 1
+        },
+        "E-PEEL": {
+         "enabled": true,
+         "enumerated": 14,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 0,
+         "survived": 14,
+         "improving": 14
+        },
+        "E-PUNCTURE": {
+         "enabled": true,
+         "enumerated": 10,
+         "apply_fail": 0,
+         "bare_qubit": 10,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 0,
+         "survived": 0,
+         "improving": 0
+        },
+        "E-EXTEND": {
+         "enabled": true,
+         "enumerated": 21,
+         "apply_fail": 0,
+         "bare_qubit": 1,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 20,
+         "dominated": 0,
+         "over_budget": 0,
+         "survived": 0,
+         "improving": 0
+        },
+        "E-GRAFT": {
+         "enabled": true,
+         "enumerated": 20,
+         "apply_fail": 20,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 0,
+         "survived": 0,
+         "improving": 0
+        },
+        "E-LOCAL-HADAMARD": {
+         "enabled": false,
+         "enumerated": 0,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 0,
+         "survived": 0,
+         "improving": 0
+        },
+        "P-REBASE": {
+         "enabled": true,
+         "enumerated": 6,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 0,
+         "survived": 6,
+         "improving": 0
+        }
+       }
+      },
+      "operation": "E-PEEL",
+      "n": 9,
+      "k": 6,
+      "w_before": 10,
+      "w_after": 5,
+      "d_upper": 2,
+      "improving_pool": 15,
+      "connected": true,
+      "label": "greedy-10-6-2-b-s0",
+      "constructor": "planner.bounded_sector_search",
+      "params": {
+       "parent": "10-6-2-b",
+       "step": 0,
+       "objective": "weight",
+       "rebase": true,
+       "budget": 64
+      },
+      "w": 5,
+      "tanner_connected": true,
+      "block_structure": {
+       "tanner_components": 1,
+       "blocks": 1,
+       "block_sizes": [
+        9
+       ],
+       "connected": true
+      },
+      "dedup_exact": 0,
+      "dedup_wl": 0,
+      "d_witness": 1,
+      "path": "/Users/mathysrennela/GitHub/qldpc-challenge/research/candidates/20261123-170931-Mathyss-MacBook-Air-12541/9-6-1-greedy-10-6-2-b-s0.json",
+      "gate_passed": true,
+      "board_advancing": false,
+      "dominated_by": [
+       "[[8,6,1]] w=5 8-6-1-3f743147ad0b56a8.json",
+       "[[9,6,1]] w=4 9-6-1-47c2912b9067610a.json",
+       "[[9,6,1]] w=4 9-6-1-c.json"
+      ],
+      "d_only_gain": false,
+      "cell": [
+       "weight-6",
+       "unrestricted"
+      ],
+      "gate": {
+       "passed": true,
+       "candidate": {
+        "n": 9,
+        "k": 6,
+        "d": 1,
+        "family": "code-calculus",
+        "weight_class": "weight-6",
+        "locality_class": "unrestricted",
+        "sector_distances": {
+         "X": {
+          "upper": 1,
+          "lower": null,
+          "exact": false,
+          "witness_weight": 1,
+          "refuted_to": null
+         },
+         "Z": {
+          "upper": 2,
+          "lower": null,
+          "exact": false,
+          "witness_weight": 2,
+          "refuted_to": null
+         },
+         "d": {
+          "upper": 1,
+          "lower": null,
+          "exact": false
+         }
+        },
+        "fingerprint": "1c2ac0a7348437d1",
+        "signature": "64cfd319078c2641"
+       },
+       "gates": {
+        "verify": {
+         "ok": true,
+         "failed_checks": [],
+         "weight_class": "weight-6",
+         "locality_class": "unrestricted"
+        },
+        "refute": {
+         "refuted": false,
+         "seed": 1288267273,
+         "detail": "no lighter logical in 2860 RIS trials (seed 1288267273)"
+        },
+        "dedup": {
+         "exact_duplicate_of": null,
+         "wl_equivalent_of": null
+        },
+        "novelty": {
+         "cell": [
+          "weight-6",
+          "unrestricted"
+         ],
+         "board": "CSS",
+         "board_advancing": false,
+         "dominated_by": [
+          "[[8,6,1]] w=5 8-6-1-3f743147ad0b56a8.json",
+          "[[9,6,1]] w=4 9-6-1-47c2912b9067610a.json",
+          "[[9,6,1]] w=4 9-6-1-c.json"
+         ],
+         "advances_by": [
+          "n",
+          "w"
+         ],
+         "d_only_gain": false,
+         "d_only_peers": [],
+         "literature_novelty": "unverified"
+        }
+       },
+       "labels": [
+        "not board-advancing: dominated by [[8,6,1]] w=5 8-6-1-3f743147ad0b56a8.json and 2 more; recorded as a non-frontier result",
+        "literature novelty UNVERIFIED"
+       ],
+       "validator": {
+        "source_sha256": "9728b82d233e3d8a9c30808b987d8a6c8402c1060e11cba32bebbad8b2ff7bf5",
+        "seed": 1288267273
+       }
+      }
+     },
+     {
+      "step": 1,
+      "improving": 0,
+      "search": {
+       "evaluated": 16,
+       "budget": 64,
+       "budget_used": 16,
+       "budget_declined": 48,
+       "exhausted": false,
+       "truncated": false,
+       "stop_reason": "frontier-exhausted",
+       "applicability": {
+        "C-DELETE-CHECK": {
+         "enabled": true,
+         "enumerated": 3,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 2,
+         "dominated": 0,
+         "over_budget": 0,
+         "survived": 1,
+         "improving": 0
+        },
+        "E-PEEL": {
+         "enabled": true,
+         "enumerated": 4,
+         "apply_fail": 0,
+         "bare_qubit": 4,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 0,
+         "survived": 0,
+         "improving": 0
+        },
+        "E-PUNCTURE": {
+         "enabled": true,
+         "enumerated": 9,
+         "apply_fail": 0,
+         "bare_qubit": 9,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 0,
+         "survived": 0,
+         "improving": 0
+        },
+        "E-EXTEND": {
+         "enabled": true,
+         "enumerated": 19,
+         "apply_fail": 0,
+         "bare_qubit": 1,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 9,
+         "dominated": 0,
+         "over_budget": 0,
+         "survived": 9,
+         "improving": 0
+        },
+        "E-GRAFT": {
+         "enabled": true,
+         "enumerated": 9,
+         "apply_fail": 9,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 0,
+         "survived": 0,
+         "improving": 0
+        },
+        "E-LOCAL-HADAMARD": {
+         "enabled": false,
+         "enumerated": 0,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 0,
+         "survived": 0,
+         "improving": 0
+        },
+        "P-REBASE": {
+         "enabled": true,
+         "enumerated": 6,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 0,
+         "survived": 6,
+         "improving": 0
+        }
+       }
+      }
+     }
+    ]
+   },
+   {
+    "parent": "16-6-3",
+    "parent_n": 16,
+    "parent_k": 6,
+    "parent_d": 3,
+    "parent_w": 6,
+    "chain": [
+     {
+      "step": 0,
+      "improving": 0,
+      "search": {
+       "evaluated": 64,
+       "budget": 64,
+       "budget_used": 64,
+       "budget_declined": 0,
+       "exhausted": true,
+       "truncated": true,
+       "stop_reason": "budget-exhausted",
+       "applicability": {
+        "C-DELETE-CHECK": {
+         "enabled": true,
+         "enumerated": 10,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 0,
+         "survived": 10,
+         "improving": 0
+        },
+        "E-PEEL": {
+         "enabled": true,
+         "enumerated": 10,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 0,
+         "survived": 10,
+         "improving": 0
+        },
+        "E-PUNCTURE": {
+         "enabled": true,
+         "enumerated": 16,
+         "apply_fail": 0,
+         "bare_qubit": 4,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 0,
+         "survived": 12,
+         "improving": 0
+        },
+        "E-EXTEND": {
+         "enabled": true,
+         "enumerated": 33,
+         "apply_fail": 0,
+         "bare_qubit": 1,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 32,
+         "dominated": 0,
+         "over_budget": 0,
+         "survived": 0,
+         "improving": 0
+        },
+        "E-GRAFT": {
+         "enabled": true,
+         "enumerated": 32,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 0,
+         "survived": 32,
+         "improving": 0
+        },
+        "E-LOCAL-HADAMARD": {
+         "enabled": false,
+         "enumerated": 0,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 0,
+         "survived": 0,
+         "improving": 0
+        },
+        "P-REBASE": {
+         "enabled": true,
+         "enumerated": 40,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 40,
+         "survived": 0,
+         "improving": 0
+        }
+       }
+      }
+     }
+    ]
+   },
+   {
+    "parent": "24-13-2",
+    "parent_n": 24,
+    "parent_k": 13,
+    "parent_d": 2,
+    "parent_w": 8,
+    "chain": [
+     {
+      "step": 0,
+      "improving": 0,
+      "search": {
+       "evaluated": 64,
+       "budget": 64,
+       "budget_used": 64,
+       "budget_declined": 0,
+       "exhausted": true,
+       "truncated": true,
+       "stop_reason": "budget-exhausted",
+       "applicability": {
+        "C-DELETE-CHECK": {
+         "enabled": true,
+         "enumerated": 11,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 0,
+         "survived": 11,
+         "improving": 0
+        },
+        "E-PEEL": {
+         "enabled": true,
+         "enumerated": 16,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 0,
+         "survived": 16,
+         "improving": 0
+        },
+        "E-PUNCTURE": {
+         "enabled": true,
+         "enumerated": 24,
+         "apply_fail": 0,
+         "bare_qubit": 16,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 0,
+         "survived": 8,
+         "improving": 0
+        },
+        "E-EXTEND": {
+         "enabled": true,
+         "enumerated": 49,
+         "apply_fail": 0,
+         "bare_qubit": 1,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 48,
+         "dominated": 0,
+         "over_budget": 0,
+         "survived": 0,
+         "improving": 0
+        },
+        "E-GRAFT": {
+         "enabled": true,
+         "enumerated": 48,
+         "apply_fail": 36,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 0,
+         "survived": 12,
+         "improving": 0
+        },
+        "E-LOCAL-HADAMARD": {
+         "enabled": false,
+         "enumerated": 0,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 0,
+         "survived": 0,
+         "improving": 0
+        },
+        "P-REBASE": {
+         "enabled": true,
+         "enumerated": 50,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 33,
+         "survived": 17,
+         "improving": 0
+        }
+       }
+      }
+     }
+    ]
+   },
+   {
+    "parent": "28-8-4",
+    "parent_n": 28,
+    "parent_k": 8,
+    "parent_d": 4,
+    "parent_w": 8,
+    "chain": [
+     {
+      "step": 0,
+      "improving": 0,
+      "search": {
+       "evaluated": 64,
+       "budget": 64,
+       "budget_used": 64,
+       "budget_declined": 0,
+       "exhausted": true,
+       "truncated": true,
+       "stop_reason": "budget-exhausted",
+       "applicability": {
+        "C-DELETE-CHECK": {
+         "enabled": true,
+         "enumerated": 20,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 0,
+         "survived": 20,
+         "improving": 0
+        },
+        "E-PEEL": {
+         "enabled": true,
+         "enumerated": 4,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 0,
+         "survived": 4,
+         "improving": 0
+        },
+        "E-PUNCTURE": {
+         "enabled": true,
+         "enumerated": 28,
+         "apply_fail": 0,
+         "bare_qubit": 4,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 0,
+         "survived": 24,
+         "improving": 0
+        },
+        "E-EXTEND": {
+         "enabled": true,
+         "enumerated": 57,
+         "apply_fail": 0,
+         "bare_qubit": 1,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 56,
+         "dominated": 0,
+         "over_budget": 0,
+         "survived": 0,
+         "improving": 0
+        },
+        "E-GRAFT": {
+         "enabled": true,
+         "enumerated": 56,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 40,
+         "survived": 16,
+         "improving": 0
+        },
+        "E-LOCAL-HADAMARD": {
+         "enabled": false,
+         "enumerated": 0,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 0,
+         "survived": 0,
+         "improving": 0
+        },
+        "P-REBASE": {
+         "enabled": true,
+         "enumerated": 180,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 180,
+         "survived": 0,
+         "improving": 0
+        }
+       }
+      }
+     }
+    ]
+   },
+   {
+    "parent": "32-16-2",
+    "parent_n": 32,
+    "parent_k": 16,
+    "parent_d": 2,
+    "parent_w": 6,
+    "chain": [
+     {
+      "step": 0,
+      "improving": 0,
+      "search": {
+       "evaluated": 64,
+       "budget": 64,
+       "budget_used": 64,
+       "budget_declined": 0,
+       "exhausted": true,
+       "truncated": true,
+       "stop_reason": "budget-exhausted",
+       "applicability": {
+        "C-DELETE-CHECK": {
+         "enabled": true,
+         "enumerated": 16,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 0,
+         "survived": 16,
+         "improving": 0
+        },
+        "E-PEEL": {
+         "enabled": true,
+         "enumerated": 32,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 0,
+         "survived": 32,
+         "improving": 0
+        },
+        "E-PUNCTURE": {
+         "enabled": true,
+         "enumerated": 32,
+         "apply_fail": 0,
+         "bare_qubit": 32,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 0,
+         "survived": 0,
+         "improving": 0
+        },
+        "E-EXTEND": {
+         "enabled": true,
+         "enumerated": 65,
+         "apply_fail": 0,
+         "bare_qubit": 1,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 64,
+         "dominated": 0,
+         "over_budget": 0,
+         "survived": 0,
+         "improving": 0
+        },
+        "E-GRAFT": {
+         "enabled": true,
+         "enumerated": 64,
+         "apply_fail": 64,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 0,
+         "survived": 0,
+         "improving": 0
+        },
+        "E-LOCAL-HADAMARD": {
+         "enabled": false,
+         "enumerated": 0,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 0,
+         "survived": 0,
+         "improving": 0
+        },
+        "P-REBASE": {
+         "enabled": true,
+         "enumerated": 112,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 96,
+         "survived": 16,
+         "improving": 0
+        }
+       }
+      }
+     }
+    ]
+   },
+   {
+    "parent": "36-18-2",
+    "parent_n": 36,
+    "parent_k": 18,
+    "parent_d": 2,
+    "parent_w": 6,
+    "chain": [
+     {
+      "step": 0,
+      "improving": 0,
+      "search": {
+       "evaluated": 64,
+       "budget": 64,
+       "budget_used": 64,
+       "budget_declined": 0,
+       "exhausted": true,
+       "truncated": true,
+       "stop_reason": "budget-exhausted",
+       "applicability": {
+        "C-DELETE-CHECK": {
+         "enabled": true,
+         "enumerated": 18,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 0,
+         "survived": 18,
+         "improving": 0
+        },
+        "E-PEEL": {
+         "enabled": true,
+         "enumerated": 36,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 0,
+         "survived": 36,
+         "improving": 0
+        },
+        "E-PUNCTURE": {
+         "enabled": true,
+         "enumerated": 36,
+         "apply_fail": 0,
+         "bare_qubit": 36,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 0,
+         "survived": 0,
+         "improving": 0
+        },
+        "E-EXTEND": {
+         "enabled": true,
+         "enumerated": 73,
+         "apply_fail": 0,
+         "bare_qubit": 1,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 72,
+         "dominated": 0,
+         "over_budget": 0,
+         "survived": 0,
+         "improving": 0
+        },
+        "E-GRAFT": {
+         "enabled": true,
+         "enumerated": 72,
+         "apply_fail": 72,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 0,
+         "survived": 0,
+         "improving": 0
+        },
+        "E-LOCAL-HADAMARD": {
+         "enabled": false,
+         "enumerated": 0,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 0,
+         "survived": 0,
+         "improving": 0
+        },
+        "P-REBASE": {
+         "enabled": true,
+         "enumerated": 144,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 134,
+         "survived": 10,
+         "improving": 0
+        }
+       }
+      }
+     }
+    ]
+   },
+   {
+    "parent": "39-24-3",
+    "parent_n": 39,
+    "parent_k": 24,
+    "parent_d": 3,
+    "parent_w": 16,
+    "chain": [
+     {
+      "step": 0,
+      "improving": 0,
+      "search": {
+       "evaluated": 64,
+       "budget": 64,
+       "budget_used": 64,
+       "budget_declined": 0,
+       "exhausted": true,
+       "truncated": true,
+       "stop_reason": "budget-exhausted",
+       "applicability": {
+        "C-DELETE-CHECK": {
+         "enabled": true,
+         "enumerated": 15,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 0,
+         "survived": 15,
+         "improving": 0
+        },
+        "E-PEEL": {
+         "enabled": true,
+         "enumerated": 10,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 0,
+         "survived": 10,
+         "improving": 0
+        },
+        "E-PUNCTURE": {
+         "enabled": true,
+         "enumerated": 39,
+         "apply_fail": 0,
+         "bare_qubit": 32,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 0,
+         "survived": 7,
+         "improving": 0
+        },
+        "E-EXTEND": {
+         "enabled": true,
+         "enumerated": 79,
+         "apply_fail": 0,
+         "bare_qubit": 1,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 78,
+         "dominated": 0,
+         "over_budget": 0,
+         "survived": 0,
+         "improving": 0
+        },
+        "E-GRAFT": {
+         "enabled": true,
+         "enumerated": 78,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 46,
+         "survived": 32,
+         "improving": 0
+        },
+        "E-LOCAL-HADAMARD": {
+         "enabled": false,
+         "enumerated": 0,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 0,
+         "survived": 0,
+         "improving": 0
+        },
+        "P-REBASE": {
+         "enabled": true,
+         "enumerated": 98,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 98,
+         "survived": 0,
+         "improving": 0
+        }
+       }
+      }
+     }
+    ]
+   },
+   {
+    "parent": "41-28-2",
+    "parent_n": 41,
+    "parent_k": 28,
+    "parent_d": 2,
+    "parent_w": 24,
+    "chain": [
+     {
+      "step": 0,
+      "improving": 0,
+      "search": {
+       "evaluated": 64,
+       "budget": 64,
+       "budget_used": 64,
+       "budget_declined": 0,
+       "exhausted": true,
+       "truncated": true,
+       "stop_reason": "budget-exhausted",
+       "applicability": {
+        "C-DELETE-CHECK": {
+         "enabled": true,
+         "enumerated": 13,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 0,
+         "survived": 13,
+         "improving": 0
+        },
+        "E-PEEL": {
+         "enabled": true,
+         "enumerated": 1,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 0,
+         "survived": 1,
+         "improving": 0
+        },
+        "E-PUNCTURE": {
+         "enabled": true,
+         "enumerated": 41,
+         "apply_fail": 0,
+         "bare_qubit": 15,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 0,
+         "survived": 26,
+         "improving": 0
+        },
+        "E-EXTEND": {
+         "enabled": true,
+         "enumerated": 83,
+         "apply_fail": 0,
+         "bare_qubit": 1,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 82,
+         "dominated": 0,
+         "over_budget": 0,
+         "survived": 0,
+         "improving": 0
+        },
+        "E-GRAFT": {
+         "enabled": true,
+         "enumerated": 82,
+         "apply_fail": 38,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 20,
+         "survived": 24,
+         "improving": 0
+        },
+        "E-LOCAL-HADAMARD": {
+         "enabled": false,
+         "enumerated": 0,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 0,
+         "survived": 0,
+         "improving": 0
+        },
+        "P-REBASE": {
+         "enabled": true,
+         "enumerated": 72,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 72,
+         "survived": 0,
+         "improving": 0
+        }
+       }
+      }
+     }
+    ]
+   },
+   {
+    "parent": "47-30-3",
+    "parent_n": 47,
+    "parent_k": 30,
+    "parent_d": 3,
+    "parent_w": 24,
+    "chain": [
+     {
+      "step": 0,
+      "improving": 18,
+      "search": {
+       "evaluated": 64,
+       "budget": 64,
+       "budget_used": 64,
+       "budget_declined": 0,
+       "exhausted": true,
+       "truncated": true,
+       "stop_reason": "budget-exhausted",
+       "applicability": {
+        "C-DELETE-CHECK": {
+         "enabled": true,
+         "enumerated": 17,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 0,
+         "survived": 17,
+         "improving": 0
+        },
+        "E-PEEL": {
+         "enabled": true,
+         "enumerated": 14,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 2,
+         "survived": 12,
+         "improving": 6
+        },
+        "E-PUNCTURE": {
+         "enabled": true,
+         "enumerated": 47,
+         "apply_fail": 0,
+         "bare_qubit": 18,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 0,
+         "survived": 29,
+         "improving": 6
+        },
+        "E-EXTEND": {
+         "enabled": true,
+         "enumerated": 95,
+         "apply_fail": 0,
+         "bare_qubit": 1,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 94,
+         "dominated": 0,
+         "over_budget": 0,
+         "survived": 0,
+         "improving": 0
+        },
+        "E-GRAFT": {
+         "enabled": true,
+         "enumerated": 94,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 88,
+         "survived": 6,
+         "improving": 6
+        },
+        "E-LOCAL-HADAMARD": {
+         "enabled": false,
+         "enumerated": 0,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 0,
+         "survived": 0,
+         "improving": 0
+        },
+        "P-REBASE": {
+         "enabled": true,
+         "enumerated": 128,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 128,
+         "survived": 0,
+         "improving": 0
+        }
+       }
+      },
+      "operation": "E-PUNCTURE",
+      "n": 46,
+      "k": 34,
+      "w_before": 24,
+      "w_after": 23,
+      "d_upper": 4,
+      "improving_pool": 18,
+      "connected": true,
+      "label": "greedy-47-30-3-s0",
+      "constructor": "planner.bounded_sector_search",
+      "params": {
+       "parent": "47-30-3",
+       "step": 0,
+       "objective": "weight",
+       "rebase": true,
+       "budget": 64
+      },
+      "w": 23,
+      "tanner_connected": true,
+      "block_structure": {
+       "tanner_components": 1,
+       "blocks": 1,
+       "block_sizes": [
+        46
+       ],
+       "connected": true
+      },
+      "dedup_exact": 0,
+      "dedup_wl": 0,
+      "d_witness": 1,
+      "path": "/Users/mathysrennela/GitHub/qldpc-challenge/research/candidates/20261123-170940-Mathyss-MacBook-Air-12541/46-34-1-greedy-47-30-3-s0.json",
+      "gate_passed": true,
+      "board_advancing": false,
+      "dominated_by": [
+       "[[38,34,1]] w=22 38-34-1.json"
+      ],
+      "d_only_gain": false,
+      "cell": [
+       "weight-9plus",
+       "unrestricted"
+      ],
+      "gate": {
+       "passed": true,
+       "candidate": {
+        "n": 46,
+        "k": 34,
+        "d": 1,
+        "family": "code-calculus",
+        "weight_class": "weight-9plus",
+        "locality_class": "unrestricted",
+        "sector_distances": {
+         "X": {
+          "upper": 3,
+          "lower": null,
+          "exact": false,
+          "witness_weight": 3,
+          "refuted_to": null
+         },
+         "Z": {
+          "upper": 1,
+          "lower": null,
+          "exact": false,
+          "witness_weight": 1,
+          "refuted_to": null
+         },
+         "d": {
+          "upper": 1,
+          "lower": null,
+          "exact": false
+         }
+        },
+        "fingerprint": "66329d0e9aa40007",
+        "signature": "2a291a1746b041da"
+       },
+       "gates": {
+        "verify": {
+         "ok": true,
+         "failed_checks": [],
+         "weight_class": "weight-9plus",
+         "locality_class": "unrestricted"
+        },
+        "refute": {
+         "refuted": false,
+         "seed": 445127194,
+         "detail": "no lighter logical in 4340 RIS trials (seed 445127194)"
+        },
+        "dedup": {
+         "exact_duplicate_of": null,
+         "wl_equivalent_of": null
+        },
+        "novelty": {
+         "cell": [
+          "weight-9plus",
+          "unrestricted"
+         ],
+         "board": "CSS",
+         "board_advancing": false,
+         "dominated_by": [
+          "[[38,34,1]] w=22 38-34-1.json"
+         ],
+         "advances_by": [],
+         "d_only_gain": false,
+         "d_only_peers": [],
+         "literature_novelty": "unverified"
+        }
+       },
+       "labels": [
+        "not board-advancing: dominated by [[38,34,1]] w=22 38-34-1.json; recorded as a non-frontier result",
+        "literature novelty UNVERIFIED"
+       ],
+       "validator": {
+        "source_sha256": "9728b82d233e3d8a9c30808b987d8a6c8402c1060e11cba32bebbad8b2ff7bf5",
+        "seed": 445127194
+       }
+      }
+     },
+     {
+      "step": 1,
+      "improving": 4,
+      "search": {
+       "evaluated": 64,
+       "budget": 64,
+       "budget_used": 64,
+       "budget_declined": 0,
+       "exhausted": true,
+       "truncated": true,
+       "stop_reason": "budget-exhausted",
+       "applicability": {
+        "C-DELETE-CHECK": {
+         "enabled": true,
+         "enumerated": 12,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 4,
+         "dominated": 0,
+         "over_budget": 0,
+         "survived": 8,
+         "improving": 0
+        },
+        "E-PEEL": {
+         "enabled": true,
+         "enumerated": 40,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 0,
+         "survived": 40,
+         "improving": 4
+        },
+        "E-PUNCTURE": {
+         "enabled": true,
+         "enumerated": 46,
+         "apply_fail": 0,
+         "bare_qubit": 38,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 0,
+         "survived": 8,
+         "improving": 0
+        },
+        "E-EXTEND": {
+         "enabled": true,
+         "enumerated": 93,
+         "apply_fail": 0,
+         "bare_qubit": 1,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 78,
+         "dominated": 0,
+         "over_budget": 14,
+         "survived": 0,
+         "improving": 0
+        },
+        "E-GRAFT": {
+         "enabled": true,
+         "enumerated": 78,
+         "apply_fail": 78,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 0,
+         "survived": 0,
+         "improving": 0
+        },
+        "E-LOCAL-HADAMARD": {
+         "enabled": false,
+         "enumerated": 0,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 0,
+         "survived": 0,
+         "improving": 0
+        },
+        "P-REBASE": {
+         "enabled": true,
+         "enumerated": 68,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 60,
+         "survived": 8,
+         "improving": 0
+        }
+       }
+      },
+      "operation": "E-PEEL",
+      "n": 45,
+      "k": 34,
+      "w_before": 23,
+      "w_after": 22,
+      "d_upper": 4,
+      "improving_pool": 4,
+      "connected": true,
+      "label": "greedy-47-30-3-s1",
+      "constructor": "planner.bounded_sector_search",
+      "params": {
+       "parent": "47-30-3",
+       "step": 1,
+       "objective": "weight",
+       "rebase": true,
+       "budget": 64
+      },
+      "w": 22,
+      "tanner_connected": true,
+      "block_structure": {
+       "tanner_components": 1,
+       "blocks": 1,
+       "block_sizes": [
+        45
+       ],
+       "connected": true
+      },
+      "dedup_exact": 0,
+      "dedup_wl": 0,
+      "d_witness": 1,
+      "path": "/Users/mathysrennela/GitHub/qldpc-challenge/research/candidates/20261123-170955-Mathyss-MacBook-Air-12541/45-34-1-greedy-47-30-3-s1.json",
+      "gate_passed": true,
+      "board_advancing": false,
+      "dominated_by": [
+       "[[38,34,1]] w=22 38-34-1.json"
+      ],
+      "d_only_gain": false,
+      "cell": [
+       "weight-9plus",
+       "unrestricted"
+      ],
+      "gate": {
+       "passed": true,
+       "candidate": {
+        "n": 45,
+        "k": 34,
+        "d": 1,
+        "family": "code-calculus",
+        "weight_class": "weight-9plus",
+        "locality_class": "unrestricted",
+        "sector_distances": {
+         "X": {
+          "upper": 3,
+          "lower": null,
+          "exact": false,
+          "witness_weight": 3,
+          "refuted_to": null
+         },
+         "Z": {
+          "upper": 1,
+          "lower": null,
+          "exact": false,
+          "witness_weight": 1,
+          "refuted_to": null
+         },
+         "d": {
+          "upper": 1,
+          "lower": null,
+          "exact": false
+         }
+        },
+        "fingerprint": "3dc9c33653971122",
+        "signature": "4cc42f663f0a53d4"
+       },
+       "gates": {
+        "verify": {
+         "ok": true,
+         "failed_checks": [],
+         "weight_class": "weight-9plus",
+         "locality_class": "unrestricted"
+        },
+        "refute": {
+         "refuted": false,
+         "seed": 1210698939,
+         "detail": "no lighter logical in 4300 RIS trials (seed 1210698939)"
+        },
+        "dedup": {
+         "exact_duplicate_of": null,
+         "wl_equivalent_of": null
+        },
+        "novelty": {
+         "cell": [
+          "weight-9plus",
+          "unrestricted"
+         ],
+         "board": "CSS",
+         "board_advancing": false,
+         "dominated_by": [
+          "[[38,34,1]] w=22 38-34-1.json"
+         ],
+         "advances_by": [],
+         "d_only_gain": false,
+         "d_only_peers": [],
+         "literature_novelty": "unverified"
+        }
+       },
+       "labels": [
+        "not board-advancing: dominated by [[38,34,1]] w=22 38-34-1.json; recorded as a non-frontier result",
+        "literature novelty UNVERIFIED"
+       ],
+       "validator": {
+        "source_sha256": "9728b82d233e3d8a9c30808b987d8a6c8402c1060e11cba32bebbad8b2ff7bf5",
+        "seed": 1210698939
+       }
+      }
+     },
+     {
+      "step": 2,
+      "improving": 3,
+      "search": {
+       "evaluated": 64,
+       "budget": 64,
+       "budget_used": 64,
+       "budget_declined": 0,
+       "exhausted": true,
+       "truncated": true,
+       "stop_reason": "budget-exhausted",
+       "applicability": {
+        "C-DELETE-CHECK": {
+         "enabled": true,
+         "enumerated": 11,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 5,
+         "dominated": 0,
+         "over_budget": 0,
+         "survived": 6,
+         "improving": 0
+        },
+        "E-PEEL": {
+         "enabled": true,
+         "enumerated": 32,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 0,
+         "survived": 32,
+         "improving": 3
+        },
+        "E-PUNCTURE": {
+         "enabled": true,
+         "enumerated": 45,
+         "apply_fail": 0,
+         "bare_qubit": 37,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 0,
+         "survived": 8,
+         "improving": 0
+        },
+        "E-EXTEND": {
+         "enabled": true,
+         "enumerated": 91,
+         "apply_fail": 0,
+         "bare_qubit": 1,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 69,
+         "dominated": 0,
+         "over_budget": 21,
+         "survived": 0,
+         "improving": 0
+        },
+        "E-GRAFT": {
+         "enabled": true,
+         "enumerated": 69,
+         "apply_fail": 69,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 0,
+         "survived": 0,
+         "improving": 0
+        },
+        "E-LOCAL-HADAMARD": {
+         "enabled": false,
+         "enumerated": 0,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 0,
+         "survived": 0,
+         "improving": 0
+        },
+        "P-REBASE": {
+         "enabled": true,
+         "enumerated": 62,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 44,
+         "survived": 18,
+         "improving": 0
+        }
+       }
+      },
+      "operation": "E-PEEL",
+      "n": 44,
+      "k": 34,
+      "w_before": 22,
+      "w_after": 21,
+      "d_upper": 4,
+      "improving_pool": 3,
+      "connected": true,
+      "label": "greedy-47-30-3-s2",
+      "constructor": "planner.bounded_sector_search",
+      "params": {
+       "parent": "47-30-3",
+       "step": 2,
+       "objective": "weight",
+       "rebase": true,
+       "budget": 64
+      },
+      "w": 21,
+      "tanner_connected": true,
+      "block_structure": {
+       "tanner_components": 1,
+       "blocks": 1,
+       "block_sizes": [
+        44
+       ],
+       "connected": true
+      },
+      "dedup_exact": 0,
+      "dedup_wl": 0,
+      "d_witness": 1,
+      "path": "/Users/mathysrennela/GitHub/qldpc-challenge/research/candidates/20261123-171011-Mathyss-MacBook-Air-12541/44-34-1-greedy-47-30-3-s2.json",
+      "gate_passed": true,
+      "board_advancing": true,
+      "dominated_by": [],
+      "d_only_gain": false,
+      "cell": [
+       "weight-9plus",
+       "unrestricted"
+      ],
+      "gate": {
+       "passed": true,
+       "candidate": {
+        "n": 44,
+        "k": 34,
+        "d": 1,
+        "family": "code-calculus",
+        "weight_class": "weight-9plus",
+        "locality_class": "unrestricted",
+        "sector_distances": {
+         "X": {
+          "upper": 3,
+          "lower": null,
+          "exact": false,
+          "witness_weight": 3,
+          "refuted_to": null
+         },
+         "Z": {
+          "upper": 1,
+          "lower": null,
+          "exact": false,
+          "witness_weight": 1,
+          "refuted_to": null
+         },
+         "d": {
+          "upper": 1,
+          "lower": null,
+          "exact": false
+         }
+        },
+        "fingerprint": "7b67e0ea28d7b4d3",
+        "signature": "6501a287cfeb01df"
+       },
+       "gates": {
+        "verify": {
+         "ok": true,
+         "failed_checks": [],
+         "weight_class": "weight-9plus",
+         "locality_class": "unrestricted"
+        },
+        "refute": {
+         "refuted": false,
+         "seed": 193586804,
+         "detail": "no lighter logical in 4260 RIS trials (seed 193586804)"
+        },
+        "dedup": {
+         "exact_duplicate_of": null,
+         "wl_equivalent_of": null
+        },
+        "novelty": {
+         "cell": [
+          "weight-9plus",
+          "unrestricted"
+         ],
+         "board": "CSS",
+         "board_advancing": true,
+         "dominated_by": [],
+         "advances_by": [],
+         "d_only_gain": false,
+         "d_only_peers": [],
+         "literature_novelty": "unverified"
+        }
+       },
+       "labels": [
+        "advances the weight-9plus x unrestricted board",
+        "literature novelty UNVERIFIED"
+       ],
+       "validator": {
+        "source_sha256": "9728b82d233e3d8a9c30808b987d8a6c8402c1060e11cba32bebbad8b2ff7bf5",
+        "seed": 193586804
+       }
+      }
+     },
+     {
+      "step": 3,
+      "improving": 2,
+      "search": {
+       "evaluated": 64,
+       "budget": 64,
+       "budget_used": 64,
+       "budget_declined": 0,
+       "exhausted": true,
+       "truncated": true,
+       "stop_reason": "budget-exhausted",
+       "applicability": {
+        "C-DELETE-CHECK": {
+         "enabled": true,
+         "enumerated": 10,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 6,
+         "dominated": 0,
+         "over_budget": 0,
+         "survived": 4,
+         "improving": 0
+        },
+        "E-PEEL": {
+         "enabled": true,
+         "enumerated": 24,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 0,
+         "survived": 24,
+         "improving": 2
+        },
+        "E-PUNCTURE": {
+         "enabled": true,
+         "enumerated": 44,
+         "apply_fail": 0,
+         "bare_qubit": 36,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 0,
+         "survived": 8,
+         "improving": 0
+        },
+        "E-EXTEND": {
+         "enabled": true,
+         "enumerated": 89,
+         "apply_fail": 0,
+         "bare_qubit": 1,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 60,
+         "dominated": 0,
+         "over_budget": 28,
+         "survived": 0,
+         "improving": 0
+        },
+        "E-GRAFT": {
+         "enabled": true,
+         "enumerated": 60,
+         "apply_fail": 60,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 0,
+         "survived": 0,
+         "improving": 0
+        },
+        "E-LOCAL-HADAMARD": {
+         "enabled": false,
+         "enumerated": 0,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 0,
+         "survived": 0,
+         "improving": 0
+        },
+        "P-REBASE": {
+         "enabled": true,
+         "enumerated": 58,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 30,
+         "survived": 28,
+         "improving": 0
+        }
+       }
+      },
+      "operation": "E-PEEL",
+      "n": 43,
+      "k": 34,
+      "w_before": 21,
+      "w_after": 20,
+      "d_upper": 4,
+      "improving_pool": 2,
+      "connected": true,
+      "label": "greedy-47-30-3-s3",
+      "constructor": "planner.bounded_sector_search",
+      "params": {
+       "parent": "47-30-3",
+       "step": 3,
+       "objective": "weight",
+       "rebase": true,
+       "budget": 64
+      },
+      "w": 20,
+      "tanner_connected": true,
+      "block_structure": {
+       "tanner_components": 1,
+       "blocks": 1,
+       "block_sizes": [
+        43
+       ],
+       "connected": true
+      },
+      "dedup_exact": 0,
+      "dedup_wl": 0,
+      "d_witness": 1,
+      "path": "/Users/mathysrennela/GitHub/qldpc-challenge/research/candidates/20261123-171027-Mathyss-MacBook-Air-12541/43-34-1-greedy-47-30-3-s3.json",
+      "gate_passed": true,
+      "board_advancing": true,
+      "dominated_by": [],
+      "d_only_gain": false,
+      "cell": [
+       "weight-9plus",
+       "unrestricted"
+      ],
+      "gate": {
+       "passed": true,
+       "candidate": {
+        "n": 43,
+        "k": 34,
+        "d": 1,
+        "family": "code-calculus",
+        "weight_class": "weight-9plus",
+        "locality_class": "unrestricted",
+        "sector_distances": {
+         "X": {
+          "upper": 3,
+          "lower": null,
+          "exact": false,
+          "witness_weight": 3,
+          "refuted_to": null
+         },
+         "Z": {
+          "upper": 1,
+          "lower": null,
+          "exact": false,
+          "witness_weight": 1,
+          "refuted_to": null
+         },
+         "d": {
+          "upper": 1,
+          "lower": null,
+          "exact": false
+         }
+        },
+        "fingerprint": "f603e6a2f5606f20",
+        "signature": "42d256be9c99b210"
+       },
+       "gates": {
+        "verify": {
+         "ok": true,
+         "failed_checks": [],
+         "weight_class": "weight-9plus",
+         "locality_class": "unrestricted"
+        },
+        "refute": {
+         "refuted": false,
+         "seed": 1416009401,
+         "detail": "no lighter logical in 4220 RIS trials (seed 1416009401)"
+        },
+        "dedup": {
+         "exact_duplicate_of": null,
+         "wl_equivalent_of": null
+        },
+        "novelty": {
+         "cell": [
+          "weight-9plus",
+          "unrestricted"
+         ],
+         "board": "CSS",
+         "board_advancing": true,
+         "dominated_by": [],
+         "advances_by": [],
+         "d_only_gain": false,
+         "d_only_peers": [],
+         "literature_novelty": "unverified"
+        }
+       },
+       "labels": [
+        "advances the weight-9plus x unrestricted board",
+        "literature novelty UNVERIFIED"
+       ],
+       "validator": {
+        "source_sha256": "9728b82d233e3d8a9c30808b987d8a6c8402c1060e11cba32bebbad8b2ff7bf5",
+        "seed": 1416009401
+       }
+      }
+     }
+    ]
+   },
+   {
+    "parent": "50-18-4",
+    "parent_n": 50,
+    "parent_k": 18,
+    "parent_d": 4,
+    "parent_w": 8,
+    "chain": [
+     {
+      "step": 0,
+      "improving": 0,
+      "search": {
+       "evaluated": 64,
+       "budget": 64,
+       "budget_used": 64,
+       "budget_declined": 0,
+       "exhausted": true,
+       "truncated": true,
+       "stop_reason": "budget-exhausted",
+       "applicability": {
+        "C-DELETE-CHECK": {
+         "enabled": true,
+         "enumerated": 32,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 18,
+         "survived": 14,
+         "improving": 0
+        },
+        "E-PEEL": {
+         "enabled": true,
+         "enumerated": 8,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 8,
+         "survived": 0,
+         "improving": 0
+        },
+        "E-PUNCTURE": {
+         "enabled": true,
+         "enumerated": 50,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 0,
+         "survived": 50,
+         "improving": 0
+        },
+        "E-EXTEND": {
+         "enabled": true,
+         "enumerated": 101,
+         "apply_fail": 0,
+         "bare_qubit": 1,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 100,
+         "dominated": 0,
+         "over_budget": 0,
+         "survived": 0,
+         "improving": 0
+        },
+        "E-GRAFT": {
+         "enabled": true,
+         "enumerated": 100,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 100,
+         "survived": 0,
+         "improving": 0
+        },
+        "E-LOCAL-HADAMARD": {
+         "enabled": false,
+         "enumerated": 0,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 0,
+         "survived": 0,
+         "improving": 0
+        },
+        "P-REBASE": {
+         "enabled": true,
+         "enumerated": 480,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 480,
+         "survived": 0,
+         "improving": 0
+        }
+       }
+      }
+     }
+    ]
+   },
+   {
+    "parent": "54-4-10",
+    "parent_n": 54,
+    "parent_k": 4,
+    "parent_d": 10,
+    "parent_w": 8,
+    "chain": [
+     {
+      "step": 0,
+      "improving": 0,
+      "search": {
+       "evaluated": 64,
+       "budget": 64,
+       "budget_used": 64,
+       "budget_declined": 0,
+       "exhausted": true,
+       "truncated": true,
+       "stop_reason": "budget-exhausted",
+       "applicability": {
+        "C-DELETE-CHECK": {
+         "enabled": true,
+         "enumerated": 50,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 40,
+         "survived": 10,
+         "improving": 0
+        },
+        "E-PEEL": {
+         "enabled": true,
+         "enumerated": 2,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 2,
+         "survived": 0,
+         "improving": 0
+        },
+        "E-PUNCTURE": {
+         "enabled": true,
+         "enumerated": 54,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 0,
+         "survived": 54,
+         "improving": 0
+        },
+        "E-EXTEND": {
+         "enabled": true,
+         "enumerated": 109,
+         "apply_fail": 0,
+         "bare_qubit": 1,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 108,
+         "dominated": 0,
+         "over_budget": 0,
+         "survived": 0,
+         "improving": 0
+        },
+        "E-GRAFT": {
+         "enabled": true,
+         "enumerated": 108,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 108,
+         "survived": 0,
+         "improving": 0
+        },
+        "E-LOCAL-HADAMARD": {
+         "enabled": false,
+         "enumerated": 0,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 0,
+         "survived": 0,
+         "improving": 0
+        },
+        "P-REBASE": {
+         "enabled": true,
+         "enumerated": 1200,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 1200,
+         "survived": 0,
+         "improving": 0
+        }
+       }
+      }
+     }
+    ]
+   },
+   {
+    "parent": "60-4-8",
+    "parent_n": 60,
+    "parent_k": 4,
+    "parent_d": 8,
+    "parent_w": 5,
+    "chain": [
+     {
+      "step": 0,
+      "improving": 0,
+      "search": {
+       "evaluated": 64,
+       "budget": 64,
+       "budget_used": 64,
+       "budget_declined": 0,
+       "exhausted": true,
+       "truncated": true,
+       "stop_reason": "budget-exhausted",
+       "applicability": {
+        "C-DELETE-CHECK": {
+         "enabled": true,
+         "enumerated": 56,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 50,
+         "survived": 6,
+         "improving": 0
+        },
+        "E-PEEL": {
+         "enabled": true,
+         "enumerated": 10,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 10,
+         "survived": 0,
+         "improving": 0
+        },
+        "E-PUNCTURE": {
+         "enabled": true,
+         "enumerated": 60,
+         "apply_fail": 0,
+         "bare_qubit": 2,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 0,
+         "survived": 58,
+         "improving": 0
+        },
+        "E-EXTEND": {
+         "enabled": true,
+         "enumerated": 121,
+         "apply_fail": 0,
+         "bare_qubit": 1,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 120,
+         "dominated": 0,
+         "over_budget": 0,
+         "survived": 0,
+         "improving": 0
+        },
+        "E-GRAFT": {
+         "enabled": true,
+         "enumerated": 120,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 120,
+         "survived": 0,
+         "improving": 0
+        },
+        "E-LOCAL-HADAMARD": {
+         "enabled": false,
+         "enumerated": 0,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 0,
+         "survived": 0,
+         "improving": 0
+        },
+        "P-REBASE": {
+         "enabled": true,
+         "enumerated": 1512,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 1512,
+         "survived": 0,
+         "improving": 0
+        }
+       }
+      }
+     }
+    ]
+   },
+   {
+    "parent": "64-16-6",
+    "parent_n": 64,
+    "parent_k": 16,
+    "parent_d": 6,
+    "parent_w": 10,
+    "chain": [
+     {
+      "step": 0,
+      "improving": 0,
+      "search": {
+       "evaluated": 64,
+       "budget": 64,
+       "budget_used": 64,
+       "budget_declined": 0,
+       "exhausted": true,
+       "truncated": true,
+       "stop_reason": "budget-exhausted",
+       "applicability": {
+        "C-DELETE-CHECK": {
+         "enabled": true,
+         "enumerated": 48,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 47,
+         "survived": 1,
+         "improving": 0
+        },
+        "E-PEEL": {
+         "enabled": true,
+         "enumerated": 1,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 1,
+         "survived": 0,
+         "improving": 0
+        },
+        "E-PUNCTURE": {
+         "enabled": true,
+         "enumerated": 64,
+         "apply_fail": 0,
+         "bare_qubit": 1,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 0,
+         "survived": 63,
+         "improving": 0
+        },
+        "E-EXTEND": {
+         "enabled": true,
+         "enumerated": 129,
+         "apply_fail": 0,
+         "bare_qubit": 1,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 128,
+         "dominated": 0,
+         "over_budget": 0,
+         "survived": 0,
+         "improving": 0
+        },
+        "E-GRAFT": {
+         "enabled": true,
+         "enumerated": 128,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 128,
+         "survived": 0,
+         "improving": 0
+        },
+        "E-LOCAL-HADAMARD": {
+         "enabled": false,
+         "enumerated": 0,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 0,
+         "survived": 0,
+         "improving": 0
+        },
+        "P-REBASE": {
+         "enabled": true,
+         "enumerated": 1104,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 1104,
+         "survived": 0,
+         "improving": 0
+        }
+       }
+      }
+     }
+    ]
+   },
+   {
+    "parent": "68-4-11",
+    "parent_n": 68,
+    "parent_k": 4,
+    "parent_d": 11,
+    "parent_w": 8,
+    "chain": [
+     {
+      "step": 0,
+      "improving": 0,
+      "search": {
+       "evaluated": 64,
+       "budget": 64,
+       "budget_used": 64,
+       "budget_declined": 0,
+       "exhausted": true,
+       "truncated": true,
+       "stop_reason": "budget-exhausted",
+       "applicability": {
+        "C-DELETE-CHECK": {
+         "enabled": true,
+         "enumerated": 64,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 64,
+         "survived": 0,
+         "improving": 0
+        },
+        "E-PEEL": {
+         "enabled": true,
+         "enumerated": 8,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 8,
+         "survived": 0,
+         "improving": 0
+        },
+        "E-PUNCTURE": {
+         "enabled": true,
+         "enumerated": 68,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 4,
+         "survived": 64,
+         "improving": 0
+        },
+        "E-EXTEND": {
+         "enabled": true,
+         "enumerated": 137,
+         "apply_fail": 0,
+         "bare_qubit": 1,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 136,
+         "dominated": 0,
+         "over_budget": 0,
+         "survived": 0,
+         "improving": 0
+        },
+        "E-GRAFT": {
+         "enabled": true,
+         "enumerated": 136,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 136,
+         "survived": 0,
+         "improving": 0
+        },
+        "E-LOCAL-HADAMARD": {
+         "enabled": false,
+         "enumerated": 0,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 0,
+         "survived": 0,
+         "improving": 0
+        },
+        "P-REBASE": {
+         "enabled": true,
+         "enumerated": 1984,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 1984,
+         "survived": 0,
+         "improving": 0
+        }
+       }
+      }
+     }
+    ]
+   },
+   {
+    "parent": "72-24-2",
+    "parent_n": 72,
+    "parent_k": 24,
+    "parent_d": 2,
+    "parent_w": 7,
+    "chain": [
+     {
+      "step": 0,
+      "improving": 0,
+      "search": {
+       "evaluated": 64,
+       "budget": 64,
+       "budget_used": 64,
+       "budget_declined": 0,
+       "exhausted": true,
+       "truncated": true,
+       "stop_reason": "budget-exhausted",
+       "applicability": {
+        "C-DELETE-CHECK": {
+         "enabled": true,
+         "enumerated": 48,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 48,
+         "survived": 0,
+         "improving": 0
+        },
+        "E-PEEL": {
+         "enabled": true,
+         "enumerated": 48,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 48,
+         "survived": 0,
+         "improving": 0
+        },
+        "E-PUNCTURE": {
+         "enabled": true,
+         "enumerated": 72,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 8,
+         "survived": 64,
+         "improving": 0
+        },
+        "E-EXTEND": {
+         "enabled": true,
+         "enumerated": 145,
+         "apply_fail": 0,
+         "bare_qubit": 1,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 144,
+         "dominated": 0,
+         "over_budget": 0,
+         "survived": 0,
+         "improving": 0
+        },
+        "E-GRAFT": {
+         "enabled": true,
+         "enumerated": 144,
+         "apply_fail": 72,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 72,
+         "survived": 0,
+         "improving": 0
+        },
+        "E-LOCAL-HADAMARD": {
+         "enabled": false,
+         "enumerated": 0,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 0,
+         "survived": 0,
+         "improving": 0
+        },
+        "P-REBASE": {
+         "enabled": true,
+         "enumerated": 1104,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 1104,
+         "survived": 0,
+         "improving": 0
+        }
+       }
+      }
+     }
+    ]
+   },
+   {
+    "parent": "77-27-5",
+    "parent_n": 77,
+    "parent_k": 27,
+    "parent_d": 5,
+    "parent_w": 10,
+    "chain": [
+     {
+      "step": 0,
+      "improving": 0,
+      "search": {
+       "evaluated": 64,
+       "budget": 64,
+       "budget_used": 64,
+       "budget_declined": 0,
+       "exhausted": true,
+       "truncated": true,
+       "stop_reason": "budget-exhausted",
+       "applicability": {
+        "C-DELETE-CHECK": {
+         "enabled": true,
+         "enumerated": 50,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 50,
+         "survived": 0,
+         "improving": 0
+        },
+        "E-PEEL": {
+         "enabled": true,
+         "enumerated": 4,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 4,
+         "survived": 0,
+         "improving": 0
+        },
+        "E-PUNCTURE": {
+         "enabled": true,
+         "enumerated": 77,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 13,
+         "survived": 64,
+         "improving": 0
+        },
+        "E-EXTEND": {
+         "enabled": true,
+         "enumerated": 155,
+         "apply_fail": 0,
+         "bare_qubit": 1,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 154,
+         "dominated": 0,
+         "over_budget": 0,
+         "survived": 0,
+         "improving": 0
+        },
+        "E-GRAFT": {
+         "enabled": true,
+         "enumerated": 154,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 154,
+         "survived": 0,
+         "improving": 0
+        },
+        "E-LOCAL-HADAMARD": {
+         "enabled": false,
+         "enumerated": 0,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 0,
+         "survived": 0,
+         "improving": 0
+        },
+        "P-REBASE": {
+         "enabled": true,
+         "enumerated": 1202,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 1202,
+         "survived": 0,
+         "improving": 0
+        }
+       }
+      }
+     }
+    ]
+   },
+   {
+    "parent": "80-8-8-b",
+    "parent_n": 80,
+    "parent_k": 8,
+    "parent_d": 8,
+    "parent_w": 8,
+    "chain": [
+     {
+      "step": 0,
+      "improving": 0,
+      "search": {
+       "evaluated": 64,
+       "budget": 64,
+       "budget_used": 64,
+       "budget_declined": 0,
+       "exhausted": true,
+       "truncated": true,
+       "stop_reason": "budget-exhausted",
+       "applicability": {
+        "C-DELETE-CHECK": {
+         "enabled": true,
+         "enumerated": 72,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 72,
+         "survived": 0,
+         "improving": 0
+        },
+        "E-PEEL": {
+         "enabled": true,
+         "enumerated": 16,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 16,
+         "survived": 0,
+         "improving": 0
+        },
+        "E-PUNCTURE": {
+         "enabled": true,
+         "enumerated": 80,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 16,
+         "survived": 64,
+         "improving": 0
+        },
+        "E-EXTEND": {
+         "enabled": true,
+         "enumerated": 161,
+         "apply_fail": 0,
+         "bare_qubit": 1,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 160,
+         "dominated": 0,
+         "over_budget": 0,
+         "survived": 0,
+         "improving": 0
+        },
+        "E-GRAFT": {
+         "enabled": true,
+         "enumerated": 160,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 160,
+         "survived": 0,
+         "improving": 0
+        },
+        "E-LOCAL-HADAMARD": {
+         "enabled": false,
+         "enumerated": 0,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 0,
+         "survived": 0,
+         "improving": 0
+        },
+        "P-REBASE": {
+         "enabled": true,
+         "enumerated": 2520,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 2520,
+         "survived": 0,
+         "improving": 0
+        }
+       }
+      }
+     }
+    ]
+   },
+   {
+    "parent": "84-8-12-b",
+    "parent_n": 84,
+    "parent_k": 8,
+    "parent_d": 12,
+    "parent_w": 8,
+    "chain": [
+     {
+      "step": 0,
+      "improving": 0,
+      "search": {
+       "evaluated": 64,
+       "budget": 64,
+       "budget_used": 64,
+       "budget_declined": 0,
+       "exhausted": true,
+       "truncated": true,
+       "stop_reason": "budget-exhausted",
+       "applicability": {
+        "C-DELETE-CHECK": {
+         "enabled": true,
+         "enumerated": 76,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 76,
+         "survived": 0,
+         "improving": 0
+        },
+        "E-PEEL": {
+         "enabled": true,
+         "enumerated": 0,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 0,
+         "survived": 0,
+         "improving": 0
+        },
+        "E-PUNCTURE": {
+         "enabled": true,
+         "enumerated": 84,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 20,
+         "survived": 64,
+         "improving": 0
+        },
+        "E-EXTEND": {
+         "enabled": true,
+         "enumerated": 169,
+         "apply_fail": 0,
+         "bare_qubit": 1,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 168,
+         "dominated": 0,
+         "over_budget": 0,
+         "survived": 0,
+         "improving": 0
+        },
+        "E-GRAFT": {
+         "enabled": true,
+         "enumerated": 168,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 168,
+         "survived": 0,
+         "improving": 0
+        },
+        "E-LOCAL-HADAMARD": {
+         "enabled": false,
+         "enumerated": 0,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 0,
+         "survived": 0,
+         "improving": 0
+        },
+        "P-REBASE": {
+         "enabled": true,
+         "enumerated": 2812,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 2812,
+         "survived": 0,
+         "improving": 0
+        }
+       }
+      }
+     }
+    ]
+   },
+   {
+    "parent": "90-24-6",
+    "parent_n": 90,
+    "parent_k": 24,
+    "parent_d": 6,
+    "parent_w": 9,
+    "chain": [
+     {
+      "step": 0,
+      "improving": 0,
+      "search": {
+       "evaluated": 64,
+       "budget": 64,
+       "budget_used": 64,
+       "budget_declined": 0,
+       "exhausted": true,
+       "truncated": true,
+       "stop_reason": "budget-exhausted",
+       "applicability": {
+        "C-DELETE-CHECK": {
+         "enabled": true,
+         "enumerated": 66,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 66,
+         "survived": 0,
+         "improving": 0
+        },
+        "E-PEEL": {
+         "enabled": true,
+         "enumerated": 12,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 12,
+         "survived": 0,
+         "improving": 0
+        },
+        "E-PUNCTURE": {
+         "enabled": true,
+         "enumerated": 90,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 26,
+         "survived": 64,
+         "improving": 0
+        },
+        "E-EXTEND": {
+         "enabled": true,
+         "enumerated": 181,
+         "apply_fail": 0,
+         "bare_qubit": 1,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 180,
+         "dominated": 0,
+         "over_budget": 0,
+         "survived": 0,
+         "improving": 0
+        },
+        "E-GRAFT": {
+         "enabled": true,
+         "enumerated": 180,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 180,
+         "survived": 0,
+         "improving": 0
+        },
+        "E-LOCAL-HADAMARD": {
+         "enabled": false,
+         "enumerated": 0,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 0,
+         "survived": 0,
+         "improving": 0
+        },
+        "P-REBASE": {
+         "enabled": true,
+         "enumerated": 2112,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 2112,
+         "survived": 0,
+         "improving": 0
+        }
+       }
+      }
+     }
+    ]
+   },
+   {
+    "parent": "96-23-6",
+    "parent_n": 96,
+    "parent_k": 23,
+    "parent_d": 6,
+    "parent_w": 8,
+    "chain": [
+     {
+      "step": 0,
+      "improving": 0,
+      "search": {
+       "evaluated": 64,
+       "budget": 64,
+       "budget_used": 64,
+       "budget_declined": 0,
+       "exhausted": true,
+       "truncated": true,
+       "stop_reason": "budget-exhausted",
+       "applicability": {
+        "C-DELETE-CHECK": {
+         "enabled": true,
+         "enumerated": 73,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 73,
+         "survived": 0,
+         "improving": 0
+        },
+        "E-PEEL": {
+         "enabled": true,
+         "enumerated": 8,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 8,
+         "survived": 0,
+         "improving": 0
+        },
+        "E-PUNCTURE": {
+         "enabled": true,
+         "enumerated": 96,
+         "apply_fail": 0,
+         "bare_qubit": 1,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 31,
+         "survived": 64,
+         "improving": 0
+        },
+        "E-EXTEND": {
+         "enabled": true,
+         "enumerated": 193,
+         "apply_fail": 0,
+         "bare_qubit": 1,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 192,
+         "dominated": 0,
+         "over_budget": 0,
+         "survived": 0,
+         "improving": 0
+        },
+        "E-GRAFT": {
+         "enabled": true,
+         "enumerated": 192,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 192,
+         "survived": 0,
+         "improving": 0
+        },
+        "E-LOCAL-HADAMARD": {
+         "enabled": false,
+         "enumerated": 0,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 0,
+         "survived": 0,
+         "improving": 0
+        },
+        "P-REBASE": {
+         "enabled": true,
+         "enumerated": 2592,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 2592,
+         "survived": 0,
+         "improving": 0
+        }
+       }
+      }
+     }
+    ]
+   },
+   {
+    "parent": "100-24-5",
+    "parent_n": 100,
+    "parent_k": 24,
+    "parent_d": 5,
+    "parent_w": 8,
+    "chain": [
+     {
+      "step": 0,
+      "improving": 0,
+      "search": {
+       "evaluated": 64,
+       "budget": 64,
+       "budget_used": 64,
+       "budget_declined": 0,
+       "exhausted": true,
+       "truncated": true,
+       "stop_reason": "budget-exhausted",
+       "applicability": {
+        "C-DELETE-CHECK": {
+         "enabled": true,
+         "enumerated": 76,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 76,
+         "survived": 0,
+         "improving": 0
+        },
+        "E-PEEL": {
+         "enabled": true,
+         "enumerated": 2,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 2,
+         "survived": 0,
+         "improving": 0
+        },
+        "E-PUNCTURE": {
+         "enabled": true,
+         "enumerated": 100,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 36,
+         "survived": 64,
+         "improving": 0
+        },
+        "E-EXTEND": {
+         "enabled": true,
+         "enumerated": 201,
+         "apply_fail": 0,
+         "bare_qubit": 1,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 200,
+         "dominated": 0,
+         "over_budget": 0,
+         "survived": 0,
+         "improving": 0
+        },
+        "E-GRAFT": {
+         "enabled": true,
+         "enumerated": 200,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 200,
+         "survived": 0,
+         "improving": 0
+        },
+        "E-LOCAL-HADAMARD": {
+         "enabled": false,
+         "enumerated": 0,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 0,
+         "survived": 0,
+         "improving": 0
+        },
+        "P-REBASE": {
+         "enabled": true,
+         "enumerated": 2812,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 2812,
+         "survived": 0,
+         "improving": 0
+        }
+       }
+      }
+     }
+    ]
+   },
+   {
+    "parent": "107-61-2",
+    "parent_n": 107,
+    "parent_k": 61,
+    "parent_d": 2,
+    "parent_w": 12,
+    "chain": [
+     {
+      "step": 0,
+      "improving": 0,
+      "search": {
+       "evaluated": 64,
+       "budget": 64,
+       "budget_used": 64,
+       "budget_declined": 0,
+       "exhausted": true,
+       "truncated": true,
+       "stop_reason": "budget-exhausted",
+       "applicability": {
+        "C-DELETE-CHECK": {
+         "enabled": true,
+         "enumerated": 46,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 46,
+         "survived": 0,
+         "improving": 0
+        },
+        "E-PEEL": {
+         "enabled": true,
+         "enumerated": 12,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 12,
+         "survived": 0,
+         "improving": 0
+        },
+        "E-PUNCTURE": {
+         "enabled": true,
+         "enumerated": 107,
+         "apply_fail": 0,
+         "bare_qubit": 6,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 37,
+         "survived": 64,
+         "improving": 0
+        },
+        "E-EXTEND": {
+         "enabled": true,
+         "enumerated": 215,
+         "apply_fail": 0,
+         "bare_qubit": 1,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 214,
+         "dominated": 0,
+         "over_budget": 0,
+         "survived": 0,
+         "improving": 0
+        },
+        "E-GRAFT": {
+         "enabled": true,
+         "enumerated": 214,
+         "apply_fail": 4,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 210,
+         "survived": 0,
+         "improving": 0
+        },
+        "E-LOCAL-HADAMARD": {
+         "enabled": false,
+         "enumerated": 0,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 0,
+         "survived": 0,
+         "improving": 0
+        },
+        "P-REBASE": {
+         "enabled": true,
+         "enumerated": 1012,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 1012,
+         "survived": 0,
+         "improving": 0
+        }
+       }
+      }
+     }
+    ]
+   },
+   {
+    "parent": "112-18-11",
+    "parent_n": 112,
+    "parent_k": 18,
+    "parent_d": 11,
+    "parent_w": 9,
+    "chain": [
+     {
+      "step": 0,
+      "improving": 0,
+      "search": {
+       "evaluated": 64,
+       "budget": 64,
+       "budget_used": 64,
+       "budget_declined": 0,
+       "exhausted": true,
+       "truncated": true,
+       "stop_reason": "budget-exhausted",
+       "applicability": {
+        "C-DELETE-CHECK": {
+         "enabled": true,
+         "enumerated": 94,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 94,
+         "survived": 0,
+         "improving": 0
+        },
+        "E-PEEL": {
+         "enabled": true,
+         "enumerated": 6,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 6,
+         "survived": 0,
+         "improving": 0
+        },
+        "E-PUNCTURE": {
+         "enabled": true,
+         "enumerated": 112,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 48,
+         "survived": 64,
+         "improving": 0
+        },
+        "E-EXTEND": {
+         "enabled": true,
+         "enumerated": 225,
+         "apply_fail": 0,
+         "bare_qubit": 1,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 224,
+         "dominated": 0,
+         "over_budget": 0,
+         "survived": 0,
+         "improving": 0
+        },
+        "E-GRAFT": {
+         "enabled": true,
+         "enumerated": 224,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 224,
+         "survived": 0,
+         "improving": 0
+        },
+        "E-LOCAL-HADAMARD": {
+         "enabled": false,
+         "enumerated": 0,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 0,
+         "survived": 0,
+         "improving": 0
+        },
+        "P-REBASE": {
+         "enabled": true,
+         "enumerated": 4324,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 4324,
+         "survived": 0,
+         "improving": 0
+        }
+       }
+      }
+     }
+    ]
+   },
+   {
+    "parent": "119-37-4",
+    "parent_n": 119,
+    "parent_k": 37,
+    "parent_d": 4,
+    "parent_w": 6,
+    "chain": [
+     {
+      "step": 0,
+      "improving": 0,
+      "search": {
+       "evaluated": 64,
+       "budget": 64,
+       "budget_used": 64,
+       "budget_declined": 0,
+       "exhausted": true,
+       "truncated": true,
+       "stop_reason": "budget-exhausted",
+       "applicability": {
+        "C-DELETE-CHECK": {
+         "enabled": true,
+         "enumerated": 82,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 82,
+         "survived": 0,
+         "improving": 0
+        },
+        "E-PEEL": {
+         "enabled": true,
+         "enumerated": 30,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 30,
+         "survived": 0,
+         "improving": 0
+        },
+        "E-PUNCTURE": {
+         "enabled": true,
+         "enumerated": 119,
+         "apply_fail": 0,
+         "bare_qubit": 2,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 53,
+         "survived": 64,
+         "improving": 0
+        },
+        "E-EXTEND": {
+         "enabled": true,
+         "enumerated": 239,
+         "apply_fail": 0,
+         "bare_qubit": 1,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 238,
+         "dominated": 0,
+         "over_budget": 0,
+         "survived": 0,
+         "improving": 0
+        },
+        "E-GRAFT": {
+         "enabled": true,
+         "enumerated": 238,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 238,
+         "survived": 0,
+         "improving": 0
+        },
+        "E-LOCAL-HADAMARD": {
+         "enabled": false,
+         "enumerated": 0,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 0,
+         "survived": 0,
+         "improving": 0
+        },
+        "P-REBASE": {
+         "enabled": true,
+         "enumerated": 3298,
+         "apply_fail": 0,
+         "bare_qubit": 0,
+         "disconnected": 0,
+         "derive_fail": 0,
+         "min_upper": 0,
+         "deep_refuted": 0,
+         "screened": 0,
+         "dominated": 0,
+         "over_budget": 3298,
+         "survived": 0,
+         "improving": 0
+        }
+       }
+      }
+     }
+    ]
+   }
+  ],
+  "gate_passed": 5,
+  "board_advancing": 2
+ },
+ "finished": "2026-11-23T17:14:43"
+}

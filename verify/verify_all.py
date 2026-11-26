@@ -83,6 +83,19 @@ rate at least gains statistics from a re-run; this gains nothing.
 codes/<slug>.json or circuits/<slug>/ changed since REF, the diff --ler-base
 uses, and only while the verifier is the one REF was checked with. That
 second condition is checked here rather than left to the caller.
+--shard I/K is the compatibility sweep's mode (issue #7252). A pull request
+that changes the verifier closure has every entry on the board verified
+under the new verifier, which is a compatibility check rather than a safety
+check (every entry already passes, so it can only fail where the new rule
+rejects an existing entry) and grows with the board. verify.yml runs it as K
+parallel jobs: shard I verifies entries I, I+K, I+2K, ... of the board in path
+order in full (structure, circuit tier, and whatever --ler-base and
+--ler-sample select among them) and scans the rest by their identity keys,
+so the K shards together verify every entry once and each one's duplicate
+scan still reads the whole tree. The flag is not combined with --board-base
+(both decide what is verified in full) or --circuit-record (one shard would
+write a part of main's record).
+
 CIRCUIT_STACK below lists every module this file can import, the schema, the
 accelerator sources, the dependency pins and the workflow that runs all of
 it, and if any of them differs from REF the flag is void and every circuit
@@ -270,6 +283,79 @@ def board_entries_since(base, code_root, codes_dir, jobs):
         f"structural pass: {len(full)} entries verified ({len(changed)} changed since "
         f"{base}, the rest name one of them); {len(entries) - len(full)} unchanged entries "
         f"keep the base branch's verdict and were scanned for duplicates",
+        flush=True,
+    )
+    return [entries[path] for path in paths]
+
+
+def parse_shard(spec):
+    """Return (i, k) for ``spec="I/K"``: shard I of K, with 0 <= I < K."""
+    try:
+        i, k = (int(x) for x in spec.split("/"))
+    except ValueError:
+        raise ValueError(f"bad shard {spec!r}: want I/K") from None
+    if k < 1 or not 0 <= i < k:
+        raise ValueError(f"bad shard {spec!r}: want 0 <= I < K")
+    return i, k
+
+
+def board_entries_sharded(codes_dir, shard, jobs):
+    """Return the sweep's entries for ``--shard I/K``.
+
+    The entries, in path order, are dealt round-robin: shard I verifies
+    entries I, I+K, I+2K, ... in full, and the K shards together verify every
+    entry exactly once. The other entries contribute their identity keys,
+    computed in ``jobs`` processes, so each shard's duplicate scan still reads
+    every byte of the tree and a collision between two shards' entries is
+    reported by both. An entry whose keys cannot be computed (oversize,
+    unparseable) is verified in full by every shard: the failure mode costs
+    time, never coverage. Entries outside the shard carry ``other_shard``:
+    True, and every reader skips them before it reads a verdict.
+    """
+    i, k = parse_shard(shard)
+    paths = sorted(glob.glob(os.path.join(codes_dir, "*.json")))
+    mine = set(paths[i::k])
+    raw = {}
+    for path in paths:
+        if file_size_error(path):
+            raw[path] = None
+            continue
+        with open(path, "rb") as f:
+            raw[path] = f.read()
+    full = [path for path in paths if path in mine or raw[path] is None]
+    light = [path for path in paths if path not in mine and raw[path] is not None]
+    workers = (os.cpu_count() or 1) if jobs == 0 else max(1, int(jobs))
+    if workers > 1 and len(light) > 1:
+        with concurrent.futures.ProcessPoolExecutor(max_workers=min(workers, len(light))) as pool:
+            keys = list(pool.map(_identity_entry, light, chunksize=16))
+    else:
+        keys = [_identity_entry(path) for path in light]
+    entries = {}
+    for path, key in zip(light, keys):
+        if key is None:
+            full.append(path)
+            continue
+        try:
+            doc = json.loads(raw[path])
+        except ValueError:
+            full.append(path)
+            continue
+        entries[path] = {
+            "path": path,
+            "slug": os.path.splitext(os.path.basename(path))[0],
+            "doc": doc,
+            "report": key,
+            "size_error": None,
+            "load_error": None,
+            "other_shard": True,
+        }
+    for path in full:
+        entry = dict(_board_entry(path, raw[path]))
+        entry["other_shard"] = False
+        entries[path] = entry
+    print(
+        f"structural pass: shard {i}/{k} verifies {len(full)} of {len(paths)} entries; the other "
+        f"{len(entries) - len(full)} entries' identity keys were scanned for duplicates",
         flush=True,
     )
     return [entries[path] for path in paths]
@@ -566,6 +652,16 @@ def main(argv=None):
         "a gate reads the sweep's memo and would pay the pass itself",
     )
     ap.add_argument(
+        "--shard",
+        default=None,
+        metavar="I/K",
+        help="verify in full only entries I, I+K, I+2K, ... of the board in "
+        "path order and scan the rest for duplicates by their identity "
+        "keys; K such runs verify every entry once (the compatibility "
+        "sweep of a pull request that changed the verifier, issue #7252). "
+        "Not with --board-base or --circuit-record",
+    )
+    ap.add_argument(
         "--jobs",
         default=1,
         type=int,
@@ -587,6 +683,15 @@ def main(argv=None):
         ap.error("--circuit-jobs must be 0 (one per CPU) or a positive count")
     if args.jobs < 0:
         ap.error("--jobs must be 0 (one per CPU) or a positive count")
+    if args.shard is not None:
+        try:
+            parse_shard(args.shard)
+        except ValueError as e:
+            ap.error(str(e))
+        if args.board_base:
+            ap.error("--shard and --board-base both decide which entries are verified in full; pass one")
+        if args.circuit_record:
+            ap.error("--shard writes no circuit record: that is a run on main's, and a shard would hold a part")
     if args.ler_sample is not None and args.ler_sample < 1:
         # Zero would be a way to ask for no re-measurement at all. Nothing
         # needs it: leaving the flag out is how a run says "only what
@@ -631,6 +736,8 @@ def main(argv=None):
     board = None
     if board_base:
         board = board_entries_since(board_base, code_root, codes_dir, args.jobs)
+    elif args.shard is not None:
+        board = board_entries_sharded(codes_dir, args.shard, args.jobs)
     if board is None:
         board = shared_pass(codes_dir)
     entries = [(e, True) for e in board]
@@ -697,7 +804,7 @@ def main(argv=None):
     if args.circuit_jobs != 1:
         jobs = []
         for e, is_code in entries:
-            if not is_code or e["size_error"] or e["load_error"] or e.get("base_verdict"):
+            if not is_code or e["size_error"] or e["load_error"] or e.get("base_verdict") or e.get("other_shard"):
                 continue
             if not (e["report"]["ok"] and e["doc"].get("circuit")):
                 continue
@@ -724,6 +831,7 @@ def main(argv=None):
     skipped_circuits = 0
     recorded_circuits = 0
     base_verdicts = 0
+    other_shards = 0
     sigs = {}
     fps = {}
 
@@ -753,6 +861,13 @@ def main(argv=None):
             print(f"BASE  {rel}  -> unchanged since {board_base}; structural verdict is the base branch's")
             file_identity(rel, e["report"])
             base_verdicts += 1
+            continue
+        if e.get("other_shard"):
+            # --shard: another shard verifies this entry; only the duplicate
+            # scan reads it
+            print(f"SHARD {rel}  -> verified by another shard of {args.shard}; identity keys scanned")
+            file_identity(rel, e["report"])
+            other_shards += 1
             continue
         if e["size_error"]:
             failed.append(rel)
@@ -850,10 +965,11 @@ def main(argv=None):
             f"\ncircuit tier not re-run for {recorded_circuits} entries recorded as "
             f"passing on these bytes; {len(passed)} passes now in {args.circuit_record}"
         )
-    verified = len(entries) - base_verdicts
+    verified = len(entries) - base_verdicts - other_shards
     print(
         f"\n{verified - len(failed)}/{verified} passed"
         + (f"; {base_verdicts} unchanged since {board_base} keep the base branch's verdict" if base_verdicts else "")
+        + (f"; {other_shards} entries left to the other shards of {args.shard}" if other_shards else "")
     )
     return 1 if (failed or identical) else 0
 
