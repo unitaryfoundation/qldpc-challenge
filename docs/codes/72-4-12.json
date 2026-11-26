@@ -802,7 +802,7 @@
    "arXiv:2610.13880"
   ],
   "date": "2026-10-12",
-  "notes": "Parameters and construction taken from the public database of arXiv:2610.13880v1. Distance is an upper bound certified by the witnesses attached here. Parameters and blocks taken from the public code database of arXiv:2610.13880v1 (Lee, 'Bicycle Race'), github.com/gideonlsx/bicycle-race @ aed705a, CC BY 4.0; rebuilt here with the repo's own group data. Distance is an upper bound certified by the attached witnesses, not the paper's exact distance.",
+  "notes": "Parameters and construction taken from the public database of arXiv:2610.13880v1. Distance is an upper bound certified by the witnesses attached here. Parameters and blocks taken from the public code database of arXiv:2610.13880v1 (Lee, 'Bicycle Race'), github.com/gideonlsx/bicycle-race @ aed705a, CC BY 4.0; rebuilt here with the repo's own group data. Distance is an upper bound certified by the attached witnesses, not the paper's exact distance. Circuit fault distance corrected on 2026-11-26 by @FarLab: the X-memory circuit has an undetected logical fault set of weight 11 in its committed detector error model (claimed 12); the Z-memory circuit has an undetected logical fault set of weight 11 in its committed detector error model (claimed 12). Found by Sisyphus (sisyphus-qec 0.2.1, github.com/varunmenon1310/sisyphus) in the sweep recorded in research/audits/sisyphus_circuit_sweep-2026-11-25.json (60 s per basis), run by Claude Fable 5.2 (Claude Code) for @FarLab, and re-verified in the committed detector error model with verify/circuit_tools.witness_errors. Each value is an upper bound from a randomized search; no lower bound is proved.",
   "origin": "baseline",
   "novelty": "known_parameters",
   "model": "Mimo-V2.6-Flash"
@@ -1112,39 +1112,37 @@
  "circuit": {
   "d_circ": {
    "Z": {
-    "value": 12,
+    "value": 11,
     "confidence": "upper_bound",
     "witness": [
-     70530,
-     70531,
-     70540,
-     70544,
-     70546,
-     70548,
-     70551,
-     70552,
-     70554,
-     70555,
-     70557,
-     70558
+     5500,
+     5516,
+     5542,
+     10945,
+     16803,
+     16806,
+     16870,
+     16882,
+     16927,
+     17001,
+     17004
     ]
    },
    "X": {
-    "value": 12,
+    "value": 11,
     "confidence": "upper_bound",
     "witness": [
-     70464,
-     70465,
-     70476,
-     70482,
-     70485,
-     70486,
-     70490,
-     70499,
-     70516,
-     70517,
-     70518,
-     70522
+     68725,
+     68741,
+     68770,
+     69161,
+     69183,
+     69329,
+     69623,
+     70456,
+     70459,
+     70466,
+     70496
     ]
    }
   },

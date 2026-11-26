@@ -1503,7 +1503,7 @@
   "origin": "submission",
   "date": "2026-09-09",
   "model": "Omen Alpha 1.0",
-  "notes": "New parameters (submitter claim): arXiv:2609.06572 swept only the (12,6) and (8,9) grids; this is from the unsearched (18,4) grid. Distance: RIS upper bound d<=15 (20k trials), corroborated by BP+OSD at 200k trials/side (weight-15 logicals, nothing lighter); exact certification not run.",
+  "notes": "New parameters (submitter claim): arXiv:2609.06572 swept only the (12,6) and (8,9) grids; this is from the unsearched (18,4) grid. Distance: RIS upper bound d<=15 (20k trials), corroborated by BP+OSD at 200k trials/side (weight-15 logicals, nothing lighter); exact certification not run. Circuit fault distance corrected on 2026-11-26 by @FarLab: the X-memory circuit has an undetected logical fault set of weight 11 in its committed detector error model (claimed 15); the Z-memory circuit has an undetected logical fault set of weight 11 in its committed detector error model (claimed 15). Found by Sisyphus (sisyphus-qec 0.2.1, github.com/varunmenon1310/sisyphus) in the sweep recorded in research/audits/sisyphus_circuit_sweep-2026-11-25.json (60 s per basis), run by Claude Fable 5.2 (Claude Code) for @FarLab, and re-verified in the committed detector error model with verify/circuit_tools.witness_errors. Each value is an upper bound from a randomized search; no lower bound is proved.",
   "novelty": "new_parameters"
  },
  "family": "bivariate-bicycle",
@@ -2099,45 +2099,37 @@
  "circuit": {
   "d_circ": {
    "Z": {
-    "value": 15,
+    "value": 11,
     "confidence": "upper_bound",
     "witness": [
-     123211,
-     123219,
-     123230,
-     123235,
-     123243,
-     123249,
-     123255,
-     123257,
-     123272,
-     123285,
-     123287,
-     123305,
-     123313,
-     123321,
-     123331
+     123112,
+     123122,
+     123162,
+     123197,
+     123217,
+     123218,
+     123290,
+     123296,
+     123300,
+     123304,
+     123328
     ]
    },
    "X": {
-    "value": 15,
+    "value": 11,
     "confidence": "upper_bound",
     "witness": [
-     123198,
-     123199,
-     123223,
-     123224,
-     123232,
-     123234,
-     123240,
-     123249,
-     123262,
-     123284,
-     123290,
-     123316,
-     123317,
-     123320,
-     123322
+     117,
+     142,
+     642,
+     678,
+     851,
+     900,
+     1971,
+     2020,
+     2483,
+     2930,
+     3077
     ]
    }
   },

@@ -1098,7 +1098,7 @@
   "construction": "2BGA (arXiv:2306.16400) on SmallGroup(52,1), from github.com/QEC-pages/2BGA-codes @ 403d194c3f98f0cadc236aecbc4a8b6139ccf23c, nonabelian.zip, diswtnonabelian_wt8wtL2_order52_k6.txt, line 8. nonidentity supports a=[4], b=[2, 3, 16, 24, 25].",
   "references": [],
   "date": "2026-09-19",
-  "notes": "Literature reproduction of a published 2BGA code (arXiv:2306.16400; github.com/QEC-pages/2BGA-codes @ 403d194c3f98f0cadc236aecbc4a8b6139ccf23c). Checked against the live board: not equivalent to any existing entry.",
+  "notes": "Literature reproduction of a published 2BGA code (arXiv:2306.16400; github.com/QEC-pages/2BGA-codes @ 403d194c3f98f0cadc236aecbc4a8b6139ccf23c). Checked against the live board: not equivalent to any existing entry. Circuit fault distance corrected on 2026-11-26 by @FarLab: the Z-memory circuit has an undetected logical fault set of weight 12 in its committed detector error model (claimed 13). Found by Sisyphus (sisyphus-qec 0.2.1, github.com/varunmenon1310/sisyphus) in the sweep recorded in research/audits/sisyphus_circuit_sweep-2026-11-25.json (60 s per basis), run by Claude Fable 5.2 (Claude Code) for @FarLab, and re-verified in the committed detector error model with verify/circuit_tools.witness_errors. Each value is an upper bound from a randomized search; no lower bound is proved.",
   "model": "DeepSeek V4 Flash 0731",
   "origin": "submission"
  },
@@ -1527,21 +1527,20 @@
  "circuit": {
   "d_circ": {
    "Z": {
-    "value": 13,
+    "value": 12,
     "confidence": "upper_bound",
     "witness": [
-     110665,
-     110667,
-     110678,
-     110690,
-     110693,
-     110703,
-     110704,
-     110713,
-     110718,
-     110720,
-     110726,
-     110745,
+     104548,
+     104561,
+     104590,
+     109752,
+     109753,
+     110440,
+     110608,
+     110625,
+     110710,
+     110727,
+     110749,
      110756
     ]
    },

@@ -1828,33 +1828,31 @@
  "circuit": {
   "d_circ": {
    "X": {
+    "value": 8,
     "confidence": "upper_bound",
-    "value": 9,
     "witness": [
-     100821,
-     100826,
-     100854,
-     100857,
-     100886,
-     100890,
-     100914,
-     100916,
-     100920
+     2613,
+     2619,
+     5227,
+     5243,
+     12768,
+     13758,
+     14360,
+     14859
     ]
    },
    "Z": {
+    "value": 8,
     "confidence": "upper_bound",
-    "value": 9,
     "witness": [
-     100797,
-     100799,
-     100809,
-     100810,
-     100909,
-     100910,
-     100913,
-     100925,
-     100956
+     859,
+     1053,
+     1938,
+     2034,
+     4120,
+     6158,
+     6982,
+     9211
     ]
    }
   },
@@ -1914,7 +1912,7 @@
   "construction": "bivariate bicycle on Z_7 x Z_13: A = x^0y^0 + x^4y^12 + x^1y^10 + x^2y^4, B = x^0y^0 + x^4y^1 + x^2y^9 + x^1y^3",
   "date": "2026-10-17",
   "model": "Claude Fable 5.1",
-  "notes": " Circuit fault distance corrected on 2026-11-06 by @vprusso: the X-memory circuit has an undetected logical fault set of weight 6 in its committed detector error model (claimed 9), with a proved lower bound of 6; the Z-memory circuit has an undetected logical fault set of weight 6 in its committed detector error model (claimed 9), with a proved lower bound of 6. Found by tropidist (arXiv:2611.08247) and re-verified in the committed detector error model (record circuit_distance_bounds-2026-11-06.json).",
+  "notes": " Circuit fault distance corrected on 2026-11-06 by @vprusso: the X-memory circuit has an undetected logical fault set of weight 6 in its committed detector error model (claimed 9), with a proved lower bound of 6; the Z-memory circuit has an undetected logical fault set of weight 6 in its committed detector error model (claimed 9), with a proved lower bound of 6. Found by tropidist (arXiv:2611.08247) and re-verified in the committed detector error model (record circuit_distance_bounds-2026-11-06.json). Circuit fault distance corrected on 2026-11-26 by @FarLab: the X-memory circuit has an undetected logical fault set of weight 8 in its committed detector error model (claimed 9); the Z-memory circuit has an undetected logical fault set of weight 8 in its committed detector error model (claimed 9). Found by Sisyphus (sisyphus-qec 0.2.1, github.com/varunmenon1310/sisyphus) in the sweep recorded in research/audits/sisyphus_circuit_sweep-2026-11-25.json (60 s per basis), run by Claude Fable 5.2 (Claude Code) for @FarLab, and re-verified in the committed detector error model with verify/circuit_tools.witness_errors. Each value is an upper bound from a randomized search; no lower bound is proved.",
   "origin": "submission",
   "search_budget": {
    "candidates_screened": 20444,

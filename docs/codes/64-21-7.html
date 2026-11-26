@@ -119,8 +119,8 @@
 <div class=kv><b>d_circ</b> &le; 5 <span class=claimed>(min over bases; penalty-only, each basis clamped to the distance of the logical it protects, so the min is &le; d)</span> &middot; 90 layers per round <span class=claimed>(the deeper basis; computed, never ranked)</span></div>
 <div class=kv><b>d_circ^X</b> 5 &middot; fault-set witness of 5 mechanisms (claimed upper_bound)</div>
 <details><summary>witness fault set (mechanism indices in the DEM derived from the committed .stim, 5)</summary><div class=wit>[55610, 55632, 55657, 55661, 55690]</div></details>
-<div class=kv><b>d_circ^Z</b> 6 &middot; fault-set witness of 6 mechanisms (claimed upper_bound)</div>
-<details><summary>witness fault set (mechanism indices in the DEM derived from the committed .stim, 6)</summary><div class=wit>[19803, 19835, 19887, 19917, 19920, 24995]</div></details>
+<div class=kv><b>d_circ^Z</b> 5 &middot; fault-set witness of 5 mechanisms (claimed upper_bound)</div>
+<details><summary>witness fault set (mechanism indices in the DEM derived from the committed .stim, 5)</summary><div class=wit>[187, 1164, 1667, 2663, 4218]</div></details>
 <div class=kv style="color:var(--mut)">no measured logical error rate yet; d_circ is a floor, and the measured tier records the prefactor it cannot see</div>
 </section>
 <section class=blk><h3>Verified 2D layout</h3>
@@ -136,6 +136,7 @@
 <div class=kv><b>construction</b> priced calculus C-DELETE-CHECK transform of codes/64-20-8.json</div>
 <div class=kv><b>model</b> <span class=modelmark></span>Beam 1.0 <span class=claimed>(claimed, not verified)</span></div>
 <div class=kv><b>date</b> 2026-11-01</div>
+<div class=kv><b>notes</b>  Circuit fault distance corrected on 2026-11-26 by @FarLab: the Z-memory circuit has an undetected logical fault set of weight 5 in its committed detector error model (claimed 6). Found by Sisyphus (sisyphus-qec 0.2.1, github.com/varunmenon1310/sisyphus) in the sweep recorded in research/audits/sisyphus_circuit_sweep-2026-11-25.json (60 s per basis), run by Claude Fable 5.2 (Claude Code) for @FarLab, and re-verified in the committed detector error model with verify/circuit_tools.witness_errors. Each value is an upper bound from a randomized search; no lower bound is proved.</div>
 <div class=kv><b>family</b> other <span class=claimed>(a tag, not a ranking)</span></div>
 <div class=kv><b>locality</b> 2D-local bilayer <span class=claimed>(computed from the layout)</span></div>
 <div class=kv><b>weight class</b> weight &gt; 8 <span class=claimed>(computed)</span></div>

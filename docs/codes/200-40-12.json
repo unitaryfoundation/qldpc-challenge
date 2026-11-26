@@ -1827,46 +1827,38 @@
    "arXiv:2607.28795"
   ],
   "date": "2026",
-  "notes": "Literature baseline. Paper claims d = 12 (exact, via sQetch + BP+OSD estimators; not certified here). Seeded per issue #377.",
+  "notes": "Literature baseline. Paper claims d = 12 (exact, via sQetch + BP+OSD estimators; not certified here). Seeded per issue #377. Circuit fault distance corrected on 2026-11-26 by @FarLab: the X-memory circuit has an undetected logical fault set of weight 8 in its committed detector error model (claimed 12); the Z-memory circuit has an undetected logical fault set of weight 8 in its committed detector error model (claimed 12). Found by Sisyphus (sisyphus-qec 0.2.1, github.com/varunmenon1310/sisyphus) in the sweep recorded in research/audits/sisyphus_circuit_sweep-2026-11-25.json (60 s per basis), run by Claude Fable 5.2 (Claude Code) for @FarLab, and re-verified in the committed detector error model with verify/circuit_tools.witness_errors. Each value is an upper bound from a randomized search; no lower bound is proved.",
   "origin": "baseline"
  },
  "family": "lifted-product",
  "circuit": {
   "d_circ": {
    "Z": {
-    "value": 12,
+    "value": 8,
     "confidence": "upper_bound",
     "witness": [
-     123831,
-     123833,
-     123843,
-     123848,
-     123849,
-     123851,
-     123859,
-     123885,
-     123886,
-     123887,
-     123893,
-     123905
+     83,
+     150,
+     477,
+     629,
+     870,
+     1591,
+     3634,
+     7996
     ]
    },
    "X": {
-    "value": 12,
+    "value": 8,
     "confidence": "upper_bound",
     "witness": [
-     123377,
-     123402,
-     123434,
-     123441,
-     123628,
-     123670,
-     123707,
-     123715,
-     123728,
-     123776,
-     123778,
-     123807
+     123465,
+     123469,
+     123497,
+     123518,
+     123523,
+     123528,
+     123563,
+     123742
     ]
    }
   },

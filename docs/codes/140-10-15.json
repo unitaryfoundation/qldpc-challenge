@@ -1469,51 +1469,38 @@
    "cpu_hours": 6.5,
    "tool": "research/kit/search.py + gf2_fast on Brev n2d-highcpu-64"
   },
-  "notes": "The Weisfeiler-Leman signature matches the board's [[140,10,10]] entry (a 2BGA on the metacyclic group Z_35 x| Z_2), but the two cannot be qubit permutations of each other: a permutation preserves logical weights, the board entry carries a weight-10 logical witness, and three fresh-seed runs of 4,000,000 gf2_fast RIS trials per side on this code (plus the qldpc submit 10,000,000-trial pass) found no logical below weight 15. This code is a bivariate bicycle code on the abelian torus Z_7 x Z_10."
+  "notes": "The Weisfeiler-Leman signature matches the board's [[140,10,10]] entry (a 2BGA on the metacyclic group Z_35 x| Z_2), but the two cannot be qubit permutations of each other: a permutation preserves logical weights, the board entry carries a weight-10 logical witness, and three fresh-seed runs of 4,000,000 gf2_fast RIS trials per side on this code (plus the qldpc submit 10,000,000-trial pass) found no logical below weight 15. This code is a bivariate bicycle code on the abelian torus Z_7 x Z_10. Circuit fault distance corrected on 2026-11-26 by @FarLab: the X-memory circuit has an undetected logical fault set of weight 9 in its committed detector error model (claimed 15); the Z-memory circuit has an undetected logical fault set of weight 8 in its committed detector error model (claimed 15). Found by Sisyphus (sisyphus-qec 0.2.1, github.com/varunmenon1310/sisyphus) in the sweep recorded in research/audits/sisyphus_circuit_sweep-2026-11-25.json (60 s per basis), run by Claude Fable 5.2 (Claude Code) for @FarLab, and re-verified in the committed detector error model with verify/circuit_tools.witness_errors. Each value is an upper bound from a randomized search; no lower bound is proved."
  },
  "family": "bivariate-bicycle",
  "circuit": {
   "d_circ": {
    "Z": {
-    "value": 15,
+    "value": 8,
     "confidence": "upper_bound",
     "witness": [
-     119004,
-     119006,
-     119020,
-     119022,
-     119040,
-     119042,
-     119053,
-     119060,
-     119068,
-     119070,
-     119078,
-     119087,
-     119089,
-     119090,
-     119109
+     19479,
+     19536,
+     19757,
+     19807,
+     19974,
+     20035,
+     20442,
+     21096
     ]
    },
    "X": {
-    "value": 15,
+    "value": 9,
     "confidence": "upper_bound",
     "witness": [
-     118692,
-     118695,
-     118755,
-     118766,
-     118808,
-     118820,
-     118822,
-     118832,
-     118939,
-     118941,
-     118985,
+     118682,
+     118683,
+     118858,
+     118867,
+     118969,
+     118970,
+     119028,
      119030,
-     119053,
-     119081,
-     119090
+     119049
     ]
    }
   },

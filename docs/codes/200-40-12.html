@@ -69,11 +69,11 @@
 <section class=blk><h3>Circuit tier</h3>
 <div class=kv style="color:var(--mut)">syndrome-extraction memory circuits committed under <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/circuits/200-40-12">circuits/200-40-12/</a> &middot; canonical noise recipe, 12 rounds, stim 1.16.0</div>
 <div class=kv title="schedule of the committed memory circuits, computed at build time and never ranked: qubits is every qubit the circuit addresses (data, ancilla, and flag), layers is the number of TICK-delimited parallel gate layers in the whole memory experiment, layers per round divides the layers between the data preparation and the final readout by the rounds, 2q layers and 2q gates per round are the two-qubit-gate layers and gates of one extraction round, 2q gates per layer is their mean over the two-qubit layers (the parallelism), and qubit-layers is qubits times layers, a spacetime volume"><b>schedule</b> <span class=claimed>(computed from the committed circuits; displayed, never ranked)</span></div><table class="lerpts sched"><thead><tr><th>basis</th><th>qubits</th><th>layers</th><th>layers / round</th><th>2q layers / round</th><th>2q gates / round</th><th>2q gates / layer</th><th>qubit-layers</th></tr></thead><tbody><tr><td>X, Z</td><td class=num>360</td><td class=num>290</td><td class=num>24</td><td class=num>22</td><td class=num>1,440</td><td class=num>65.5</td><td class=num>104,400</td></tr></tbody></table>
-<div class=kv><b>d_circ</b> &le; 12 <span class=claimed>(min over bases; penalty-only, each basis clamped to the distance of the logical it protects, so the min is &le; d)</span> &middot; 24 layers per round <span class=claimed>(the deeper basis; computed, never ranked)</span></div>
-<div class=kv><b>d_circ^X</b> 12 &middot; fault-set witness of 12 mechanisms (claimed upper_bound)</div>
-<details><summary>witness fault set (mechanism indices in the DEM derived from the committed .stim, 12)</summary><div class=wit>[123377, 123402, 123434, 123441, 123628, 123670, 123707, 123715, 123728, 123776, 123778, 123807]</div></details>
-<div class=kv><b>d_circ^Z</b> 12 &middot; fault-set witness of 12 mechanisms (claimed upper_bound)</div>
-<details><summary>witness fault set (mechanism indices in the DEM derived from the committed .stim, 12)</summary><div class=wit>[123831, 123833, 123843, 123848, 123849, 123851, 123859, 123885, 123886, 123887, 123893, 123905]</div></details>
+<div class=kv><b>d_circ</b> &le; 8 <span class=claimed>(min over bases; penalty-only, each basis clamped to the distance of the logical it protects, so the min is &le; d)</span> &middot; 24 layers per round <span class=claimed>(the deeper basis; computed, never ranked)</span></div>
+<div class=kv><b>d_circ^X</b> 8 &middot; fault-set witness of 8 mechanisms (claimed upper_bound)</div>
+<details><summary>witness fault set (mechanism indices in the DEM derived from the committed .stim, 8)</summary><div class=wit>[123465, 123469, 123497, 123518, 123523, 123528, 123563, 123742]</div></details>
+<div class=kv><b>d_circ^Z</b> 8 &middot; fault-set witness of 8 mechanisms (claimed upper_bound)</div>
+<details><summary>witness fault set (mechanism indices in the DEM derived from the committed .stim, 8)</summary><div class=wit>[83, 150, 477, 629, 870, 1591, 3634, 7996]</div></details>
 <div class=kv style="color:var(--mut)">no measured logical error rate yet; d_circ is a floor, and the measured tier records the prefactor it cannot see</div>
 </section>
 <section class=blk><h3>Construction &amp; provenance</h3>
@@ -83,7 +83,7 @@
 <div class=kv><b>model</b> <span class=modelmark></span>human <span class=claimed>(claimed, not verified)</span></div>
 <div class=kv><b>reference</b> <a href="https://arxiv.org/abs/2607.28795">arXiv:2607.28795</a></div>
 <div class=kv><b>date</b> 2026</div>
-<div class=kv><b>notes</b> Literature baseline. Paper claims d = 12 (exact, via sQetch + BP+OSD estimators; not certified here). Seeded per issue #377.</div>
+<div class=kv><b>notes</b> Literature baseline. Paper claims d = 12 (exact, via sQetch + BP+OSD estimators; not certified here). Seeded per issue #377. Circuit fault distance corrected on 2026-11-26 by @FarLab: the X-memory circuit has an undetected logical fault set of weight 8 in its committed detector error model (claimed 12); the Z-memory circuit has an undetected logical fault set of weight 8 in its committed detector error model (claimed 12). Found by Sisyphus (sisyphus-qec 0.2.1, github.com/varunmenon1310/sisyphus) in the sweep recorded in research/audits/sisyphus_circuit_sweep-2026-11-25.json (60 s per basis), run by Claude Fable 5.2 (Claude Code) for @FarLab, and re-verified in the committed detector error model with verify/circuit_tools.witness_errors. Each value is an upper bound from a randomized search; no lower bound is proved.</div>
 <div class=kv><b>family</b> lifted product <span class=claimed>(a tag, not a ranking)</span></div>
 <div class=kv><b>locality</b> unrestricted <span class=claimed>(computed from the layout)</span></div>
 <div class=kv><b>weight class</b> weight &gt; 8 <span class=claimed>(computed)</span></div>

@@ -1215,45 +1215,39 @@
    "cpu_hours": 3,
    "tool": "research/kit 2BGA sweep + gf2_fast on Brev n2d-highcpu-64"
   },
-  "notes": " Circuit fault distance corrected on 2026-11-06 by @vprusso: the X-memory circuit has an undetected logical fault set of weight 5 in its committed detector error model (claimed 10), with a proved lower bound of 5; the Z-memory circuit has an undetected logical fault set of weight 6 in its committed detector error model (claimed 10), with a proved lower bound of 6. Found by tropidist (arXiv:2611.08247) and re-verified in the committed detector error model (record circuit_distance_bounds-2026-11-06.json)."
+  "notes": " Circuit fault distance corrected on 2026-11-06 by @vprusso: the X-memory circuit has an undetected logical fault set of weight 5 in its committed detector error model (claimed 10), with a proved lower bound of 5; the Z-memory circuit has an undetected logical fault set of weight 6 in its committed detector error model (claimed 10), with a proved lower bound of 6. Found by tropidist (arXiv:2611.08247) and re-verified in the committed detector error model (record circuit_distance_bounds-2026-11-06.json). Circuit fault distance corrected on 2026-11-26 by @FarLab: the X-memory circuit has an undetected logical fault set of weight 9 in its committed detector error model (claimed 12); the Z-memory circuit has an undetected logical fault set of weight 9 in its committed detector error model (claimed 12). Found by Sisyphus (sisyphus-qec 0.2.1, github.com/varunmenon1310/sisyphus) in the sweep recorded in research/audits/sisyphus_circuit_sweep-2026-11-25.json (60 s per basis), run by Claude Fable 5.2 (Claude Code) for @FarLab, and re-verified in the committed detector error model with verify/circuit_tools.witness_errors. Each value is an upper bound from a randomized search; no lower bound is proved."
  },
  "family": "bivariate-bicycle",
  "circuit": {
   "d_circ": {
    "X": {
-    "value": 12,
+    "value": 9,
     "confidence": "upper_bound",
     "witness": [
-     105782,
-     105787,
-     105792,
-     105798,
-     105799,
-     105805,
-     105811,
-     105812,
-     105814,
-     105818,
-     105819,
-     105829
+     2731,
+     2752,
+     3988,
+     4006,
+     10900,
+     11116,
+     11151,
+     11227,
+     12155
     ]
    },
    "Z": {
-    "value": 12,
+    "value": 9,
     "confidence": "upper_bound",
     "witness": [
-     105754,
-     105755,
-     105761,
-     105766,
-     105768,
-     105772,
-     105790,
-     105792,
-     105803,
-     105807,
-     105809,
-     105815
+     19865,
+     19882,
+     19890,
+     19987,
+     19993,
+     25522,
+     25778,
+     25828,
+     25832
     ]
    }
   },

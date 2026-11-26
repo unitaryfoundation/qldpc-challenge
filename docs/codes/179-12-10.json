@@ -1858,7 +1858,7 @@
   "construction": "frozen-qubit deflation of codes/181-12-10.json (itself an r=1 lattice graft of codes/183-12-10.json): removed the two weight-1 Z stabilizers (qubits 50 and 145) and their qubit columns; k unchanged, n lower; distance witnesses preserved under reindexing. Follow-up to PR #1060, whose stabilizer-group connectivity check rejects the weight-1 checks.",
   "references": [],
   "date": "2026-09-15",
-  "notes": "",
+  "notes": " Circuit fault distance corrected on 2026-11-26 by @FarLab: the Z-memory circuit has an undetected logical fault set of weight 9 in its committed detector error model (claimed 10). Found by Sisyphus (sisyphus-qec 0.2.1, github.com/varunmenon1310/sisyphus) in the sweep recorded in research/audits/sisyphus_circuit_sweep-2026-11-25.json (60 s per basis), run by Claude Fable 5.2 (Claude Code) for @FarLab, and re-verified in the committed detector error model with verify/circuit_tools.witness_errors. Each value is an upper bound from a randomized search; no lower bound is proved.",
   "model": [
    "GLM 5.3 Flash",
    "Omen Alpha 1.0"
@@ -2590,19 +2590,18 @@
  "circuit": {
   "d_circ": {
    "Z": {
-    "value": 10,
+    "value": 9,
     "confidence": "upper_bound",
     "witness": [
-     127344,
-     127345,
-     127363,
-     127393,
-     127395,
-     127402,
-     127428,
-     127433,
-     127454,
-     127462
+     3303,
+     3341,
+     5391,
+     5425,
+     5437,
+     5511,
+     7931,
+     9192,
+     10182
     ]
    },
    "X": {

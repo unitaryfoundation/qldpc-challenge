@@ -1142,7 +1142,7 @@
    "arXiv:2608.09115"
   ],
   "date": "2026-08-10",
-  "notes": "The paper reports exact d=6. This staged record keeps the repository's witness-backed distance evidence as upper_bound until trusted certification.",
+  "notes": "The paper reports exact d=6. This staged record keeps the repository's witness-backed distance evidence as upper_bound until trusted certification. Circuit fault distance corrected on 2026-11-26 by @FarLab: the Z-memory circuit has an undetected logical fault set of weight 5 in its committed detector error model (claimed 6). Found by Sisyphus (sisyphus-qec 0.2.1, github.com/varunmenon1310/sisyphus) in the sweep recorded in research/audits/sisyphus_circuit_sweep-2026-11-25.json (60 s per basis), run by Claude Fable 5.2 (Claude Code) for @FarLab, and re-verified in the committed detector error model with verify/circuit_tools.witness_errors. Each value is an upper bound from a randomized search; no lower bound is proved.",
   "model": "GPT-5.6 Luna",
   "origin": "submission",
   "novelty": "known_parameters"
@@ -1332,15 +1332,14 @@
  "circuit": {
   "d_circ": {
    "Z": {
-    "value": 6,
+    "value": 5,
     "confidence": "upper_bound",
     "witness": [
-     71976,
-     71979,
-     71993,
-     71997,
-     71998,
-     72006
+     939,
+     3183,
+     4103,
+     5707,
+     7525
     ]
    },
    "X": {
