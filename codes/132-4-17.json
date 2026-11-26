@@ -1412,7 +1412,7 @@
    "S. Bravyi, A. W. Cross, J. M. Gambetta, D. Maslov, P. Rall, and T. J. Yoder, High-threshold and low-overhead fault-tolerant quantum memory, Nature 627, 778 (2024), arXiv:2308.07915"
   ],
   "date": "2026-10-25",
-  "notes": "Unattended loop run on Perlmutter, iteration 862, direction bb-w4-mid, seed 20261879. The deeper rungs recorded in notes/ agree with the gate's reading of d = 17.",
+  "notes": "Unattended loop run on Perlmutter, iteration 862, direction bb-w4-mid, seed 20261879. The deeper rungs recorded in notes/ agree with the gate's reading of d = 17. Circuit fault distance corrected on 2026-11-25 by @FarLab: the X-memory circuit has an undetected logical fault set of weight 11 in its committed detector error model (claimed 17); the Z-memory circuit has an undetected logical fault set of weight 11 in its committed detector error model (claimed 17). Found by Sisyphus (sisyphus-qec 0.2.0, github.com/varunmenon1310/sisyphus), in searches run by Claude Fable 5.2 (Claude Code) for @FarLab, and re-verified in the committed detector error model with verify/circuit_tools.witness_errors. Each value is an upper bound from a randomized search; no lower bound is proved.",
   "model": "Claude Fable 5.1 (Claude Code) working for @vprusso",
   "origin": "submission",
   "search_budget": {
@@ -1427,49 +1427,37 @@
  "circuit": {
   "d_circ": {
    "Z": {
-    "value": 17,
+    "value": 11,
     "confidence": "upper_bound",
     "witness": [
-     128315,
-     128323,
-     128359,
-     128365,
-     128377,
-     128378,
-     128390,
-     128394,
-     128418,
-     128444,
-     128495,
-     128518,
-     128520,
-     128524,
-     128531,
-     128534,
-     128552
+     127942,
+     127946,
+     128201,
+     128309,
+     128317,
+     128404,
+     128469,
+     128491,
+     128500,
+     128516,
+     128554
     ]
    },
    "X": {
-    "value": 17,
+    "value": 11,
     "confidence": "upper_bound",
     "witness": [
-     128447,
-     128449,
-     128451,
-     128457,
-     128464,
-     128508,
-     128514,
-     128516,
-     128518,
-     128522,
-     128530,
-     128531,
-     128533,
-     128539,
-     128558,
-     128560,
-     128565
+     29,
+     92,
+     127,
+     199,
+     559,
+     667,
+     701,
+     1028,
+     1714,
+     2927,
+     3162
     ]
    }
   },

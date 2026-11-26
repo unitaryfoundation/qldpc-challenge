@@ -728,9 +728,11 @@ def test_negative_circuit_jobs_is_refused(tmp_path, monkeypatch):
 _WORKFLOW = os.path.join(
     os.path.dirname(os.path.dirname(os.path.abspath(__file__))), ".github", "workflows", "verify.yml"
 )
+_COMPAT = "verify all submissions (compatibility sweep, one shard)"
 _PR_SWEEPS = (
     "verify all submissions (trusted verifier for code changes)",
     "verify all submissions (LER stack unchanged)",
+    _COMPAT,
 )
 _PUSH_SWEEP = "verify all submissions (push to main, LER scoped to the merge)"
 _FULL_SWEEP = "verify all submissions (LER stack changed, or the weekly run)"
@@ -739,6 +741,9 @@ _SAVE = "save the circuit record (runs on main)"
 _RECORD = "../circuit-record/record.json"
 # What verify.yml's env block hands the stack sweep's script besides the event.
 _SAMPLE_ENV = {"LER_SAMPLE": "3", "PR_NUMBER": "5578", "RUN_ID": "43263400509"}
+# What it hands the compatibility sweep's script (issue #7252): the shard,
+# whether the LER stack changed, and the sample's size and seed.
+_COMPAT_ENV = {"SHARD": "1", "SHARDS": "4", "LER_STACK_CHANGED": "false", "LER_SAMPLE": "3", "PR_NUMBER": "5578"}
 
 
 def _workflow_steps():
@@ -811,12 +816,10 @@ def test_every_pull_request_sweep_passes_circuit_base(tmp_path):
     """Whether the flag holds is verify_all's call, so no pull request sweep withholds it."""
     steps = _workflow_steps()
     for name in _PR_SWEEPS:
-        argv = _verify_all_argv(_script(steps[name]), tmp_path)
+        argv = _verify_all_argv(_script(steps[name]), tmp_path, **_COMPAT_ENV)
         assert argv[argv.index("--circuit-base") + 1] == "origin/main", (name, argv)
         assert argv[argv.index("--ler-base") + 1] == "origin/main", (name, argv)
-    argv = _verify_all_argv(_script(steps[_FULL_SWEEP]), tmp_path, EVENT_NAME="pull_request", **_SAMPLE_ENV)
-    assert argv[argv.index("--circuit-base") + 1] == "origin/main", argv
-    assert argv[-2:] == ["--circuit-jobs", "0"], argv
+        assert argv[-2:] == ["--circuit-jobs", "0"], (name, argv)
 
 
 def test_no_pull_request_sweep_is_handed_the_record(tmp_path):
@@ -826,7 +829,9 @@ def test_no_pull_request_sweep_is_handed_the_record(tmp_path):
         assert not any("--circuit-record" in ln for ln in _code(steps[name])), name
         assert "--circuit-record" not in _verify_all_argv(_script(steps[name]), tmp_path), name
     full = _script(steps[_FULL_SWEEP])
-    assert "--circuit-record" not in _verify_all_argv(full, tmp_path, EVENT_NAME="pull_request", **_SAMPLE_ENV)
+    # and the stack sweep, which is handed the record, no longer runs on one
+    cond = next(ln for ln in steps[_FULL_SWEEP] if ln.startswith("        if: "))
+    assert "pull_request" not in cond, cond
     for event in ("push", "schedule", "workflow_dispatch"):
         argv = _verify_all_argv(full, tmp_path, EVENT_NAME=event, BEFORE="abc123", **_SAMPLE_ENV)
         assert argv[-6:] == ["--circuit-record", _RECORD, "--jobs", "0", "--circuit-jobs", "0"], (event, argv)
@@ -838,7 +843,7 @@ def test_no_pull_request_sweep_is_handed_the_record(tmp_path):
 
 
 def test_every_sweep_is_scoped_one_way_or_the_other():
-    """Four sweeps, and each names how its circuit tier is scoped: none is left to a default."""
+    """Five sweeps, and each names how its circuit tier is scoped: none is left to a default."""
     steps = _workflow_steps()
     sweeps = {name for name, lines in steps.items() if any("verify/verify_all.py" in ln for ln in _code(lines))}
     assert sweeps == {*_PR_SWEEPS, _PUSH_SWEEP, _FULL_SWEEP}, sorted(sweeps)
@@ -1007,20 +1012,22 @@ def test_each_kind_of_run_reaches_the_sweep_meant_for_it():
     def cond(name):
         return next(ln for ln in steps[name] if ln.startswith("        if: "))[len("        if: ") :]
 
+    # The stack sweep is main's: a push that changed the stack, the weekly
+    # run, a dispatch. A pull request that changed the stack is the
+    # compatibility sweep's (issue #7252).
     assert set(cond(_FULL_SWEEP).split(" || ")) == {
         "github.event_name == 'schedule'",
         "github.event_name == 'workflow_dispatch'",
         "(github.event_name == 'push' && steps.merge.outputs.ler_stack_changed == 'true')",
-        "(github.event_name == 'pull_request' && steps.changes.outputs.codes_changed != 'true'"
-        " && steps.changes.outputs.ler_stack_changed == 'true'"
-        " && steps.verdict.outputs.cache-hit != 'true')",
     }
-    # The complements: a push or a pull request that left the stack alone.
+    # The complements: a push that left the stack alone, and a pull request
+    # that left the stack and the closure alone.
     assert cond(_PUSH_SWEEP) == ("github.event_name == 'push' && steps.merge.outputs.ler_stack_changed != 'true'")
     assert cond(_PR_SWEEPS[1]) == (
         "github.event_name == 'pull_request'"
         " && steps.changes.outputs.codes_changed != 'true'"
         " && steps.changes.outputs.ler_stack_changed != 'true'"
+        " && steps.changes.outputs.closure_changed != 'true'"
         " && steps.verdict.outputs.cache-hit != 'true'"
     )
     assert cond(_PR_SWEEPS[0]) == (
@@ -1028,6 +1035,8 @@ def test_each_kind_of_run_reaches_the_sweep_meant_for_it():
         " && steps.changes.outputs.codes_changed == 'true'"
         " && steps.verdict.outputs.cache-hit != 'true'"
     )
+    # The compatibility sweep runs when its own job found the closure changed.
+    assert cond(_COMPAT) == "steps.closure.outputs.closure_changed == 'true'"
 
 
 def test_a_stack_change_is_sampled_and_the_weekly_run_is_not(tmp_path):
@@ -1036,28 +1045,10 @@ def test_a_stack_change_is_sampled_and_the_weekly_run_is_not(tmp_path):
     for line in (
         '          LER_SAMPLE: "3"',
         "          BEFORE: ${{ github.event.before }}",
-        "          PR_NUMBER: ${{ github.event.pull_request.number }}",
         "          RUN_ID: ${{ github.run_id }}",
     ):
         assert line in lines, line
     script = _script(lines)
-    pr = _verify_all_argv(script, tmp_path, EVENT_NAME="pull_request", **_SAMPLE_ENV)
-    assert pr == [
-        "--ler-base",
-        "origin/main",
-        "--ler-sample",
-        "3",
-        "--ler-seed",
-        "5578",
-        "--circuit-base",
-        "origin/main",
-        "--board-base",
-        "origin/main",
-        "--jobs",
-        "0",
-        "--circuit-jobs",
-        "0",
-    ], pr
     push = _verify_all_argv(script, tmp_path, EVENT_NAME="push", BEFORE="abc123", **_SAMPLE_ENV)
     assert push == [
         "--ler-base",
@@ -1096,11 +1087,145 @@ def test_the_flags_the_workflow_passes_are_ones_verify_all_takes(tmp_path, monke
     assert rc == 0 and measured == ["a-1-1", "b-1-1", "c-1-1"]
 
 
-def test_only_the_stack_sweep_samples():
+def test_only_the_stack_sweeps_sample():
     """Every other sweep either diffs against a base it can trust or re-measures everything."""
     steps = _workflow_steps()
     users = {name for name, lines in steps.items() if any("--ler-sample" in ln for ln in _code(lines))}
-    assert users == {_FULL_SWEEP}, sorted(users)
+    assert users == {_FULL_SWEEP, _COMPAT}, sorted(users)
+
+
+# --shard I/K (issue #7252): the compatibility sweep of a pull request that
+# changed the verifier, run as K parallel jobs that together verify every
+# entry once and each scan the whole tree for duplicates.
+
+
+def _pass_slugs(out):
+    lines = [ln for ln in out.splitlines() if ln.startswith("PASS  codes/")]
+    return sorted(ln.split()[1].removeprefix("codes/").removesuffix(".json") for ln in lines)
+
+
+def _stub_keys(monkeypatch):
+    """Identity keys for the stub entries, which carry no checks for the real ones to read."""
+    import hashlib
+
+    def keys(path):
+        h = hashlib.sha256(open(path, "rb").read()).hexdigest()
+        return {"fingerprint": h, "signature": {"hash": h}}
+
+    monkeypatch.setattr(VA, "_identity_entry", keys)
+
+
+def test_shards_partition_the_board(tmp_path, monkeypatch, capsys):
+    root, slugs = _claims_repo(tmp_path, n=6)
+    every = sorted([*slugs, "plain-1-1"])
+    _stub_keys(monkeypatch)
+    seen = []
+    for i in range(3):
+        rc, _ = _run(monkeypatch, ["--root", root, "--shard", f"{i}/3"])
+        out = capsys.readouterr().out
+        assert rc == 0
+        mine = _pass_slugs(out)
+        assert mine == every[i::3], (i, mine)
+        assert sum(1 for ln in out.splitlines() if ln.startswith("SHARD codes/")) == len(every) - len(mine)
+        assert f"shard {i}/3 verifies {len(mine)} of {len(every)} entries" in out
+        assert f"{len(every) - len(mine)} entries left to the other shards of {i}/3" in out
+        seen += mine
+    assert sorted(seen) == every, "the shards together verify every entry exactly once"
+
+
+def test_a_shard_scans_the_other_shards_entries_for_duplicates(tmp_path, capsys):
+    """Two identical entries in different shards are reported by both, with the real verifier."""
+    root = str(tmp_path)
+    with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "fixtures", "72-6-6.json")) as f:
+        text = f.read()
+    _write(root, "codes/a-72-6-6.json", text)
+    _write(root, "codes/b-72-6-6.json", text)
+    for i in range(2):
+        rc = VA.main(["--root", root, "--shard", f"{i}/2"])
+        out = capsys.readouterr().out
+        assert rc == 1, out
+        assert "IDENTICAL CODES" in out and "codes/a-72-6-6.json" in out and "codes/b-72-6-6.json" in out
+        assert _pass_slugs(out) == [["a-72-6-6"], ["b-72-6-6"]][i]
+
+
+@pytest.mark.parametrize("spec", ["3/3", "a/b", "1/0", "-1/2", "2", "0/-1"])
+def test_a_bad_shard_is_refused(tmp_path, monkeypatch, spec):
+    root, _ = _claims_repo(tmp_path)
+    with pytest.raises(SystemExit):
+        _run(monkeypatch, ["--root", root, "--shard", spec])
+
+
+def test_a_shard_is_not_combined_with_the_base_or_the_record(tmp_path, monkeypatch):
+    root = _repo(tmp_path)
+    with pytest.raises(SystemExit):
+        _run(monkeypatch, ["--root", root, "--shard", "0/2", "--board-base", "main"])
+    with pytest.raises(SystemExit):
+        _run(monkeypatch, ["--root", root, "--shard", "0/2", "--circuit-record", str(tmp_path / "r.json")])
+
+
+def test_a_shard_measures_only_its_own_sampled_claims(tmp_path, monkeypatch):
+    """The sample is drawn across the board, so the shards together measure exactly it."""
+    root, slugs = _claims_repo(tmp_path)
+    every = sorted([*slugs, "plain-1-1"])
+    _stub_keys(monkeypatch)
+    measured = []
+    for i in range(2):
+        rc, got = _run(monkeypatch, ["--root", root, "--shard", f"{i}/2", "--ler-sample", "3", "--ler-seed", "5578"])
+        assert rc == 0
+        assert got == sorted(set(PINNED_SAMPLE) & set(every[i::2])), (i, got)
+        measured += got
+    assert sorted(measured) == PINNED_SAMPLE
+
+
+def test_the_compatibility_sweep_shards_and_samples_a_stack_change(tmp_path):
+    """Run the compatibility step's shell and read the flags back."""
+    steps = _workflow_steps()
+    lines = steps[_COMPAT]
+    for line in (
+        "          SHARD: ${{ matrix.shard }}",
+        "          LER_STACK_CHANGED: ${{ steps.closure.outputs.ler_stack_changed }}",
+        "          PR_NUMBER: ${{ github.event.pull_request.number }}",
+        '          LER_SAMPLE: "3"',
+    ):
+        assert line in lines, line
+    script = _script(lines)
+    plain = _verify_all_argv(script, tmp_path, **_COMPAT_ENV)
+    want = ["--ler-base", "origin/main", "--circuit-base", "origin/main", "--shard", "1/4"]
+    assert plain == [*want, "--jobs", "0", "--circuit-jobs", "0"], plain
+    sampled = _verify_all_argv(script, tmp_path, **{**_COMPAT_ENV, "LER_STACK_CHANGED": "true"})
+    assert sampled == [*plain[:6], "--ler-sample", "3", "--ler-seed", "5578", *plain[6:]], sampled
+    assert "--board-base" not in plain and "--circuit-record" not in sampled
+    # the matrix and SHARDS agree, so the shards partition the board
+    with open(_WORKFLOW, encoding="utf-8") as f:
+        text = f.read()
+    shards = re.search(r"^        shard: \[([0-9, ]+)\]$", text, re.M)
+    count = re.search(r'^      SHARDS: "(\d+)"$', text, re.M)
+    assert shards and count, "compat-sweep needs a `shard:` matrix and a SHARDS env"
+    listed = [int(x) for x in shards.group(1).split(",")]
+    assert listed == list(range(int(count.group(1)))), (listed, count.group(1))
+    # the job runs on pull requests only, and its summary waits on every shard
+    assert "\n  compat-sweep:\n    if: github.event_name == 'pull_request'\n" in text
+    summary = "\n  compat-summary:\n    needs: compat-sweep\n    if: always() && github.event_name == 'pull_request'\n"
+    assert summary in text
+
+
+def test_the_closure_covers_the_stack_and_the_manifest():
+    """CLOSURE in verify.yml is what makes a pull request pay the compatibility sweep."""
+    with open(_WORKFLOW, encoding="utf-8") as f:
+        text = f.read()
+    match = re.search(r"^\s+CLOSURE:\s*(.+?)\s*$", text, re.M)
+    assert match, "verify.yml: no CLOSURE env entry"
+    closure = match.group(1).split()
+    root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    with open(os.path.join(root, "verify", "validator_manifest.json"), encoding="utf-8") as f:
+        pinned = set(json.load(f)["files"])
+
+    def covered(rel):
+        return any(rel == c or rel.startswith(c.rstrip("/") + "/") for c in closure)
+
+    uncovered = sorted(rel for rel in set(VA.CIRCUIT_STACK) | pinned if not covered(rel))
+    assert not uncovered, f"CLOSURE in verify.yml does not cover {uncovered}"
+    assert text.count("...HEAD -- $CLOSURE; then") == 2, "both jobs diff the closure the same way"
 
 
 PINNED_SAMPLE = ["s04-1-1", "s05-1-1", "s11-1-1"]

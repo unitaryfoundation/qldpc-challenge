@@ -64,7 +64,7 @@ def test_stabilizer_entries_render_on_their_own_board(tmp_path):
     assert "<th data-c=asym" not in stab
     assert 'data-asym="-1"' in stab
     assert 'href="codes/5-1-3.html"' in stab  # the tracks grid lists it
-    assert 'href="index.html"' in stab
+    assert 'href="./"' in stab and 'href="index.html"' not in stab
     assert "1 total, 1 records" in stab
 
     # both boards' codes are served by id, tagged with their type

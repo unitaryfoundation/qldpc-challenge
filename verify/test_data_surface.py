@@ -166,6 +166,7 @@ def run_step(root):
         DATA_SURFACE=" ".join(workflow_env("DATA_SURFACE")),
         GATE_GOLDENS=" ".join(workflow_env("GATE_GOLDENS")),
         LER_STACK=" ".join(workflow_env("LER_STACK")),
+        CLOSURE=" ".join(workflow_env("CLOSURE")),
     )
     # `bash -e`, without pipefail, is what GitHub gives a `run:` step that
     # names no shell, and no step in verify.yml names one.
@@ -234,7 +235,26 @@ def test_a_diff_that_cannot_be_computed_runs_the_suite(tmp_path):
         "data_only": "false",
         "slug_tests": "",
         "ler_stack_changed": "true",
+        "closure_changed": "true",
     }
+
+
+def test_a_closure_change_is_detected_and_a_research_change_is_not(tmp_path):
+    """closure_changed sends the whole-board sweep to the compat-sweep job (issue #7252)."""
+    for i, (rel, want) in enumerate(
+        [
+            ("verify/qldpc_verify.py", "true"),
+            ("schema/code.schema.json", "true"),
+            ("decode/distance.py", "true"),
+            ("uv.lock", "true"),
+            (".github/workflows/verify.yml", "true"),
+            ("research/build.py", "false"),
+            ("site/build.py", "false"),
+            ("cli/qldpc.py", "false"),
+        ]
+    ):
+        got = detect(tmp_path / str(i), {rel: "x = 2\n"})
+        assert got["closure_changed"] == want, rel
 
 
 def test_the_tests_naming_a_changed_entry_are_found_by_either_spelling(tmp_path):
