@@ -1297,7 +1297,6 @@ def test_the_board_memo_is_handed_to_one_sweep_and_its_gate():
         ("verify.yml", _MAIN_MEMO.strip()),
         ("verify.yml", _MAIN_MEMO.strip()),
         ("verify.yml", 'rm -rf "$QLDPC_BOARD_CACHE"'),
-        ("verify.yml", 'rm -rf "$QLDPC_BOARD_CACHE"'),
         ("verify.yml", _MEMO.strip()),
     ], mentions
     reproduce = workflows["reproduce.yml"]
@@ -1344,7 +1343,12 @@ def test_the_carried_board_memo_is_restored_and_saved_only_on_main():
 
 
 def test_the_full_sweep_empties_the_memo_except_on_a_push(tmp_path):
-    """A push extends the restored memo; a pull request, the schedule and a dispatch start empty."""
+    """A push extends the restored memo; the schedule and a dispatch start empty.
+
+    A pull request no longer reaches this step (issue #7252 moved its sweep
+    to the compat-sweep job); the case is kept so that the script's default
+    branch is seen to empty the directory for anything that is not a push.
+    """
     script = _script(_workflow_steps()[_FULL_SWEEP])
     kinds = (("push", True), ("pull_request", False), ("schedule", False), ("workflow_dispatch", False))
     for event, survives in kinds:
