@@ -1,0 +1,1068 @@
+{
+ "cc": "/Users/mathysrennela/GitHub/code-calculus-dev",
+ "args": {
+  "arm": "ppscale",
+  "limit": 24,
+  "n_lo": 10,
+  "n_hi": 120,
+  "order": "n",
+  "steps": 4,
+  "budget": 64,
+  "trials": 8000,
+  "gate_cap": 12,
+  "cap": 8,
+  "max_w": 10,
+  "label_contains": "q(1, 0, 1, 0)",
+  "open_prs": true,
+  "out": "research/campaigns/cc-v031-stress-2026-11-23/result-ppscale3.json"
+ },
+ "started": "2026-11-23T17:16:26",
+ "ppscale": {
+  "derived": 20,
+  "connected": 8,
+  "staged": 8,
+  "gate_passed": 8,
+  "board_advancing": 8,
+  "records": [
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(0, 0, 0, 0)-all0-identity-P7",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(0, 0, 0, 0)-all0-identity-P11",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(0, 0, 0, 0)-all0-identity-P13",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(0, 0, 0, 0)-all0-alternating-P7",
+    "constructor": "PP-SCALE",
+    "connected": false,
+    "blocks": 4,
+    "block_sizes": [
+     8,
+     8,
+     8,
+     4
+    ],
+    "n": 28,
+    "k": 14,
+    "w": 4
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(0, 0, 0, 0)-all0-alternating-P11",
+    "constructor": "PP-SCALE",
+    "connected": false,
+    "blocks": 6,
+    "block_sizes": [
+     8,
+     8,
+     8,
+     8,
+     8,
+     4
+    ],
+    "n": 44,
+    "k": 22,
+    "w": 4
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(0, 0, 0, 0)-all0-alternating-P13",
+    "constructor": "PP-SCALE",
+    "connected": false,
+    "blocks": 7,
+    "block_sizes": [
+     8,
+     8,
+     8,
+     8,
+     8,
+     8,
+     4
+    ],
+    "n": 52,
+    "k": 26,
+    "w": 4
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(0, 0, 0, 0)-all0-pairwise-P7",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(0, 0, 0, 0)-all0-pairwise-P11",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(0, 0, 0, 0)-all0-pairwise-P13",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(0, 0, 0, 0)-all0-reverse-P7",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(0, 0, 0, 0)-all0-reverse-P11",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(0, 0, 0, 0)-all0-reverse-P13",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(0, 0, 0, 0)-identity-all0-P7",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(0, 0, 0, 0)-identity-all0-P11",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(0, 0, 0, 0)-identity-all0-P13",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(0, 0, 0, 0)-identity-alternating-P7",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(0, 0, 0, 0)-identity-alternating-P11",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(0, 0, 0, 0)-identity-alternating-P13",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(0, 0, 0, 0)-identity-pairwise-P7",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(0, 0, 0, 0)-identity-pairwise-P11",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(0, 0, 0, 0)-identity-pairwise-P13",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(0, 0, 0, 0)-identity-reverse-P7",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(0, 0, 0, 0)-identity-reverse-P11",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(0, 0, 0, 0)-identity-reverse-P13",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(0, 0, 0, 0)-alternating-all0-P7",
+    "constructor": "PP-SCALE",
+    "connected": false,
+    "blocks": 4,
+    "block_sizes": [
+     8,
+     8,
+     8,
+     4
+    ],
+    "n": 28,
+    "k": 14,
+    "w": 4
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(0, 0, 0, 0)-alternating-all0-P11",
+    "constructor": "PP-SCALE",
+    "connected": false,
+    "blocks": 6,
+    "block_sizes": [
+     8,
+     8,
+     8,
+     8,
+     8,
+     4
+    ],
+    "n": 44,
+    "k": 22,
+    "w": 4
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(0, 0, 0, 0)-alternating-all0-P13",
+    "constructor": "PP-SCALE",
+    "connected": false,
+    "blocks": 7,
+    "block_sizes": [
+     8,
+     8,
+     8,
+     8,
+     8,
+     8,
+     4
+    ],
+    "n": 52,
+    "k": 26,
+    "w": 4
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(0, 0, 0, 0)-alternating-identity-P7",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(0, 0, 0, 0)-alternating-identity-P11",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(0, 0, 0, 0)-alternating-identity-P13",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(0, 0, 0, 0)-alternating-pairwise-P7",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(0, 0, 0, 0)-alternating-pairwise-P11",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(0, 0, 0, 0)-alternating-pairwise-P13",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(0, 0, 0, 0)-alternating-reverse-P7",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(0, 0, 0, 0)-alternating-reverse-P11",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(0, 0, 0, 0)-alternating-reverse-P13",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(0, 0, 0, 0)-pairwise-all0-P7",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(0, 0, 0, 0)-pairwise-all0-P11",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(0, 0, 0, 0)-pairwise-all0-P13",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(0, 0, 0, 0)-pairwise-identity-P7",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(0, 0, 0, 0)-pairwise-identity-P11",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(0, 0, 0, 0)-pairwise-identity-P13",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(0, 0, 0, 0)-pairwise-alternating-P7",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(0, 0, 0, 0)-pairwise-alternating-P11",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(0, 0, 0, 0)-pairwise-alternating-P13",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(0, 0, 0, 0)-pairwise-reverse-P7",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: PP-SCALE: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(0, 0, 0, 0)-pairwise-reverse-P11",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: PP-SCALE: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(0, 0, 0, 0)-pairwise-reverse-P13",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: PP-SCALE: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(0, 0, 0, 0)-reverse-all0-P7",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(0, 0, 0, 0)-reverse-all0-P11",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(0, 0, 0, 0)-reverse-all0-P13",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(0, 0, 0, 0)-reverse-identity-P7",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(0, 0, 0, 0)-reverse-identity-P11",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(0, 0, 0, 0)-reverse-identity-P13",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(0, 0, 0, 0)-reverse-alternating-P7",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(0, 0, 0, 0)-reverse-alternating-P11",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(0, 0, 0, 0)-reverse-alternating-P13",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(0, 0, 0, 0)-reverse-pairwise-P7",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: PP-SCALE: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(0, 0, 0, 0)-reverse-pairwise-P11",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: PP-SCALE: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(0, 0, 0, 0)-reverse-pairwise-P13",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: PP-SCALE: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(1, 1, 1, 1)-all0-identity-P7",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(1, 1, 1, 1)-all0-identity-P11",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(1, 1, 1, 1)-all0-identity-P13",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(1, 1, 1, 1)-all0-alternating-P7",
+    "constructor": "PP-SCALE",
+    "connected": false,
+    "blocks": 4,
+    "block_sizes": [
+     8,
+     8,
+     8,
+     4
+    ],
+    "n": 28,
+    "k": 14,
+    "w": 4
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(1, 1, 1, 1)-all0-alternating-P11",
+    "constructor": "PP-SCALE",
+    "connected": false,
+    "blocks": 6,
+    "block_sizes": [
+     8,
+     8,
+     8,
+     8,
+     8,
+     4
+    ],
+    "n": 44,
+    "k": 22,
+    "w": 4
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(1, 1, 1, 1)-all0-alternating-P13",
+    "constructor": "PP-SCALE",
+    "connected": false,
+    "blocks": 7,
+    "block_sizes": [
+     8,
+     8,
+     8,
+     8,
+     8,
+     8,
+     4
+    ],
+    "n": 52,
+    "k": 26,
+    "w": 4
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(1, 1, 1, 1)-all0-pairwise-P7",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(1, 1, 1, 1)-all0-pairwise-P11",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(1, 1, 1, 1)-all0-pairwise-P13",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(1, 1, 1, 1)-all0-reverse-P7",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(1, 1, 1, 1)-all0-reverse-P11",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(1, 1, 1, 1)-all0-reverse-P13",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(1, 1, 1, 1)-identity-all0-P7",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(1, 1, 1, 1)-identity-all0-P11",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(1, 1, 1, 1)-identity-all0-P13",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(1, 1, 1, 1)-identity-alternating-P7",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(1, 1, 1, 1)-identity-alternating-P11",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(1, 1, 1, 1)-identity-alternating-P13",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(1, 1, 1, 1)-identity-pairwise-P7",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(1, 1, 1, 1)-identity-pairwise-P11",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(1, 1, 1, 1)-identity-pairwise-P13",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(1, 1, 1, 1)-identity-reverse-P7",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(1, 1, 1, 1)-identity-reverse-P11",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(1, 1, 1, 1)-identity-reverse-P13",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(1, 1, 1, 1)-alternating-all0-P7",
+    "constructor": "PP-SCALE",
+    "connected": false,
+    "blocks": 4,
+    "block_sizes": [
+     8,
+     8,
+     8,
+     4
+    ],
+    "n": 28,
+    "k": 14,
+    "w": 4
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(1, 1, 1, 1)-alternating-all0-P11",
+    "constructor": "PP-SCALE",
+    "connected": false,
+    "blocks": 6,
+    "block_sizes": [
+     8,
+     8,
+     8,
+     8,
+     8,
+     4
+    ],
+    "n": 44,
+    "k": 22,
+    "w": 4
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(1, 1, 1, 1)-alternating-all0-P13",
+    "constructor": "PP-SCALE",
+    "connected": false,
+    "blocks": 7,
+    "block_sizes": [
+     8,
+     8,
+     8,
+     8,
+     8,
+     8,
+     4
+    ],
+    "n": 52,
+    "k": 26,
+    "w": 4
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(1, 1, 1, 1)-alternating-identity-P7",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(1, 1, 1, 1)-alternating-identity-P11",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(1, 1, 1, 1)-alternating-identity-P13",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(1, 1, 1, 1)-alternating-pairwise-P7",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(1, 1, 1, 1)-alternating-pairwise-P11",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(1, 1, 1, 1)-alternating-pairwise-P13",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(1, 1, 1, 1)-alternating-reverse-P7",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(1, 1, 1, 1)-alternating-reverse-P11",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(1, 1, 1, 1)-alternating-reverse-P13",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(1, 1, 1, 1)-pairwise-all0-P7",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(1, 1, 1, 1)-pairwise-all0-P11",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(1, 1, 1, 1)-pairwise-all0-P13",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(1, 1, 1, 1)-pairwise-identity-P7",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(1, 1, 1, 1)-pairwise-identity-P11",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(1, 1, 1, 1)-pairwise-identity-P13",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(1, 1, 1, 1)-pairwise-alternating-P7",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(1, 1, 1, 1)-pairwise-alternating-P11",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(1, 1, 1, 1)-pairwise-alternating-P13",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(1, 1, 1, 1)-pairwise-reverse-P7",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: PP-SCALE: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(1, 1, 1, 1)-pairwise-reverse-P11",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: PP-SCALE: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(1, 1, 1, 1)-pairwise-reverse-P13",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: PP-SCALE: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(1, 1, 1, 1)-reverse-all0-P7",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(1, 1, 1, 1)-reverse-all0-P11",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(1, 1, 1, 1)-reverse-all0-P13",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(1, 1, 1, 1)-reverse-identity-P7",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(1, 1, 1, 1)-reverse-identity-P11",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(1, 1, 1, 1)-reverse-identity-P13",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(1, 1, 1, 1)-reverse-alternating-P7",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(1, 1, 1, 1)-reverse-alternating-P11",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(1, 1, 1, 1)-reverse-alternating-P13",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(1, 1, 1, 1)-reverse-pairwise-P7",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: PP-SCALE: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(1, 1, 1, 1)-reverse-pairwise-P11",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: PP-SCALE: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(1, 1, 1, 1)-reverse-pairwise-P13",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: PP-SCALE: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(1, 0, 1, 0)-all0-identity-P7",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: PP-SCALE: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(1, 0, 1, 0)-all0-identity-P11",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: PP-SCALE: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(1, 0, 1, 0)-all0-identity-P13",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: PP-SCALE: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(1, 0, 1, 0)-all0-alternating-P7",
+    "constructor": "PP-SCALE",
+    "connected": true,
+    "blocks": 1,
+    "block_sizes": [
+     28
+    ],
+    "n": 28,
+    "k": 14,
+    "w": 4,
+    "gate_passed": true,
+    "board_advancing": true,
+    "dominated_by": [],
+    "d_only_gain": false,
+    "cell": [
+     "weight-4",
+     "unrestricted"
+    ],
+    "dedup_exact": 0,
+    "dedup_wl": 6,
+    "d_witness": 2,
+    "path": "/Users/mathysrennela/GitHub/qldpc-challenge/research/candidates/20261123-171629-Mathyss-MacBook-Air-15124/28-14-2-ppscale-q(1, 0, 1, 0)(1,.json",
+    "tanner_connected": true
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(1, 0, 1, 0)-all0-alternating-P11",
+    "constructor": "PP-SCALE",
+    "connected": true,
+    "blocks": 1,
+    "block_sizes": [
+     44
+    ],
+    "n": 44,
+    "k": 22,
+    "w": 4,
+    "gate_passed": true,
+    "board_advancing": true,
+    "dominated_by": [],
+    "d_only_gain": false,
+    "cell": [
+     "weight-4",
+     "unrestricted"
+    ],
+    "dedup_exact": 0,
+    "dedup_wl": 11,
+    "d_witness": 2,
+    "path": "/Users/mathysrennela/GitHub/qldpc-challenge/research/candidates/20261123-171641-Mathyss-MacBook-Air-15124/44-22-2-ppscale-q(1, 0, 1, 0)(1,.json",
+    "tanner_connected": true
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(1, 0, 1, 0)-all0-alternating-P13",
+    "constructor": "PP-SCALE",
+    "connected": true,
+    "blocks": 1,
+    "block_sizes": [
+     52
+    ],
+    "n": 52,
+    "k": 26,
+    "w": 4,
+    "gate_passed": true,
+    "board_advancing": true,
+    "dominated_by": [],
+    "d_only_gain": false,
+    "cell": [
+     "weight-4",
+     "unrestricted"
+    ],
+    "dedup_exact": 0,
+    "dedup_wl": 6,
+    "d_witness": 2,
+    "path": "/Users/mathysrennela/GitHub/qldpc-challenge/research/candidates/20261123-171655-Mathyss-MacBook-Air-15124/52-26-2-ppscale-q(1, 0, 1, 0)(1,.json",
+    "tanner_connected": true
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(1, 0, 1, 0)-all0-pairwise-P7",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(1, 0, 1, 0)-all0-pairwise-P11",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(1, 0, 1, 0)-all0-pairwise-P13",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(1, 0, 1, 0)-all0-reverse-P7",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: PP-SCALE: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(1, 0, 1, 0)-all0-reverse-P11",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: PP-SCALE: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(1, 0, 1, 0)-all0-reverse-P13",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: PP-SCALE: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(1, 0, 1, 0)-identity-all0-P7",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: PP-SCALE: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(1, 0, 1, 0)-identity-all0-P11",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: PP-SCALE: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(1, 0, 1, 0)-identity-all0-P13",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: PP-SCALE: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(1, 0, 1, 0)-identity-alternating-P7",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(1, 0, 1, 0)-identity-alternating-P11",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(1, 0, 1, 0)-identity-alternating-P13",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(1, 0, 1, 0)-identity-pairwise-P7",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(1, 0, 1, 0)-identity-pairwise-P11",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(1, 0, 1, 0)-identity-pairwise-P13",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(1, 0, 1, 0)-identity-reverse-P7",
+    "constructor": "PP-SCALE",
+    "connected": true,
+    "blocks": 1,
+    "block_sizes": [
+     28
+    ],
+    "n": 28,
+    "k": 14,
+    "w": 4,
+    "gate_passed": true,
+    "board_advancing": true,
+    "dominated_by": [],
+    "d_only_gain": false,
+    "cell": [
+     "weight-4",
+     "unrestricted"
+    ],
+    "dedup_exact": 0,
+    "dedup_wl": 7,
+    "d_witness": 2,
+    "path": "/Users/mathysrennela/GitHub/qldpc-challenge/research/candidates/20261123-171706-Mathyss-MacBook-Air-15124/28-14-2-ppscale-q(1, 0, 1, 0)(1,.json",
+    "tanner_connected": true
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(1, 0, 1, 0)-identity-reverse-P11",
+    "constructor": "PP-SCALE",
+    "connected": true,
+    "blocks": 1,
+    "block_sizes": [
+     44
+    ],
+    "n": 44,
+    "k": 22,
+    "w": 4,
+    "gate_passed": true,
+    "board_advancing": true,
+    "dominated_by": [],
+    "d_only_gain": false,
+    "cell": [
+     "weight-4",
+     "unrestricted"
+    ],
+    "dedup_exact": 0,
+    "dedup_wl": 12,
+    "d_witness": 2,
+    "path": "/Users/mathysrennela/GitHub/qldpc-challenge/research/candidates/20261123-171719-Mathyss-MacBook-Air-15124/44-22-2-ppscale-q(1, 0, 1, 0)(1,.json",
+    "tanner_connected": true
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(1, 0, 1, 0)-identity-reverse-P13",
+    "constructor": "PP-SCALE",
+    "connected": true,
+    "blocks": 1,
+    "block_sizes": [
+     52
+    ],
+    "n": 52,
+    "k": 26,
+    "w": 4,
+    "gate_passed": true,
+    "board_advancing": true,
+    "dominated_by": [],
+    "d_only_gain": false,
+    "cell": [
+     "weight-4",
+     "unrestricted"
+    ],
+    "dedup_exact": 0,
+    "dedup_wl": 7,
+    "d_witness": 2,
+    "path": "/Users/mathysrennela/GitHub/qldpc-challenge/research/candidates/20261123-171735-Mathyss-MacBook-Air-15124/52-26-2-ppscale-q(1, 0, 1, 0)(1,.json",
+    "tanner_connected": true
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(1, 0, 1, 0)-alternating-all0-P7",
+    "constructor": "PP-SCALE",
+    "connected": true,
+    "blocks": 1,
+    "block_sizes": [
+     28
+    ],
+    "n": 28,
+    "k": 14,
+    "w": 4,
+    "gate_passed": true,
+    "board_advancing": true,
+    "dominated_by": [],
+    "d_only_gain": false,
+    "cell": [
+     "weight-4",
+     "unrestricted"
+    ],
+    "dedup_exact": 0,
+    "dedup_wl": 8,
+    "d_witness": 2,
+    "path": "/Users/mathysrennela/GitHub/qldpc-challenge/research/candidates/20261123-171748-Mathyss-MacBook-Air-15124/28-14-2-ppscale-q(1, 0, 1, 0)(1,.json",
+    "tanner_connected": true
+   },
+   {
+    "label": "ppscale-q(1, 0, 1, 0)(1, 0, 1, 0)-alternating-all0-P11",
+    "constructor": "PP-SCALE",
+    "connected": true,
+    "blocks": 1,
+    "block_sizes": [
+     44
+    ],
+    "n": 44,
+    "k": 22,
+    "w": 4,
+    "gate_passed": true,
+    "board_advancing": true,
+    "dominated_by": [],
+    "d_only_gain": false,
+    "cell": [
+     "weight-4",
+     "unrestricted"
+    ],
+    "dedup_exact": 0,
+    "dedup_wl": 13,
+    "d_witness": 2,
+    "path": "/Users/mathysrennela/GitHub/qldpc-challenge/research/candidates/20261123-171801-Mathyss-MacBook-Air-15124/44-22-2-ppscale-q(1, 0, 1, 0)(1,.json",
+    "tanner_connected": true
+   }
+  ]
+ },
+ "finished": "2026-11-23T17:18:09",
+ "pairpartition": {
+  "derived": null,
+  "connected": null,
+  "staged": null,
+  "gate_passed": null,
+  "board_advancing": null,
+  "records": []
+ }
+}

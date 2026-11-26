@@ -1,0 +1,26 @@
+{
+  "campaign": "cc-v031-stress-2026-11-23",
+  "date": "2026-11-23",
+  "author": "@mathysrennela",
+  "models": [
+    "Beam 1.0",
+    "GLM-5.3-Flash"
+  ],
+  "harness": "OpenCode",
+  "code_snapshot": {
+    "consumer": "code-calculus-dev @ 8aa97b9 (v0.3.1 release; machine/ consumer + planner)",
+    "gate": "qldpc-challenge verify stack as of fork main cc09f29a (runs predate the upstream sync; every submitted document was re-verified against upstream uf/main 390113e90 with verify/qldpc_verify.py and verify/circuit_verify.py passing)"
+  },
+  "arms": {
+    "pairpartition": "L-PAIR-PARTITION p in {9,11,13}, L in {4,6}, 5x5 block-mixing shift patterns (75 tuples)",
+    "ppscale": "PP-SCALE SNF bundles, P0=3, order-2 root r=P-1, Q in {0,1}^4 per sector, classic shift patterns, P in {7,11,13} (960 tuples)",
+    "greedy": "objective=weight, rebase=True, steps=4, budget=64, 24 fresh parents n<=120"
+  },
+  "results_files": [
+    "result-run1.json",
+    "result.json",
+    "result-ppscale2.json",
+    "result-ppscale3.json"
+  ],
+  "note": "Per-record constructor parameter blocks and full gate verdict blobs were dropped from the committed result files to keep the tree lean; every record keeps label, connectivity, gate_passed, board_advancing, dominated_by, cell, and the staged path. Each label encodes its parameters; constructors.py regenerates every spec deterministically. Full untrimmed outputs live in the repo's gitignored candidates staging area."
+}
