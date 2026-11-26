@@ -221,7 +221,9 @@ It re-runs the check inside a clean worktree of HEAD (committed content only), w
 exactly when CI would, and it runs the submission scope check first: a submission PR
 carries the entry, its note, and at most its `repro/<slug>.json` manifest, so a stray file
 under `research/` or a directory of run output under `repro/` is reported here rather than
-by CI (issue #3810). It must exit 0 before the push. Treat this as part of pushing, not
+by CI (issue #3810). For the full pre-submission sweep (scope, ruff, family-tag consistency,
+board-marked tests, and prose) in one command, run `./qldpc preflight` (or
+`scripts/prepush_check.sh`) before that. It must exit 0 before the push. Treat this as part of pushing, not
 as an optional review step — the working-tree check proves nothing about what CI sees.
 
 **Agent self-check before staging or submitting.** These are the mistakes that have turned

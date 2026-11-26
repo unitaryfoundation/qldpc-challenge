@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
-# Local guard for the two CI gates that most often fail on submission PRs:
+# Local guard for the CI gates that most often fail on submission PRs:
 #   - codes format (json.dumps(doc, indent=1))
+#   - validator integrity (trusted stack pin)
 #   - prose (cited paths must resolve)
+#   - ruff on newly added Python files (modified legacy files stay advisory)
 set -e
 
 # Codes format
@@ -18,4 +20,11 @@ python3 verify/check_validator_integrity.py
 changed_md=$(git diff --cached --name-only --diff-filter=AMR -- 'notes/*.md' 'fieldnotes/*.md' || true)
 if [ -n "$changed_md" ]; then
     python3 verify/check_prose.py --files $changed_md
+fi
+
+# Ruff on newly added Python files only.
+files=$(git diff --cached --name-only --diff-filter=A -- '*.py' || true)
+if [ -n "$files" ]; then
+    uv run --frozen --only-group dev ruff check $files
+    uv run --frozen --only-group dev ruff format --check $files
 fi
