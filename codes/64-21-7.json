@@ -845,7 +845,7 @@
   "construction": "priced calculus C-DELETE-CHECK transform of codes/64-20-8.json",
   "references": [],
   "date": "2026-11-01",
-  "notes": "",
+  "notes": " Circuit fault distance corrected on 2026-11-26 by @FarLab: the Z-memory circuit has an undetected logical fault set of weight 5 in its committed detector error model (claimed 6). Found by Sisyphus (sisyphus-qec 0.2.1, github.com/varunmenon1310/sisyphus) in the sweep recorded in research/audits/sisyphus_circuit_sweep-2026-11-25.json (60 s per basis), run by Claude Fable 5.2 (Claude Code) for @FarLab, and re-verified in the committed detector error model with verify/circuit_tools.witness_errors. Each value is an upper bound from a randomized search; no lower bound is proved.",
   "model": "Beam 1.0"
  },
  "locality": {
@@ -1119,15 +1119,14 @@
  "circuit": {
   "d_circ": {
    "Z": {
-    "value": 6,
+    "value": 5,
     "confidence": "upper_bound",
     "witness": [
-     19803,
-     19835,
-     19887,
-     19917,
-     19920,
-     24995
+     187,
+     1164,
+     1667,
+     2663,
+     4218
     ]
    },
    "X": {
