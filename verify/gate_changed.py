@@ -579,7 +579,7 @@ def _circuits_diffed(base, code_root, slug):
 # claimed weight within 5 s; on all 16 from 50,000 mechanisms up it ran 12
 # to 231 trials and its lightest fault set weighed 19 to 354 against claims
 # of 8 to 19, so at that size it could not have refuted any claim. Sisyphus
-# reached the claimed weight on all 28 and went below it on 7 of them, in
+# (0.2.0) reached the claimed weight on all 28 and went below it on 7, in
 # under a second of search each: an over-stated d_circ that ris_dem passes.
 # It learns which columns to keep out of the information set and searches
 # windows of whole rounds, so its cost does not grow the same way.
@@ -590,24 +590,37 @@ def _circuits_diffed(base, code_root, slug):
 # under. A wrong proposal is dropped, so the searcher can miss a refutation
 # and cannot invent one.
 #
-# The budget is added to ris_dem's, which is left as it was: 15 s of search
-# on the smallest DEMs, rising linearly to 60 s at the mechanism cap. The 7
-# refutations above each took under a second of search, and that is the
-# whole of the evidence, from one sample that is mostly one circuit family;
-# the figures are a starting point to revise once a board-wide sweep shows
-# how long a refutation takes when there is one. The limit bounds the
-# search alone. Building the matrices and loading the compiled kernels came
-# to 2 to 20 s more per basis on that machine, and SISYPHUS_GRACE is the
-# room the hard kill leaves for it. 120 s is an estimate, not a measurement
-# on the runner: 20 s at the mechanism cap, a runner about twice as slow on
-# the one search compared, the 20 to 65 s of set-up Sisyphus's own README
-# reports at this size on a Xeon, and a first call in a job that also
-# compiles the kernels, come to about 95 s. It was 240 s, which let a
-# proposer that hangs hold the job for 5 minutes per entry (vprusso's
-# review of #7264); a hang fails the entry on the basis where it happens,
-# so it is paid once per entry, 3 minutes at the cap now.
+# The budget is added to ris_dem's, which is left as it was. From
+# SISYPHUS_LARGE_DEM mechanisms up the search runs SISYPHUS_MAX_SECONDS;
+# below that it runs 15 s on the smallest DEMs and rises linearly, at the
+# rate that would reach 60 s at the mechanism cap.
+#
+# What the large-DEM figure rests on: the sweep of 2026-11-25
+# (research/audits/sisyphus_circuit_sweep-2026-11-25.json): Sisyphus 0.2.1,
+# 60 s per basis, both bases of the 349 entries with 50,000 mechanisms or
+# more, on four 4-core 15.6 GB Linux machines. 97 searches on 59 entries
+# ended below the claim. The first lighter fault set appeared after a
+# median of 0.42 s, 32 s at the 90th percentile, and 59 s at most, and 5 of
+# the 97 came later than the linear rule alone would have allowed, which is
+# why a large DEM gets the full 60 s. Nothing measures what a search longer
+# than 60 s would add, and 5 searches in that sweep ended above a claim
+# that is known to be reachable, so surviving this search proves nothing.
+# Below SISYPHUS_LARGE_DEM there is no sweep: the linear rule stands on the
+# 12 small DEMs of the 2026-11-23 sample, where Sisyphus held a fault set
+# at the claimed weight within 5 s of the call.
+#
+# The limit bounds the search alone. Set-up (matrices, kernels, windows)
+# took a median of 12.5 s in the sweep and 68.8 s at most, the largest
+# figures being first calls on a machine, which also compile the kernels.
+# SISYPHUS_GRACE, 120 s, is the room the hard kill leaves for it. It was
+# 240 s, which let a proposer that hangs hold the job for 5 minutes per
+# entry (vprusso's review of #7264); a hang fails the entry on the basis
+# where it happens, so it is paid once per entry, 3 minutes now. The peak
+# memory of the proposer's process group in the sweep was 1.18 GB at the
+# median and 3.38 GB at most.
 SISYPHUS_MIN_SECONDS = 15.0
 SISYPHUS_MAX_SECONDS = 60.0
+SISYPHUS_LARGE_DEM = 50_000
 SISYPHUS_GRACE = 120.0
 SISYPHUS_SCRIPT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "sisyphus_propose.py")
 SISYPHUS_MARKER = "SISYPHUS_RESULT "
@@ -615,7 +628,9 @@ SISYPHUS_MARKER = "SISYPHUS_RESULT "
 
 def _sisyphus_seconds(m):
     """Return the Sisyphus search limit, in seconds, for a DEM of m mechanisms."""
-    share = min(1.0, max(0.0, m / MAX_DEM_MECHANISMS))
+    if m >= SISYPHUS_LARGE_DEM:
+        return SISYPHUS_MAX_SECONDS
+    share = max(0.0, m / MAX_DEM_MECHANISMS)
     return SISYPHUS_MIN_SECONDS + (SISYPHUS_MAX_SECONDS - SISYPHUS_MIN_SECONDS) * share
 
 
@@ -674,7 +689,10 @@ def _sisyphus_propose(stim_path, claim, seconds, seed):
         raise RuntimeError(f"sisyphus search outlived {float(seconds) + SISYPHUS_GRACE:.0f} s and was killed") from None
     if proc.returncode != 0:
         tail = " | ".join((err or "").strip().splitlines()[-3:])
-        raise RuntimeError(f"sisyphus search exited {proc.returncode}: {tail}")
+        hint = ""
+        if "No module named 'sisyphus_qec'" in (err or ""):
+            hint = " (sisyphus-qec is in the research extra: run the gate with `uv run --extra research`)"
+        raise RuntimeError(f"sisyphus search exited {proc.returncode}: {tail}{hint}")
     lines = [ln for ln in out.splitlines() if ln.startswith(SISYPHUS_MARKER)]
     if len(lines) != 1:
         raise RuntimeError(f"sisyphus search printed {len(lines)} result lines, expected 1")
@@ -740,12 +758,16 @@ def _circuit_refute(doc, circuits_dir, seed, trials_override=None, sisyphus_seco
         if seconds > 0 and claim > 1:
             rec = _sisyphus_propose(base + ".stim", claim, seconds, seed)
             sw, swit = rec["lightest"], rec["witness"]
-            if sw is not None and sw < claim and not CT.witness_errors(dem, swit, sw):
-                hits[side] = (sw, swit, claim)
-                continue
+            found = f"lightest {sw}"
+            if sw is not None and sw < claim:
+                if not CT.witness_errors(dem, swit, sw):
+                    hits[side] = (sw, swit, claim)
+                    continue
+                # Say so: "lightest 4 vs claimed 5" beside "ok" would read as a refutation that was let through.
+                found = f"a proposal of weight {sw} that witness_errors rejected, so nothing lighter than the claim"
             note += (
                 f"; sisyphus {rec.get('version')}: {rec.get('search_seconds')} s of {seconds:.0f}, "
-                f"{rec.get('steps')} steps, lightest {sw}"
+                f"{rec.get('steps')} steps, {found}"
             )
         notes.append(note + ")")
     return hits, notes
@@ -994,7 +1016,7 @@ def main(argv):
         seed = secrets.randbelow(2**31)
     print(
         f"refutation seed = {seed}  "
-        f"(reproduce: python verify/gate_changed.py --seed {seed} <files>; "
+        f"(reproduce: uv run --extra research python verify/gate_changed.py --seed {seed} <files>; "
         f"the fast pass is also wall-clock capped, see fast_trials in the "
         f"receipt)\n"
     )

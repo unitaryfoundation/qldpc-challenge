@@ -42,8 +42,11 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 # Steps are never the binding budget: the wall-clock limit is. Sisyphus
 # counted about 5e4 steps per second on the largest board DEMs.
 MAX_STEPS = 10**9
-# Sisyphus honours a wall-clock limit only with a worker pool (two or more
-# processes). Four matches the threads ris_dem uses and the CI runner's cores.
+# Four matches the threads ris_dem uses and the CI runner's cores, and is
+# what the sweep behind the gate's budget ran. Never fewer than two:
+# Sisyphus 0.2.0 honoured a wall-clock limit only with a worker pool, and
+# although 0.2.1 does with one process too, the limit is what bounds the
+# gate, so it does not rest on which of the two is installed.
 WORKERS = 4
 MARKER = "SISYPHUS_RESULT "
 

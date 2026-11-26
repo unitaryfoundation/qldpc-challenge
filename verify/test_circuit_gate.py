@@ -332,7 +332,10 @@ def test_sisyphus_budget_shape():
     assert gc._sisyphus_seconds(0) == gc.SISYPHUS_MIN_SECONDS
     assert gc._sisyphus_seconds(MAX_DEM_MECHANISMS) == gc.SISYPHUS_MAX_SECONDS
     assert gc._sisyphus_seconds(10 * MAX_DEM_MECHANISMS) == gc.SISYPHUS_MAX_SECONDS  # clamped
-    assert gc._sisyphus_seconds(20_000) < gc._sisyphus_seconds(100_000)
+    assert gc._sisyphus_seconds(20_000) < gc._sisyphus_seconds(40_000) < gc.SISYPHUS_MAX_SECONDS
+    # from SISYPHUS_LARGE_DEM up the search gets the whole limit, whatever the size
+    assert gc._sisyphus_seconds(gc.SISYPHUS_LARGE_DEM - 1) < gc.SISYPHUS_MAX_SECONDS
+    assert gc._sisyphus_seconds(gc.SISYPHUS_LARGE_DEM) == gc._sisyphus_seconds(100_000) == gc.SISYPHUS_MAX_SECONDS
 
 
 def test_sisyphus_refutes_an_overclaim_ris_missed(surface3, monkeypatch):
@@ -396,6 +399,8 @@ def test_sisyphus_proposal_counts_only_if_the_witness_check_accepts_it(surface3,
     monkeypatch.setattr(gc, "_sisyphus_propose", lambda *a, **kw: dict(proposal))
     hits, notes = gc._circuit_refute(doc_for(3), d, seed=0)
     assert hits == {} and len(notes) == 2
+    # the note says the proposal was rejected, and does not print it as the lightest fault set found
+    assert all("witness_errors rejected" in n and "lightest 2" not in n for n in notes)
 
 
 def _fake_proposer(tmp_path, monkeypatch, body):
@@ -407,7 +412,11 @@ def _fake_proposer(tmp_path, monkeypatch, body):
 @pytest.mark.parametrize(
     "body, message",
     [
-        ("import sys\nsys.stderr.write('no module named sisyphus_qec\\n')\nsys.exit(1)\n", "exited 1"),
+        ("import sys\nsys.stderr.write('some other failure\\n')\nsys.exit(1)\n", "exited 1: some other failure$"),
+        (
+            "import sys\nsys.stderr.write(\"No module named 'sisyphus_qec'\\n\")\nsys.exit(1)\n",
+            "uv run --extra research",
+        ),
         ("print('nothing useful')\n", "0 result lines"),
         ("print('SISYPHUS_RESULT {}')\nprint('SISYPHUS_RESULT {}')\n", "2 result lines"),
         ("print('SISYPHUS_RESULT not json')\n", "declared shape"),

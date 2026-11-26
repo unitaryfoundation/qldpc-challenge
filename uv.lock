@@ -1199,7 +1199,7 @@ requires-dist = [
     { name = "python-sat", marker = "extra == 'research'", specifier = ">=1.8" },
     { name = "scipy", marker = "extra == 'certify'", specifier = ">=1.11" },
     { name = "scipy", marker = "extra == 'research'", specifier = ">=1.11" },
-    { name = "sisyphus-qec", marker = "extra == 'research'", specifier = "==0.2.0" },
+    { name = "sisyphus-qec", marker = "extra == 'research'", specifier = "==0.2.1" },
     { name = "stim", specifier = "==1.16.0" },
 ]
 provides-extras = ["certify", "research"]
@@ -1665,7 +1665,7 @@ sdist = { url = "https://files.pythonhosted.org/packages/cd/6b/b546cc9240fb1b644
 
 [[package]]
 name = "sisyphus-qec"
-version = "0.2.0"
+version = "0.2.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "numba" },
@@ -1675,9 +1675,9 @@ dependencies = [
     { name = "scipy", version = "1.17.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
     { name = "stim" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/de/0f/a82f41835ac6c26e4dc2ed2048cbc8306de970077e918b2393d90fd6724d/sisyphus_qec-0.2.0.tar.gz", hash = "sha256:b6b4051aeda1b895338fd46539b980778a75c362dbc409b580cfaa98ece00374", size = 103389, upload-time = "2026-11-24T19:58:23.126Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/64/09/81b0a0801fd2a7930acc9b7044d7c36a0119dc7f04abe59fe8e5db3aadbb/sisyphus_qec-0.2.1.tar.gz", hash = "sha256:c188f0974aa9cf5e97913fce2b0c5444167f9f49512fc4e4727e3976ed9061bb", size = 100736, upload-time = "2026-11-25T15:12:14.575Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/ca/0d/60951c66d508bfd0ca8e076fa756f4fc29a4b7ebcb1eafa48e80adc01d7a/sisyphus_qec-0.2.0-py3-none-any.whl", hash = "sha256:e0d7c860e8022ce72be5e6fc0ecf14f49d3f33c84de90676fb7db152773f0b8d", size = 74939, upload-time = "2026-11-24T19:58:22.245Z" },
+    { url = "https://files.pythonhosted.org/packages/25/e0/42e5f954aa8c2eacc7308dda5bf1e4c032bc689ccc345fe51cb393b9fb6b/sisyphus_qec-0.2.1-py3-none-any.whl", hash = "sha256:88288fea5d13a0c6f5448380f2c47f49dba7f33349e7d4624b7b4926f12bcc2d", size = 74063, upload-time = "2026-11-25T15:12:13.566Z" },
 ]
 
 [[package]]
