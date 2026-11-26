@@ -1315,7 +1315,7 @@
   "origin": "submission",
   "date": "2026-09-18",
   "model": "DeepSeek V4 Flash 0731",
-  "notes": "Literature reproduction of a published 2BGA code (arXiv:2306.16400; github.com/QEC-pages/2BGA-codes @ 403d194c3f98f0cadc236aecbc4a8b6139ccf23c). Checked against the live board: not equivalent to any existing entry."
+  "notes": "Literature reproduction of a published 2BGA code (arXiv:2306.16400; github.com/QEC-pages/2BGA-codes @ 403d194c3f98f0cadc236aecbc4a8b6139ccf23c). Checked against the live board: not equivalent to any existing entry. Circuit fault distance corrected on 2026-11-26 by @FarLab: the X-memory circuit has an undetected logical fault set of weight 16 in its committed detector error model (claimed 17); the Z-memory circuit has an undetected logical fault set of weight 16 in its committed detector error model (claimed 17). Found by Sisyphus (sisyphus-qec 0.2.1, github.com/varunmenon1310/sisyphus) in the sweep recorded in research/audits/sisyphus_circuit_sweep-2026-11-25.json (60 s per basis), run by Claude Fable 5.2 (Claude Code) for @FarLab, and re-verified in the committed detector error model with verify/circuit_tools.witness_errors. Each value is an upper bound from a randomized search; no lower bound is proved."
  },
  "family": "generalized-bicycle",
  "locality": {
@@ -1958,49 +1958,47 @@
  "circuit": {
   "d_circ": {
    "Z": {
-    "value": 17,
+    "value": 16,
     "confidence": "upper_bound",
     "witness": [
-     121804,
-     121805,
-     121819,
-     121820,
-     121832,
-     121850,
-     121851,
-     121858,
-     121864,
-     121865,
-     121871,
-     121874,
-     121911,
-     121913,
-     121921,
-     121931,
-     121941
+     3000,
+     3015,
+     10480,
+     10501,
+     10979,
+     11219,
+     11228,
+     11909,
+     11918,
+     12007,
+     12016,
+     12096,
+     12159,
+     12197,
+     12277,
+     12379
     ]
    },
    "X": {
-    "value": 17,
+    "value": 16,
     "confidence": "upper_bound",
     "witness": [
-     121799,
-     121800,
-     121836,
-     121844,
-     121845,
-     121852,
-     121855,
-     121881,
-     121883,
-     121889,
-     121897,
-     121900,
-     121905,
-     121939,
-     121944,
-     121948,
-     121950
+     8766,
+     8776,
+     9830,
+     9840,
+     10907,
+     10911,
+     10948,
+     10957,
+     11051,
+     11136,
+     11370,
+     11674,
+     11878,
+     11980,
+     12046,
+     12639
     ]
    }
   },
