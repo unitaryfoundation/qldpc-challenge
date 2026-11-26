@@ -646,6 +646,29 @@ jobs:
           key: circuit-record-${{ github.run_id }}-${{ github.run_attempt }}
           restore-keys: |
             circuit-record-
+      # The board memo on main (issue #7253): the structural counterpart of
+      # the circuit record, on the same terms. qldpc_verify.board_reports
+      # files each entry's report under its bytes, the validator closure
+      # and the bytes of every entry it reads (a benchmark baseline, an
+      # architecture partner, a relabeling parent), so a report answers
+      # only when nothing its verdict was computed from has changed, under
+      # any state of the board. Restored only on a push to main, saved
+      # only from a run on main, handed to no pull request step; the
+      # scheduled run and a manual dispatch start from an empty directory
+      # and write the memo afresh, so nothing in it is more than a week
+      # from a verification made from scratch. The whole board is about
+      # 20 MB, and a warm pass reads it in seconds where a cold one
+      # verifies it in minutes. site.yml restores and saves the same
+      # cache, so a site rebuild verifies the merge and not the board.
+      # verify/test_verify_all.py reads these conditions back.
+      - name: restore the board memo (push to main)
+        if: github.event_name == 'push'
+        uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
+        with:
+          path: board-memo
+          key: board-memo-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: |
+            board-memo-
       - name: verify all submissions (push to main, LER scoped to the merge)
         if: github.event_name == 'push' && steps.merge.outputs.ler_stack_changed != 'true'
         working-directory: submitted
@@ -653,6 +676,10 @@ jobs:
         # merge did not touch keeps the rate the PR that introduced it
         # measured; a base that cannot be diffed makes verify_all re-measure
         # everything (its own fail-open rule), so a skip is never silent.
+        # QLDPC_BOARD_CACHE is the memo restored above: the structural pass
+        # verifies the merge's entries and reads the rest.
+        env:
+          QLDPC_BOARD_CACHE: ${{ github.workspace }}/board-memo
         run: uv run --frozen --extra research python verify/verify_all.py --ler-base ${{ github.event.before }} --circuit-record ../circuit-record/record.json --jobs 0 --circuit-jobs 0
       - name: verify all submissions (LER stack changed, or the weekly run)
         if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && steps.merge.outputs.ler_stack_changed == 'true')
@@ -686,11 +713,18 @@ jobs:
         # full re-measure, so the pull request's run is the one to count on.
         # verify/test_verify_all.py runs this script for each kind and reads
         # the flags and this step's `if:` back.
+        #
+        # The board memo (issue #7253): a push reads the one restored above
+        # and extends it; the scheduled run and a dispatch empty the
+        # directory first, since they are the from-scratch checks the
+        # memo's lines are never more than a week from. No pull request
+        # reaches this step, and none is handed main's memo anywhere.
         env:
           EVENT_NAME: ${{ github.event_name }}
           BEFORE: ${{ github.event.before }}
           RUN_ID: ${{ github.run_id }}
           LER_SAMPLE: "3"
+          QLDPC_BOARD_CACHE: ${{ github.workspace }}/board-memo
         run: |
           record="--circuit-record ../circuit-record/record.json"
           case "$EVENT_NAME" in
@@ -700,6 +734,7 @@ jobs:
                 scope="--ler-base $BEFORE --ler-sample $LER_SAMPLE --ler-seed $RUN_ID $record"
               fi ;;
             *)
+              rm -rf "$QLDPC_BOARD_CACHE"
               scope="$record" ;;
           esac
           uv run --frozen --extra research python verify/verify_all.py $scope --jobs 0 --circuit-jobs 0
@@ -712,6 +747,15 @@ jobs:
         with:
           path: circuit-record
           key: circuit-record-${{ github.run_id }}-${{ github.run_attempt }}
+      # always(): a sweep that failed on one entry still verified the rest,
+      # and a report is the same verdict whichever way it went; a run that
+      # wrote nothing saves nothing.
+      - name: save the board memo (runs on main)
+        if: always() && github.event_name != 'pull_request' && github.ref == 'refs/heads/main' && hashFiles('board-memo/**') != ''
+        uses: actions/cache/save@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
+        with:
+          path: board-memo
+          key: board-memo-${{ github.run_id }}-${{ github.run_attempt }}
       # A completed refutation, carried between runs of the same PR (issue
       # #2633). gate_changed.py diffs against the base branch, so a PR that
       # adds a code has a non-empty diff on every push, and a push that only

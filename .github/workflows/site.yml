@@ -33,7 +33,22 @@ jobs:
         with:
           fetch-depth: 0
       - uses: astral-sh/setup-uv@d4b2f3b6ecc6e67c4457f6d3e41ec42d3d0fcb86 # v5
+      # The board memo on main (issue #7253): the structural reports
+      # verify.yml's runs on main wrote, keyed on each entry's bytes, the
+      # validator closure and the bytes of the entries it reads, so the
+      # build verifies the merge and reads the rest. This workflow runs on
+      # pushes to main only, so both ends of the cache are main's; the
+      # memo this build adds is saved for the next run.
+      - name: restore the board memo (main)
+        uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
+        with:
+          path: board-memo
+          key: board-memo-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: |
+            board-memo-
       - name: rebuild and commit regenerated pages (race-safe)
+        env:
+          QLDPC_BOARD_CACHE: ${{ github.workspace }}/board-memo
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -62,3 +77,9 @@ jobs:
             echo "push raced; retrying ($attempt)"
           done
           echo "failed to push after 5 attempts"; exit 1
+      - name: save the board memo (main)
+        if: always() && github.ref == 'refs/heads/main' && hashFiles('board-memo/**') != ''
+        uses: actions/cache/save@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
+        with:
+          path: board-memo
+          key: board-memo-${{ github.run_id }}-${{ github.run_attempt }}

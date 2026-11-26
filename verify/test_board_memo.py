@@ -251,3 +251,87 @@ def test_a_pooled_pass_gives_the_serial_reports_and_fills_the_memo(tmp_path, mon
     written = sorted(p.name for p in memo_b.rglob("*.json"))
     assert written == sorted(p.name for p in memo_a.rglob("*.json")) and len(written) == 3
     shutil.rmtree(memo_b)
+
+
+# The key covers the entries verify() reads for an entry (issue #7253), so a
+# memo can be carried from one state of the board to another: runs on main do.
+
+
+def _relabel_board(tmp_path):
+    """Return a board with a parent entry and a child that declares it as its Clifford relabeling."""
+    d = tmp_path / "codes"
+    d.mkdir()
+    shutil.copy(FIXTURE, d / "72-6-6.json")
+    child = json.loads(open(FIXTURE, encoding="utf-8").read())
+    child["name"] = "relabeling of the fixture"
+    child.setdefault("provenance", {})["clifford_relabel_of"] = "72-6-6"
+    (d / "72-6-6-b.json").write_text(json.dumps(child))
+    return d
+
+
+def test_partner_slugs_name_what_verify_reads():
+    assert Q._partner_slugs({"n": 1}) == []
+    assert Q._partner_slugs("not a dict") == []
+    doc = {
+        "benchmark": {"surface_baseline": {"slug": "9-1-3"}},
+        "architecture": {"gadgets": [{"partner": "25-1-5"}, {"operation": "x"}, "junk"]},
+        "provenance": {"clifford_relabel_of": "7-1-3"},
+    }
+    assert Q._partner_slugs(doc) == ["25-1-5", "7-1-3", "9-1-3"]
+    assert Q._partner_slugs({"benchmark": {"surface_baseline": {"slug": 7}}}) == []
+    assert Q._partner_slugs({"provenance": {"clifford_relabel_of": None}}) == []
+
+
+def test_a_changed_partner_retires_the_entry_that_reads_it(tmp_path, memo, monkeypatch):
+    """The verdict on a relabeling reads its parent, so the parent's bytes are in its key."""
+    board = _relabel_board(tmp_path)
+    # verify() reads the parent from this checkout's codes/; the scratch
+    # board stands in for it, for the verdict and for the key alike
+    monkeypatch.setattr(Q, "_checkout_codes_dir", lambda: str(board))
+    fresh(board)
+    with open(board / "72-6-6-b.json", "rb") as f:
+        child = f.read()
+    key_before = Q._memo_path(str(memo), child)
+    parent = board / "72-6-6.json"
+    doc = json.loads(parent.read_text())
+    doc["name"] = "the parent, edited"
+    parent.write_text(json.dumps(doc))
+    assert Q._memo_path(str(memo), child) != key_before, "the child's key must move with its parent's bytes"
+    calls = count_passes(monkeypatch)
+    fresh(board)
+    assert len(calls) == 2, "the edited parent and the child that reads it are both re-verified"
+    calls.clear()
+    fresh(board)
+    assert calls == []
+
+
+def test_an_entry_without_partners_is_keyed_on_its_own_bytes(board, memo):
+    with open(board / "72-6-6.json", "rb") as f:
+        data = f.read()
+    assert Q._partner_bytes(data) == []
+    import hashlib
+
+    h = hashlib.sha256()
+    h.update(Q.validator_closure_digest().encode("utf-8") + b"\0" + data)
+    key = h.hexdigest()
+    assert Q._memo_path(str(memo), data) == os.path.join(str(memo), key[:2], key[2:] + ".json")
+
+
+def test_an_absent_partner_is_part_of_the_key(tmp_path, memo):
+    child = json.dumps({"name": "orphan", "provenance": {"clifford_relabel_of": "no-such-entry-0-0-0"}}).encode()
+    assert Q._partner_bytes(child) == [("no-such-entry-0-0-0", None)]
+    assert Q._memo_path(str(memo), child) != Q._memo_path(str(memo), child.replace(b"orphan", b"orphan2"))
+
+
+def test_a_version_one_memo_is_a_miss(board, memo, monkeypatch):
+    """The key changed meaning, so a file the old key would have answered from is not read."""
+    fresh(board)
+    with open(board / "72-6-6.json", "rb") as f:
+        data = f.read()
+    path = Q._memo_path(str(memo), data)
+    memo_doc = json.load(open(path))
+    memo_doc["memo_version"] = 1
+    json.dump(memo_doc, open(path, "w"))
+    calls = count_passes(monkeypatch)
+    fresh(board)
+    assert len(calls) == 1
