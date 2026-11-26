@@ -1447,7 +1447,7 @@
   "origin": "baseline",
   "date": "2026-10-12",
   "model": "Claude Fable 5.1 (Claude Code)",
-  "notes": "Literature reconstruction. The paper states d = 14 exactly (d_X: equal to d_Z by a checked X/Z-exchange automorphism; d_Z: ladder (cluster engine, symmetry roots), from the screen's lower bound 13, no target; verification record: verified: second exact engine (dist-m4ri from symmetry roots), GAP rebuild, QDistRnd, QDistEvol). Readings here: qldpc submit's RIS (20,000 NumPy trials per side) and its 2,000,000-trial accelerator pass, plus the verifier's refutation search; witnessed upper bound, see notes/126-16-14.md.",
+  "notes": "Literature reconstruction. The paper states d = 14 exactly (d_X: equal to d_Z by a checked X/Z-exchange automorphism; d_Z: ladder (cluster engine, symmetry roots), from the screen's lower bound 13, no target; verification record: verified: second exact engine (dist-m4ri from symmetry roots), GAP rebuild, QDistRnd, QDistEvol). Readings here: qldpc submit's RIS (20,000 NumPy trials per side) and its 2,000,000-trial accelerator pass, plus the verifier's refutation search; witnessed upper bound, see notes/126-16-14.md. Circuit fault distance corrected on 2026-11-26 by @FarLab: the X-memory circuit has an undetected logical fault set of weight 10 in its committed detector error model (claimed 14); the Z-memory circuit has an undetected logical fault set of weight 10 in its committed detector error model (claimed 14). Found by Sisyphus (sisyphus-qec 0.2.1, github.com/varunmenon1310/sisyphus) in the sweep recorded in research/audits/sisyphus_circuit_sweep-2026-11-25.json (60 s per basis), run by Claude Fable 5.2 (Claude Code) for @FarLab, and re-verified in the committed detector error model with verify/circuit_tools.witness_errors. Each value is an upper bound from a randomized search; no lower bound is proved.",
   "novelty": "known_parameters",
   "references": [
    "arXiv:2610.13880"
@@ -1457,43 +1457,35 @@
  "circuit": {
   "d_circ": {
    "Z": {
-    "value": 14,
+    "value": 10,
     "confidence": "upper_bound",
     "witness": [
-     116060,
-     116065,
-     116084,
-     116096,
-     116111,
-     116115,
-     116138,
-     116186,
-     116193,
-     116220,
-     116281,
-     116294,
-     116296,
-     116297
+     116099,
+     116103,
+     116109,
+     116116,
+     116133,
+     116154,
+     116157,
+     116173,
+     116201,
+     116243
     ]
    },
    "X": {
-    "value": 14,
+    "value": 10,
     "confidence": "upper_bound",
     "witness": [
-     116118,
-     116122,
-     116134,
-     116138,
-     116170,
-     116175,
-     116201,
-     116210,
-     116212,
-     116216,
-     116219,
-     116223,
-     116248,
-     116250
+     24520,
+     24758,
+     24976,
+     25095,
+     25592,
+     25673,
+     25854,
+     26541,
+     27083,
+     28385
     ]
    }
   },
