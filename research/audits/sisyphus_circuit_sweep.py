@@ -38,7 +38,8 @@ line; the record keeps the version that ran:
         --min-mechanisms 50000 --seconds 60 --shard 0/4 \
         --out research/audits/sisyphus_circuit_sweep-<date>-0.json
 
-    uv run --frozen python research/audits/sisyphus_circuit_sweep.py report RECORD.json [RECORD.json ...]
+    uv run --frozen python research/audits/sisyphus_circuit_sweep.py report RECORD.json [RECORD.json ...] \\
+        [--out MERGED.json]
 
 A record is resumable: entries already in --out are skipped. Nothing here
 edits codes/ or circuits/. A refuted entry is corrected the way
@@ -357,6 +358,19 @@ def host():
     return info
 
 
+def merge(records):
+    """Return one record with every entry of `records` once, the first record's settings, and a fresh summary."""
+    out = {k: v for k, v in records[0].items() if k not in ("entries", "summary", "shard")}
+    entries = {}
+    for record in records:
+        for e in record["entries"]:
+            entries[e["slug"]] = e
+    out["merged_from"] = len(records)
+    out["entries"] = [entries[slug] for slug in sorted(entries)]
+    out["summary"] = summarize(out["entries"])
+    return out
+
+
 def load_record(path):
     """Return the record at path, or None when there is none yet."""
     return json.load(open(path)) if os.path.exists(path) else None
@@ -393,15 +407,15 @@ def main(argv=None):
     s.add_argument("--seed", type=int, default=0)
     r = sub.add_parser("report", help="summarize one or more records")
     r.add_argument("records", nargs="+")
+    r.add_argument("--out", default=None, help="also write the records merged into one, each entry once")
     a = ap.parse_args(argv)
     if a.cmd == "child":
         return child(a.stim_path, a.seconds, a.seed, a.workers)
     if a.cmd == "report":
-        entries = {}
-        for path in a.records:
-            for e in json.load(open(path))["entries"]:
-                entries[e["slug"]] = e
-        print(json.dumps(summarize(list(entries.values())), indent=1))
+        record = merge([json.load(open(path)) for path in a.records])
+        if a.out:
+            save_record(record, a.out)
+        print(json.dumps(record["summary"], indent=1))
         return 0
     record = load_record(a.out) or {
         "tool": "sisyphus-qec",
