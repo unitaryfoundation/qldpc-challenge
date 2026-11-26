@@ -1108,41 +1108,40 @@
   "construction": "Symplectically halved pair-partition code (Lee et al. 2026) converted to CSS via LC (arXiv:2610.28737).",
   "origin": "submission",
   "date": "2026-10-22",
-  "model": "Beam 1.0"
+  "model": "Beam 1.0",
+  "notes": " Circuit fault distance corrected on 2026-11-26 by @FarLab: the X-memory circuit has an undetected logical fault set of weight 9 in its committed detector error model (claimed 10); the Z-memory circuit has an undetected logical fault set of weight 9 in its committed detector error model (claimed 10). Found by Sisyphus (sisyphus-qec 0.2.1, github.com/varunmenon1310/sisyphus) in the sweep recorded in research/audits/sisyphus_circuit_sweep-2026-11-25.json (60 s per basis), run by Claude Fable 5.2 (Claude Code) for @FarLab, and re-verified in the committed detector error model with verify/circuit_tools.witness_errors. Each value is an upper bound from a randomized search; no lower bound is proved."
  },
  "family": "pair-partition-cpm",
  "circuit": {
   "d_circ": {
    "Z": {
-    "value": 10,
+    "value": 9,
     "confidence": "upper_bound",
     "witness": [
-     101077,
-     101078,
-     101085,
-     101086,
-     101096,
-     101098,
-     101103,
-     101108,
-     101113,
-     101115
+     23769,
+     23795,
+     23808,
+     23838,
+     29619,
+     29623,
+     29804,
+     29874,
+     29881
     ]
    },
    "X": {
-    "value": 10,
+    "value": 9,
     "confidence": "upper_bound",
     "witness": [
-     101085,
-     101086,
-     101101,
-     101104,
-     101114,
-     101117,
-     101121,
-     101127,
-     101165,
-     101167
+     5232,
+     5250,
+     5260,
+     5289,
+     14178,
+     14420,
+     14542,
+     14574,
+     14803
     ]
    }
   },
