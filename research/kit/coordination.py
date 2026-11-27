@@ -827,7 +827,148 @@ def seed_cache_from_record(cache, doc, record_path):
     return cache.put(doc, rec) is not None
 
 
-def gate_and_record(path, *, seed=None, refute=True, cache=None, validator=None, preflight=True):
+# -- the deep-verify ladder (issue #7441) ------------------------------------
+#
+# A screen at a thousand trials overstates the distance, and the gate's own
+# refutation pass is sized for CI rather than for the depth a submission is
+# held to, so a staged candidate could pass the gate and still be over-claimed
+# ([[389,96,30]] tightened to d_X <= 15 under the submission pass). The gate
+# command therefore runs the staged trial ladder on the candidate after the
+# gate, records every rung and the lightest logical found beside the verdict,
+# and marks a candidate whose corrected distance is below its claim as not
+# submittable. The gate's own verdict is not touched: the ladder is the kit's
+# reading, written in the same record, and a lighter logical it finds is kept
+# with its support so the candidate can be re-staged at the corrected distance
+# (AGENTS.md: a found witness is never lost).
+
+DEEP_LADDER = (2_000, 20_000, 200_000, 2_000_000)
+DEEP_THREADS = 4
+# Without the accelerator the NumPy search is some hundred times slower, so
+# the ladder stops here and the record says so rather than running for hours.
+NUMPY_LADDER_CAP = 20_000
+
+
+def deep_ladder(top=None):
+    """Return the ladder's rungs up to ``top`` trials; ``top`` itself becomes the last rung when it is not one."""
+    if top is None:
+        return list(DEEP_LADDER)
+    top = int(top)
+    if top < 1:
+        raise ValueError("--trials must be at least 1")
+    rungs = [t for t in DEEP_LADDER if t <= top]
+    if not rungs or rungs[-1] != top:
+        rungs.append(top)
+    return rungs
+
+
+def _deep_search(HX, HZ, trials, seed, threads):
+    """One rung: the kit's witness search on both sides (gf2_fast when built, NumPy otherwise)."""
+    if _HERE not in sys.path:
+        sys.path.insert(0, _HERE)
+    import surrogate
+
+    return surrogate.distance_rand_witness(HX, HZ, trials=trials, seed=seed, backend="auto", threads=threads)
+
+
+def _deep_backend():
+    if _HERE not in sys.path:
+        sys.path.insert(0, _HERE)
+    import surrogate
+
+    return "fast" if surrogate._fast is not None else "numpy"
+
+
+def deep_verify(doc, *, trials=None, seed=None, threads=DEEP_THREADS):
+    """Run the staged trial ladder on a candidate and return the kit's reading of its distance.
+
+    The record carries ``screened_d`` (the claim), ``corrected_d`` (the
+    lightest logical any rung found, or the claim), one row per rung run
+    (``trials``, ``weight`` or None, ``side``, ``seconds``), the lighter
+    witness when there is one (``side``, ``weight``, ``support``), and
+    ``submittable``: False exactly when a rung found a logical lighter than
+    the claim. The ladder stops at the first such rung; nothing deeper could
+    make the claim true again. A stabilizer document is skipped, since the
+    ladder runs on CSS check matrices. ``trials`` caps the ladder
+    (:func:`deep_ladder`); without the accelerator it is capped at
+    ``NUMPY_LADDER_CAP`` and the record says so.
+    """
+    claimed = int((doc.get("distance") or {}).get("d"))
+    checks = doc.get("checks") or {}
+    if "S" in checks or "X" not in checks:
+        return {
+            "status": "skipped",
+            "reason": "stabilizer entry: the ladder runs on CSS check matrices",
+            "screened_d": claimed,
+            "corrected_d": claimed,
+            "rungs": [],
+            "witness": None,
+            "submittable": True,
+        }
+    vdir = os.path.join(_ROOT, "verify")
+    if vdir not in sys.path:
+        sys.path.insert(0, vdir)
+    from qldpc_verify import _matrix
+
+    n = int(doc["n"])
+    HX, HZ = _matrix(checks["X"], n), _matrix(checks["Z"], n)
+    backend = _deep_backend()
+    rungs = deep_ladder(trials)
+    capped = False
+    if backend == "numpy" and rungs[-1] > NUMPY_LADDER_CAP:
+        rungs = [t for t in rungs if t <= NUMPY_LADDER_CAP] or [NUMPY_LADDER_CAP]
+        capped = True
+    base_seed = int(seed) if seed is not None else 0
+    best, witness, rows = claimed, None, []
+    for i, t in enumerate(rungs):
+        t0 = time.monotonic()
+        found = _deep_search(HX, HZ, t, base_seed + 1_000_003 * i, threads)
+        weight = int(found.weight) if found and found.weight != float("inf") else None
+        rows.append(
+            {
+                "trials": t,
+                "weight": weight,
+                "side": found.side if found else "",
+                "seconds": round(time.monotonic() - t0, 2),
+            }
+        )
+        if weight is not None and weight < best:
+            best = weight
+            witness = {"side": found.side, "weight": weight, "support": [int(q) for q in found.support]}
+            break
+    out = {
+        "status": "ran",
+        "backend": backend,
+        "screened_d": claimed,
+        "corrected_d": best,
+        "rungs": rows,
+        "witness": witness,
+        "submittable": best >= claimed,
+    }
+    if capped:
+        out["note"] = (
+            f"verify/gf2_fast is not built, so the ladder stopped at {NUMPY_LADDER_CAP:,} trials; "
+            "build it (make fast) for the full ladder"
+        )
+    if not out["submittable"]:
+        out["reason"] = (
+            f"the ladder found a weight-{best} {witness['side']} logical at {rows[-1]['trials']:,} trials, "
+            f"below the claimed d = {claimed}; re-stage the candidate at the corrected distance with this witness"
+        )
+    return out
+
+
+def gate_and_record(
+    path,
+    *,
+    seed=None,
+    refute=True,
+    cache=None,
+    validator=None,
+    preflight=True,
+    deep=True,
+    trials=None,
+    threads=DEEP_THREADS,
+):
     """Run the gate on the candidate at ``path`` and keep the verdict beside it.
 
     Returns ``(verdict, out_path)``. The verdict is the gate's own, obtained
@@ -855,6 +996,12 @@ def gate_and_record(path, *, seed=None, refute=True, cache=None, validator=None,
     the verdict file beside the candidate is fed back into the cache when
     the cache has lost it, so the search is not run again for a lighter
     logical that an earlier run already found.
+
+    With ``deep`` (the default) the staged trial ladder runs after the gate
+    (:func:`deep_verify`, issue #7441) and its reading is written into the
+    record as ``deep_verify``; ``submittable`` in the record is the gate's
+    ``passed`` and the ladder's verdict together. ``trials`` caps the ladder.
+    The returned verdict is the gate's own either way.
     """
     with open(path, encoding="utf-8") as f:
         doc = json.load(f)
@@ -875,6 +1022,12 @@ def gate_and_record(path, *, seed=None, refute=True, cache=None, validator=None,
         "run_id": run_id(),
         "recorded_at": datetime.now(timezone.utc).isoformat(),
     }
+    submittable = bool(verdict.get("passed"))
+    if deep and submittable:
+        reading = deep_verify(doc, trials=trials, seed=seed, threads=threads)
+        record["deep_verify"] = reading
+        submittable = submittable and bool(reading.get("submittable", True))
+    record["submittable"] = submittable
     _write_atomic(out, record)
     return verdict, out
 
@@ -889,18 +1042,41 @@ def _main(argv):
     instead of a verdict, exit 1.
     """
     if argv and argv[0] == "gate":
-        if len(argv) != 2:
-            print("usage: python research/kit/coordination.py gate <candidate.json>")
+        import argparse
+
+        ap = argparse.ArgumentParser(prog="python research/kit/coordination.py gate")
+        ap.add_argument("candidate")
+        ap.add_argument("--trials", type=int, default=None, help="cap the deep-verify ladder at this many trials")
+        ap.add_argument("--no-deep", action="store_true", help="skip the deep-verify ladder")
+        ap.add_argument("--seed", type=int, default=None)
+        try:
+            a = ap.parse_args(argv[1:])
+        except SystemExit:
             return 2
         try:
-            verdict, out = gate_and_record(argv[1])
+            verdict, out = gate_and_record(a.candidate, seed=a.seed, deep=not a.no_deep, trials=a.trials)
         except PreflightFailure as e:
             print(json.dumps(e.result, indent=2))
             print(e, file=sys.stderr)
             return 1
         print(json.dumps(verdict, indent=2))
         print(f"verdict written to {out}", file=sys.stderr)
-        return 0 if verdict.get("passed") else 1
+        with open(out, encoding="utf-8") as f:
+            record = json.load(f)
+        reading = record.get("deep_verify")
+        if reading and reading.get("status") == "ran":
+            print(
+                f"deep verify: claimed d = {reading['screened_d']}, ladder "
+                + ", ".join(
+                    f"{r['trials']:,} -> {r['weight'] if r['weight'] is not None else 'none'}" for r in reading["rungs"]
+                )
+                + f"; corrected d = {reading['corrected_d']}; "
+                + ("submittable" if reading["submittable"] else "NOT submittable: " + reading["reason"]),
+                file=sys.stderr,
+            )
+            if reading.get("note"):
+                print(f"deep verify: {reading['note']}", file=sys.stderr)
+        return 0 if record.get("submittable") else 1
     _cache = VerdictCache()
     print(f"run_id       {run_id()}")
     print(f"staging      {staging_dir(create=False)}")

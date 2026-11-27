@@ -849,3 +849,131 @@ def test_reading_claims_in_a_missing_directory_is_empty_not_an_error(tmp_path):
     assert live_claims(root=str(tmp_path / "nope"), now=T0) == []
     assert read_claim("weight-6/unrestricted", root=str(tmp_path / "nope"), now=T0) is None
     assert prune_claims(root=str(tmp_path / "nope"), now=T0) == 0
+
+
+# -- the deep-verify ladder (issue #7441) ----------------------------------
+#
+# The gate command runs the staged trial ladder after the gate and records the
+# lightest logical it finds beside the verdict; a candidate the ladder tightens
+# below its claim is not submittable. These drive the ladder with a stand-in
+# search so they test the bookkeeping, not the accelerator.
+
+import coordination as C  # noqa: E402
+import surrogate  # noqa: E402
+from coordination import DEEP_LADDER, NUMPY_LADDER_CAP, deep_ladder, deep_verify  # noqa: E402
+
+
+def _found(weight, side="X", support=()):
+    return surrogate.LogicalWitness(weight, side, list(support), "")
+
+
+def _passing(d, *, seed=None, refute=True):
+    return stamped(passed=True)
+
+
+def test_deep_ladder_stops_at_the_trials_cap():
+    assert deep_ladder() == list(DEEP_LADDER) == [2_000, 20_000, 200_000, 2_000_000]
+    assert deep_ladder(20_000) == [2_000, 20_000]
+    assert deep_ladder(50_000) == [2_000, 20_000, 50_000]
+    assert deep_ladder(1_000) == [1_000]
+    with pytest.raises(ValueError):
+        deep_ladder(0)
+
+
+def test_deep_verify_stops_at_the_rung_that_lowers_the_claim(monkeypatch):
+    seq = iter([_found(2, "X", [0, 1]), _found(1, "Z", [3])])
+    calls = []
+
+    def search(HX, HZ, trials, seed, threads):
+        calls.append((trials, seed))
+        return next(seq)
+
+    monkeypatch.setattr(C, "_deep_search", search)
+    monkeypatch.setattr(C, "_deep_backend", lambda: "fast")
+    r = deep_verify(candidate(), seed=5)
+    assert r["status"] == "ran" and r["backend"] == "fast"
+    assert [row["trials"] for row in r["rungs"]] == [2_000, 20_000], "nothing deeper can make the claim true again"
+    assert r["screened_d"] == 2 and r["corrected_d"] == 1 and r["submittable"] is False
+    assert r["witness"] == {"side": "Z", "weight": 1, "support": [3]}, "the lighter logical is kept, never lost"
+    assert "weight-1 Z logical at 20,000 trials" in r["reason"] and "re-stage" in r["reason"]
+    assert calls[0][1] != calls[1][1], "each rung draws its own seed"
+
+
+def test_deep_verify_runs_the_whole_ladder_when_the_claim_holds(monkeypatch):
+    monkeypatch.setattr(C, "_deep_search", lambda HX, HZ, t, s, th: _found(2, "X", [0, 1]))
+    monkeypatch.setattr(C, "_deep_backend", lambda: "fast")
+    r = deep_verify(candidate())
+    assert [row["trials"] for row in r["rungs"]] == list(DEEP_LADDER)
+    assert r["submittable"] is True and r["witness"] is None and r["corrected_d"] == 2 and "reason" not in r
+    # a rung that finds no logical is recorded with no weight
+    monkeypatch.setattr(C, "_deep_search", lambda HX, HZ, t, s, th: surrogate.NO_LOGICAL)
+    r = deep_verify(candidate(), trials=2_000)
+    (row,) = r["rungs"]
+    assert row["trials"] == 2_000 and row["weight"] is None and row["side"] == "" and r["submittable"] is True
+
+
+def test_deep_verify_without_the_accelerator_is_capped_and_says_so(monkeypatch):
+    monkeypatch.setattr(C, "_deep_search", lambda HX, HZ, t, s, th: _found(2, "X", [0, 1]))
+    monkeypatch.setattr(C, "_deep_backend", lambda: "numpy")
+    r = deep_verify(candidate())
+    assert [row["trials"] for row in r["rungs"]] == [2_000, NUMPY_LADDER_CAP]
+    assert r["backend"] == "numpy" and "gf2_fast" in r["note"] and r["submittable"] is True
+
+
+def test_deep_verify_skips_a_stabilizer_document():
+    doc = candidate(code_type="stabilizer", checks={"S": [{"X": [0, 1], "Z": [2, 3]}]})
+    r = deep_verify(doc)
+    assert r["status"] == "skipped" and r["submittable"] is True and r["rungs"] == []
+
+
+def test_gate_and_record_writes_the_ladder_and_the_submittable_flag(tmp_path, monkeypatch):
+    doc = candidate()
+    path = str(tmp_path / "4-2-2.json")
+    save_submission(doc, path)
+    monkeypatch.setattr(C, "_deep_backend", lambda: "fast")
+    monkeypatch.setattr(C, "_deep_search", lambda HX, HZ, t, s, th: _found(1, "X", [0]))
+    verdict, out = gate_and_record(path, cache=cache_at(tmp_path / "a"), validator=_passing, seed=7, trials=20_000)
+    with open(out, encoding="utf-8") as f:
+        rec = json.load(f)
+    assert rec["deep_verify"]["corrected_d"] == 1 and rec["deep_verify"]["rungs"][0]["trials"] == 2_000
+    assert rec["submittable"] is False and rec["passed"] is True
+    assert "deep_verify" not in verdict and "submittable" not in verdict, "the gate's own verdict is returned untouched"
+    # --no-deep keeps the record as it was
+    verdict, out = gate_and_record(path, cache=cache_at(tmp_path / "b"), validator=_passing, deep=False)
+    with open(out, encoding="utf-8") as f:
+        rec = json.load(f)
+    assert "deep_verify" not in rec and rec["submittable"] is True
+    # a candidate the gate refuses is not submittable and the ladder is not spent on it
+    ran = []
+    monkeypatch.setattr(C, "_deep_search", lambda HX, HZ, t, s, th: ran.append(t) or _found(2, "X", [0, 1]))
+    verdict, out = gate_and_record(
+        path, cache=cache_at(tmp_path / "c"), validator=lambda d, *, seed=None, refute=True: stamped(passed=False)
+    )
+    with open(out, encoding="utf-8") as f:
+        rec = json.load(f)
+    assert rec["submittable"] is False and "deep_verify" not in rec and ran == []
+
+
+def test_the_gate_command_takes_trials_and_no_deep(tmp_path, monkeypatch, capsys):
+    doc = candidate()
+    path = str(tmp_path / "4-2-2.json")
+    save_submission(doc, path)
+    monkeypatch.setattr(C, "_gate", lambda: _passing)
+    monkeypatch.setattr(C, "VerdictCache", lambda *a, **k: cache_at(tmp_path))
+    monkeypatch.setattr(C, "_deep_backend", lambda: "fast")
+    seen = []
+    monkeypatch.setattr(C, "_deep_search", lambda HX, HZ, t, s, th: seen.append(t) or _found(2, "X", [0, 1]))
+    assert C._main(["gate", path, "--trials", "20000"]) == 0
+    assert seen == [2_000, 20_000]
+    err = capsys.readouterr().err
+    assert (
+        "deep verify: claimed d = 2" in err
+        and "2,000 -> 2, 20,000 -> 2" in err
+        and err.rstrip().endswith("submittable")
+    )
+    seen.clear()
+    assert C._main(["gate", path, "--no-deep"]) == 0 and seen == []
+    monkeypatch.setattr(C, "_deep_search", lambda HX, HZ, t, s, th: _found(1, "Z", [1]))
+    assert C._main(["gate", path]) == 1
+    assert "NOT submittable" in capsys.readouterr().err
+    assert C._main(["gate"]) == 2

@@ -139,7 +139,12 @@ the same `(n,k,d,w)`.
 **No code is a "find" until `verify/validate_candidate.py` returns `passed: true` for it.**
 Run it as `uv run --extra research python research/kit/coordination.py gate <path>`, which
 calls the gate unchanged and writes its verdict to `<path>.verdict.json` beside the candidate;
-the gate script alone prints the verdict and keeps nothing.
+the gate script alone prints the verdict and keeps nothing. After a pass the command runs the
+staged trial ladder (2,000 to 2,000,000 accelerator trials) on the candidate and records every
+rung and the lightest logical it finds in the same file; a candidate the ladder tightens below
+its claim is marked `submittable: false` there and the command exits 1, with the witness kept
+so the candidate can be re-staged at the corrected distance (issue #7441). `--trials N` caps
+the ladder and `--no-deep` skips it.
 Never write your own distance/quality check or edit anything under `verify/` (the trusted,
 CI-hash-pinned stack). In unattended autoresearch, stage candidates for human review; the
 contributor-driven workflow above is allowed to promote a validated candidate into `codes/`

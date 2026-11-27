@@ -106,8 +106,12 @@ print(path)                                  # the recipe is kept beside the can
 uv run --extra research python research/kit/coordination.py gate <the path it printed>
 ```
 
-Exit 0 and `passed: true`, or it is not a find. The gate is the expensive step,
-so screen widely and spend it only on survivors.
+Exit 0 and `passed: true`, or it is not a find. After a pass the command also runs
+the staged trial ladder (2,000 to 2,000,000 trials) and exits 1 with
+`submittable: false` in the verdict file when a rung finds a logical lighter than
+the claim; the witness is kept there, so re-stage at the corrected distance rather
+than submitting. The gate is the expensive step, so screen widely and spend it
+only on survivors.
 
 Two of the gate's refusals cost nothing to make yourself: a direct sum (a
 stabilizer group in independent blocks on disjoint qubits) and a code the board
