@@ -1920,6 +1920,25 @@ def cmd_submit(args):
     rc = _frontier_check(doc, report, args, res)
     if rc:
         return rc
+    # --open-pr ships the note with the entry, so a note that still carries TODO
+    # placeholders must stop the run before anything is written: drafting
+    # scaffolding is replaced before review (AGENTS.md). The auto-staged stub is
+    # all placeholders, so --open-pr needs a finished --note-file.
+    if args.open_pr and not args.dry_run:
+        stub_here = not args.note_file and os.path.abspath(args.out) == os.path.join(os.path.abspath(_ROOT), "codes")
+        if args.note_file:
+            with open(args.note_file, encoding="utf-8") as f:
+                todos = [i + 1 for i, line in enumerate(f) if re.search(r"\bTODO\b", line)]
+            where = f"{args.note_file} still has TODO placeholders (lines {', '.join(map(str, todos[:10]))})" if todos else ""
+        elif stub_here:
+            where = "no --note-file given, and --open-pr would ship the auto-staged TODO stub"
+        else:
+            where = ""
+        if where:
+            msg = f"{where}; write the note (see notes/TEMPLATE.md) and re-run with --open-pr"
+            print(f"\n{msg}")
+            res["error"] = {"stage": "note", "message": msg}
+            return 1
     out = os.path.join(args.out, f"{slug}.json")
     circuits_dir = os.path.join(os.path.dirname(os.path.abspath(args.out)), "circuits", slug)
     if not args.dry_run and not args.force:
