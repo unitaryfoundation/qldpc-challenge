@@ -120,7 +120,7 @@
   "construction": "2BGA (arXiv:2306.16400) on SmallGroup(6,2), from github.com/QEC-pages/2BGA-codes @ 403d194c3f98f0cadc236aecbc4a8b6139ccf23c, abelian.zip, diswtabelian_wt5wtL2_order6_k4.txt, line 1. nonidentity supports a=[2], b=[3, 5].",
   "references": [],
   "date": "2026-09-19",
-  "notes": "Literature reproduction of a published 2BGA code (arXiv:2306.16400; github.com/QEC-pages/2BGA-codes @ 403d194c3f98f0cadc236aecbc4a8b6139ccf23c). Checked against the live board: not equivalent to any existing entry.",
+  "notes": "Literature reproduction of a published 2BGA code (arXiv:2306.16400; github.com/QEC-pages/2BGA-codes @ 403d194c3f98f0cadc236aecbc4a8b6139ccf23c). Checked against the live board: not equivalent to any existing entry. Layout added 2026-11-17 by @vprusso: bilayer coordinates with interaction radius 2.2361 (research/local2d/layout_sweep.py, screen stage).",
   "model": "DeepSeek V4 Flash 0731",
   "origin": "submission"
  },
@@ -153,6 +153,67 @@
    ],
    "date": "2026-11-06",
    "method": "circuit_autogen schedule search (two-block interleaved, then layout, then generic), verified by verify/circuit_verify.py before writing"
+  }
+ },
+ "locality": {
+  "coordinates": [
+   [
+    0.0,
+    0.0
+   ],
+   [
+    0.0,
+    1.0
+   ],
+   [
+    0.0,
+    2.0
+   ],
+   [
+    1.0,
+    0.0
+   ],
+   [
+    1.0,
+    1.0
+   ],
+   [
+    1.0,
+    2.0
+   ],
+   [
+    0.0,
+    0.0
+   ],
+   [
+    0.0,
+    1.0
+   ],
+   [
+    0.0,
+    2.0
+   ],
+   [
+    1.0,
+    0.0
+   ],
+   [
+    1.0,
+    1.0
+   ],
+   [
+    1.0,
+    2.0
+   ]
+  ],
+  "layers": 2,
+  "interaction_radius": 2.2361,
+  "contributed_by": {
+   "by": [
+    "@vprusso"
+   ],
+   "date": "2026-11-17",
+   "method": "torus_grid.py: the two-block index convention read off as a Z_2 x Z_3 grid, one qubit of each block per site, no search; radius measured with the verifier's rule (research/local2d/layout_sweep.py)"
   }
  }
 }

@@ -103,7 +103,7 @@
   "construction": "priced calculus E-PEEL transform of bbga code",
   "references": [],
   "date": "2026-11-02",
-  "notes": "",
+  "notes": "Layout added 2026-11-17 by @vprusso: single-layer coordinates with interaction radius 2.2361 (research/local2d/layout_sweep.py, fold stage).",
   "model": "Beam 1.0"
  },
  "circuit": {
@@ -134,6 +134,63 @@
    ],
    "date": "2026-11-06",
    "method": "circuit_autogen schedule search (two-block interleaved, then layout, then generic), verified by verify/circuit_verify.py before writing"
+  }
+ },
+ "locality": {
+  "coordinates": [
+   [
+    1.0,
+    3.0
+   ],
+   [
+    2.0,
+    0.0
+   ],
+   [
+    3.0,
+    1.0
+   ],
+   [
+    0.0,
+    2.0
+   ],
+   [
+    2.0,
+    1.0
+   ],
+   [
+    2.0,
+    2.0
+   ],
+   [
+    1.0,
+    1.0
+   ],
+   [
+    0.0,
+    1.0
+   ],
+   [
+    1.0,
+    0.0
+   ],
+   [
+    2.0,
+    3.0
+   ],
+   [
+    1.0,
+    2.0
+   ]
+  ],
+  "layers": 1,
+  "interaction_radius": 2.2361,
+  "contributed_by": {
+   "by": [
+    "@vprusso"
+   ],
+   "date": "2026-11-17",
+   "method": "fold_layout.anneal on a 4 x 4 integer grid, 1 per site, seed 4, 100000 iterations (research/local2d/layout_sweep.py)"
   }
  }
 }
