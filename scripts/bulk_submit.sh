@@ -2,7 +2,7 @@
 # Submit a batch of codes, one PR per code, as the contract requires.
 #
 # Usage:
-#   scripts/bulk_submit.sh --authors @handle --no-circuit --fast-trials 0 --open-pr -- file1.npz file2.npz ...
+#   scripts/bulk_submit.sh --authors @handle --no-circuit --open-pr -- file1.npz file2.npz ...
 #
 # Everything before "--" is passed unchanged to each `./qldpc submit` call;
 # everything after "--" is treated as a candidate file. Each candidate gets its
@@ -35,7 +35,7 @@ fi
 rc=0
 for f in "${files[@]}"; do
     echo "=== submitting $f ==="
-    if ! ./qldpc submit "$f" "${common[@]}"; then
+    if ! ./qldpc submit "$f" ${common[@]+"${common[@]}"}; then
         echo "FAILED: $f" >&2
         rc=1
     fi

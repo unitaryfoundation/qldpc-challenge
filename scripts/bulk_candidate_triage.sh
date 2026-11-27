@@ -21,11 +21,16 @@ echo "=== duplicate collapse ==="
 uv run python research/kit/dedup_submissions.py "$@" || true
 echo
 
+if ! uv run --extra research python -c "import sys; sys.path.insert(0, 'verify'); import gf2_fast" >/dev/null 2>&1; then
+    echo "WARNING: verify/gf2_fast is not importable; the gate runs shallow Python passes only." >&2
+    echo "         Copy verify/gf2_fast.cpython-*.so into verify/ (see AGENTS.md worktree recipe)." >&2
+fi
+
 echo "=== per-candidate gate ==="
 rc=0
 for f in "$@"; do
     echo "--- $f ---"
-    if uv run python research/kit/coordination.py gate "$f"; then
+    if uv run --extra research python research/kit/coordination.py gate "$f"; then
         echo "PASSED: $f"
     else
         echo "BLOCKED: $f"
