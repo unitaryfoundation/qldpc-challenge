@@ -88,7 +88,7 @@
   "construction": "repair of codes/8-4-1.json by adding one X-check [2, 3]",
   "references": [],
   "date": "2026-10-19",
-  "notes": "",
+  "notes": "Layout added 2026-11-17 by @vprusso: bilayer coordinates with interaction radius 1.4143 (research/local2d/layout_sweep.py, screen stage).",
   "model": "Beam 1.0"
  },
  "circuit": {
@@ -119,6 +119,51 @@
    ],
    "date": "2026-11-06",
    "method": "circuit_autogen schedule search (two-block interleaved, then layout, then generic), verified by verify/circuit_verify.py before writing"
+  }
+ },
+ "locality": {
+  "coordinates": [
+   [
+    0.0,
+    0.0
+   ],
+   [
+    0.0,
+    1.0
+   ],
+   [
+    1.0,
+    0.0
+   ],
+   [
+    1.0,
+    1.0
+   ],
+   [
+    0.0,
+    0.0
+   ],
+   [
+    0.0,
+    1.0
+   ],
+   [
+    1.0,
+    0.0
+   ],
+   [
+    1.0,
+    1.0
+   ]
+  ],
+  "layers": 2,
+  "interaction_radius": 1.4143,
+  "contributed_by": {
+   "by": [
+    "@vprusso"
+   ],
+   "date": "2026-11-17",
+   "method": "torus_grid.py: the two-block index convention read off as a Z_2 x Z_2 grid, one qubit of each block per site, no search; radius measured with the verifier's rule (research/local2d/layout_sweep.py)"
   }
  }
 }
