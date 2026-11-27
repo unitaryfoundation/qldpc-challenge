@@ -1,0 +1,192 @@
+{
+ "aborted_experiments": 0,
+ "budget": {
+  "declared": {
+   "candidates_screened": 2000,
+   "cpu_hours": 1500,
+   "gpu_hours": 3000,
+   "walltime_hours": 720
+  },
+  "note": "cpu_hours are Perlmutter core-hours charged (256 logical CPUs per node); node-hours 35.1; the GPU budget was not used, since no witness search was needed",
+  "spent": {
+   "candidates_screened": 2827,
+   "cpu_hours": 8989.3,
+   "gpu_hours": 0,
+   "llm_tokens": {},
+   "walltime_hours": 35.1
+  }
+ },
+ "campaign_id": "certification-and-layout-boardwide-2026-11",
+ "campaign_name": "Board-wide certification and layout campaign",
+ "errors": [],
+ "experiments": [
+  {
+   "family": "other",
+   "note": "Part A, certification of queue bands A, B, P (tropidist+sat, 1200 s per solve, 300 s ladder); Perlmutter job 61479479",
+   "params": {
+    "exact": 561,
+    "ladder": 300,
+    "partial": 100,
+    "processes": 30,
+    "threads": 4,
+    "timeout": 3,
+    "tlim": 1200
+   },
+   "screened": {
+    "backend": "sat",
+    "d": null,
+    "trials": 664
+   },
+   "seed": null,
+   "spent": {
+    "candidates_screened": 664,
+    "cpu_hours": 1970.9,
+    "gpu_hours": 0,
+    "llm_tokens": {},
+    "walltime_hours": 7.7
+   },
+   "survivors": 0
+  },
+  {
+   "family": "other",
+   "note": "Part A, certification of queue bands C, D (tropidist+sat, 3600 s per solve, 600 s ladder); Perlmutter job 61479480, cut at the 24 h wall",
+   "params": {
+    "exact": 53,
+    "ladder": 600,
+    "partial": 217,
+    "processes": 30,
+    "threads": 4,
+    "timeout": 0,
+    "tlim": 3600
+   },
+   "screened": {
+    "backend": "sat",
+    "d": null,
+    "trials": 270
+   },
+   "seed": null,
+   "spent": {
+    "candidates_screened": 270,
+    "cpu_hours": 6145.6,
+    "gpu_hours": 0,
+    "llm_tokens": {},
+    "walltime_hours": 24.0
+   },
+   "survivors": 0
+  },
+  {
+   "family": "other",
+   "note": "Part B, 2D layout sweep over the 1,893 layoutless CSS entries (research/local2d/layout_sweep.py, 600 s per entry, 60 processes); Perlmutter job 61479606",
+   "params": {
+    "accepted": 939,
+    "class_local-2d-bilayer": 871,
+    "class_local-2d-single": 68,
+    "entry_seconds": 600,
+    "miss": 954,
+    "processes": 60,
+    "stage_fold": 423,
+    "stage_hinge": 121,
+    "stage_screen": 140,
+    "stage_tri": 255
+   },
+   "screened": {
+    "backend": "structural",
+    "d": null,
+    "trials": 1893
+   },
+   "seed": null,
+   "spent": {
+    "candidates_screened": 1893,
+    "cpu_hours": 872.8,
+    "gpu_hours": 0,
+    "llm_tokens": {},
+    "walltime_hours": 3.4
+   },
+   "survivors": 0
+  }
+ ],
+ "filed": {
+  "attempt_logs": {
+   "pr": [
+    7395
+   ]
+  },
+  "certificates": {
+   "count": 178,
+   "new_partial": 18,
+   "pr": [
+    7392
+   ],
+   "raised": 160
+  },
+  "layouts": {
+   "batches": 24,
+   "count": 930,
+   "prs": [
+    7394,
+    7396,
+    7397,
+    7398,
+    7399,
+    7400,
+    7401,
+    7402,
+    7407,
+    7408,
+    7409,
+    7411,
+    7412,
+    7413,
+    7414,
+    7415,
+    7416,
+    7417,
+    7418,
+    7419,
+    7420,
+    7421,
+    7422,
+    7423
+   ]
+  },
+  "sweep_fix": {
+   "pr": [
+    7393
+   ]
+  }
+ },
+ "frontier_advances": 0,
+ "negative_results": [
+  {
+   "detail": "no tool here searches 3D embeddings or stabilizer layouts; the sweep placed CSS entries in 2D only, so those clubs stay empty (issues #5840, #5841)",
+   "what": "D = 3 and stabilizer 2D geometric-efficiency clubs"
+  },
+  {
+   "detail": "the sweep version on Perlmutter predated the binding; not filed. All but 45 are exact on main anyway through the QEDist sweeps (#7109, #6197)",
+   "what": "614 certification records without a checks_sha256 binding"
+  },
+  {
+   "detail": "research/local2d/sweep_attempts.jsonl records each with its best radius, so a later run at this budget skips them",
+   "what": "954 of 1,893 layoutless entries not placed at 600 s"
+  },
+  {
+   "detail": "160-32-10, 160-36-6, 170-34-8, 180-36-8, 190-38-8 have golden-pinned gate verdicts (verify/fixtures/validation_gate/golden); a layout moves the verdict, so filing them needs a deliberate golden re-record (Tier 1)",
+   "what": "5 placed layouts not filed"
+  }
+ ],
+ "non_frontier_survivors": 0,
+ "report": "research/campaigns/certification-and-layout-boardwide-2026-11/report.md",
+ "required_outputs": [
+  "experiment_ledger",
+  "campaign_summary",
+  "negative_results",
+  "surviving_candidates"
+ ],
+ "status": "completed",
+ "stopped_by": {
+  "note": "the queue bands and the layoutless entries were exhausted at the budgets run; the C/D job ended at its 24 h wall limit",
+  "type": "budget_exhausted"
+ },
+ "summary_version": 1,
+ "survivors": []
+}
