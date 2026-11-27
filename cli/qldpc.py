@@ -2225,6 +2225,402 @@ def open_pr(
     return 0
 
 
+# ---------------------------------------------------------------------------
+# submit-batch (issue #7449): the bulk path as one command. Each candidate is
+# run through `submit` with the shared flags (the argument list is parsed by
+# the real parser, so the defaults are submit's), and the PR is opened by
+# `open_pr` only after the batch has checked the result against what it has
+# already filed. A dropped or refused candidate costs nothing beyond its own
+# search; an --open-pr failure stops the batch, because the files it wrote are
+# then in the working tree unfiled and the next PR must not carry them.
+
+BATCH_DROPPED = ("duplicate", "parameter-tie")
+BATCH_OK = ("filed", "written", "dry-run") + BATCH_DROPPED
+_BATCH_REFUSAL_STAGES = ("verify", "frontier", "peer-audit", "revision", "structure")
+_BATCH_SUBMIT_KEYS = (
+    "stage",
+    "slug",
+    "n",
+    "k",
+    "d",
+    "code_type",
+    "score",
+    "earned_distance",
+    "code_path",
+    "note_path",
+    "note_stub",
+    "circuits_dir",
+    "body_file",
+    "title",
+    "branch",
+    "novelty",
+    "dedup",
+    "revision",
+    "next_steps",
+    "would_write",
+    "would_refuse",
+)
+
+
+def _batch_paths(items):
+    """Expand files, directories, and globs into candidate paths, in the order given, without repeats."""
+    out = []
+    for item in items:
+        hits = sorted(glob.glob(item)) if any(ch in item for ch in "*?[") else [item]
+        for hit in hits:
+            if os.path.isdir(hit):
+                for name in sorted(os.listdir(hit)):
+                    if name.endswith((".json", ".npz")) and not name.endswith((".verdict.json", ".preflight.json")):
+                        out.append(os.path.join(hit, name))
+            else:
+                out.append(hit)
+    seen, uniq = set(), []
+    for path in out:
+        key = os.path.abspath(path)
+        if key not in seen:
+            seen.add(key)
+            uniq.append(path)
+    return uniq
+
+
+def _batch_identity(HX, HZ, draft):
+    """Return the fingerprint and WL-signature sets the gate recognizes a candidate by.
+
+    A CSS candidate gets the oracle's matrix identity. A stabilizer draft gets
+    the identity of its packaged document when it passes the structural
+    checks, and otherwise its symplectic fingerprint alone (the WL signature
+    is a CSS object), so a draft the batch will rebuild is still deduplicated.
+    """
+    import dedup_oracle
+
+    if isinstance(draft, dict) and draft.get("code_type") == "stabilizer":
+        ident, _fails = dedup_oracle.identity_doc(draft)
+        if ident is not None:
+            return ident
+        import hashlib
+
+        S = np.concatenate([np.asarray(HX, dtype=np.int8) % 2, np.asarray(HZ, dtype=np.int8) % 2], axis=1)
+        fp = hashlib.sha256(gf2.rref(S)[0].tobytes()).hexdigest()[:16]
+        return {
+            "n": int(S.shape[1] // 2),
+            "fingerprint": fp,
+            "signature": None,
+            "fingerprints": {fp},
+            "signatures": set(),
+        }
+    return dedup_oracle.identity_matrices(HX, HZ)
+
+
+def _batch_index(args):
+    """Return the board (and with --against-open-prs the open pull requests) as the dedup oracle indexes them."""
+    import dedup_oracle
+
+    return dedup_oracle.combined_index(
+        include_board=True, include_open_prs=bool(args.against_open_prs), open_pr_limit=args.open_pr_limit
+    )
+
+
+def _batch_submit_argv(args, path):
+    """Return the `submit` argument list for one candidate of the batch."""
+    argv = [
+        "submit",
+        path,
+        "--authors",
+        *args.authors,
+        "--out",
+        args.out,
+        "--trials",
+        str(args.trials),
+        "--fast-trials",
+        str(args.fast_trials),
+        "--seed",
+        str(args.seed),
+        "--json",
+    ]
+    if not args.circuit:
+        argv.append("--no-circuit")
+    if args.dry_run:
+        argv.append("--dry-run")
+    if args.base_ref:
+        argv += ["--base-ref", args.base_ref]
+    for flag in ("anonymous", "allow_non_frontier", "force"):
+        if getattr(args, flag, False):
+            argv.append("--" + flag.replace("_", "-"))
+    for flag in ("model", "harness", "construction", "family"):
+        value = getattr(args, flag, "")
+        if value:
+            argv += ["--" + flag, value]
+    if args.note_dir:
+        stem = os.path.splitext(os.path.basename(path))[0]
+        note = os.path.join(args.note_dir, stem + ".md")
+        if os.path.exists(note):
+            argv += ["--note-file", note]
+    return argv
+
+
+def _batch_weight(record):
+    """Return the check weight of the code a submit run produced, from its document or its written file."""
+    doc = record.get("doc")
+    if doc is None and record.get("code_path"):
+        try:
+            with open(record["code_path"], encoding="utf-8") as f:
+                doc = json.load(f)
+        except (OSError, ValueError):
+            return None
+    if not isinstance(doc, dict):
+        return None
+    checks = doc.get("checks") or {}
+    if doc.get("code_type") == "stabilizer":
+        weights = [len(set(g.get("X", [])) | set(g.get("Z", []))) for g in checks.get("S", [])]
+    else:
+        weights = [len(r) for r in list(checks.get("X", [])) + list(checks.get("Z", []))]
+    return max(weights) if weights else None
+
+
+def _batch_discard(record):
+    """Remove what a submit run wrote for a candidate the batch then dropped."""
+    import shutil
+
+    removed = []
+    for key in ("code_path", "note_path"):
+        path = record.get(key)
+        if path and os.path.isfile(path):
+            os.remove(path)
+            removed.append(path)
+    circuits = record.get("circuits_dir")
+    if circuits and os.path.isdir(circuits):
+        shutil.rmtree(circuits)
+        removed.append(circuits)
+    return removed
+
+
+def _batch_run_submit(args, row):
+    """Run `submit` for one candidate; return (exit code, its result record)."""
+    argv = _batch_submit_argv(args, row["path"])
+    try:
+        sub_args = build_parser().parse_args(argv)
+    except SystemExit as e:
+        return 2, {"error": {"stage": "usage", "message": f"submit {' '.join(argv[1:])}: exit {e.code}"}}
+    try:
+        rc = cmd_submit(sub_args)
+    except SystemExit as e:
+        code = e.code
+        if isinstance(code, str):
+            _result(sub_args)["error"] = {"stage": "usage", "message": code}
+            rc = 2
+        else:
+            rc = 0 if code is None else int(code)
+    return (0 if rc is None else int(rc)), _result(sub_args)
+
+
+def _batch_table(rows):
+    """Return the human summary, one line per candidate."""
+    lines = []
+    for row in rows:
+        what = row.get("pr_url") or row.get("slug") or ""
+        if row["status"] in BATCH_DROPPED:
+            dup = row.get("duplicate_of") or {}
+            what = "same as " + str(dup.get("path") or dup.get("name") or "?")
+            if dup.get("kind") == "wl":
+                what += " (probable permutation)"
+            elif dup.get("kind") == "parameters":
+                what += " on (n, k, d, w)"
+        elif row["status"] in ("refused", "error"):
+            err = row.get("error") or {}
+            what = f"{err.get('stage', 'error')}: {err.get('message', '')}"[:160]
+        lines.append(f"  {row['status']:<14} {row['path']}  {what}")
+    return "\n".join(lines)
+
+
+def cmd_submit_batch(args):
+    import contextlib
+    from collections import Counter
+
+    res = _result(args)
+    res["stage"] = "load"
+    args.authors = validate_authors(args.authors, args.anonymous)
+    paths = _batch_paths(args.candidates)
+    if not paths:
+        raise SystemExit("submit-batch: no candidate files (.npz or .json) found in " + ", ".join(args.candidates))
+    quiet = contextlib.redirect_stdout(sys.stderr) if args.json else contextlib.nullcontext()
+    say = (lambda msg: print(msg, file=sys.stderr, flush=True)) if args.json else (lambda msg: print(msg, flush=True))
+
+    # 1. load every candidate and compute the identity the gate would see
+    rows, loaded = [], []
+    for path in paths:
+        row = {"path": path, "status": None}
+        rows.append(row)
+        try:
+            HX, HZ, _coords, draft = load_checks(path)
+            ident = _batch_identity(HX, HZ, draft)
+        except SystemExit as e:
+            row.update(status="error", error={"stage": "load", "message": str(e)})
+            continue
+        except Exception as e:  # noqa: BLE001 - one bad file must not end the batch
+            row.update(status="error", error={"stage": "load", "message": f"{type(e).__name__}: {e}"})
+            continue
+        row["n"] = ident.get("n")
+        row["fingerprint"] = ident.get("fingerprint")
+        if isinstance(draft, dict):
+            row["claimed"] = {"k": draft.get("k"), "d": (draft.get("distance") or {}).get("d")}
+        loaded.append((row, ident))
+    say(f"submit-batch: {len(paths)} candidate(s), {len(loaded)} loaded")
+
+    # 2. dedup inside the batch (same code first, then probable permutations), then against the board
+    res["stage"] = "dedup"
+    by_fp, by_sig = {}, {}
+    for row, ident in loaded:
+        first = next((by_fp[fp] for fp in ident["fingerprints"] if fp in by_fp), None)
+        kind = "exact"
+        if first is None and not args.keep_wl_matches:
+            first = next((by_sig[sg] for sg in ident["signatures"] if sg in by_sig), None)
+            kind = "wl"
+        if first is not None:
+            row.update(status="duplicate", duplicate_of={"path": first["path"], "kind": kind})
+            continue
+        for fp in ident["fingerprints"]:
+            by_fp.setdefault(fp, row)
+        for sg in ident["signatures"]:
+            by_sig.setdefault(sg, row)
+    survivors = [(row, ident) for row, ident in loaded if row["status"] is None]
+    if survivors:
+        import dedup_oracle
+
+        with quiet:
+            index = _batch_index(args)
+        for row, ident in survivors:
+            hit = dedup_oracle.check(ident, index)
+            if hit["exact"]:
+                e = hit["exact"][0]
+                row.update(
+                    status="duplicate",
+                    duplicate_of={"name": e["name"], "source": e["source"], "pr": e.get("pr"), "kind": "exact"},
+                )
+            elif hit["wl"]:
+                row["wl_matches"] = [{"name": e["name"], "source": e["source"], "pr": e.get("pr")} for e in hit["wl"]]
+    dropped = sum(1 for row in rows if row["status"] == "duplicate")
+    say(f"  dedup: {dropped} duplicate(s) dropped, {sum(1 for r in rows if r['status'] is None)} to gate")
+
+    # 3. gate and file, one candidate at a time
+    res["stage"] = "submit"
+    filed_axes, filed_slugs = {}, {}
+    stopped = False
+    for row, _ident in loaded:
+        if row["status"] is not None:
+            continue
+        if stopped:
+            row["status"] = "not-run"
+            continue
+        say(f"\n== {row['path']}")
+        with quiet:
+            rc, rec = _batch_run_submit(args, row)
+        row["submit"] = {key: rec.get(key) for key in _BATCH_SUBMIT_KEYS if key in rec}
+        if rc != 0:
+            err = rec.get("error") or {"stage": rec.get("stage"), "message": f"exit {rc}"}
+            row["error"] = err
+            row["status"] = "refused" if err.get("stage") in _BATCH_REFUSAL_STAGES else "error"
+            continue
+        slug = rec.get("slug")
+        row.update(slug=slug, n=rec.get("n"), k=rec.get("k"), d=rec.get("d"), w=_batch_weight(rec))
+        axes = (row["n"], row["k"], row["d"], row["w"])
+        if axes in filed_axes and not args.keep_parameter_ties:
+            row["removed"] = [] if args.dry_run else _batch_discard(rec)
+            row.update(
+                status="parameter-tie",
+                duplicate_of={"path": filed_axes[axes], "kind": "parameters", "axes": list(axes)},
+            )
+            continue
+        if slug in filed_slugs:
+            row["removed"] = [] if args.dry_run else _batch_discard(rec)
+            row.update(
+                status="error",
+                error={
+                    "stage": "slug",
+                    "message": f"slug {slug} was already used in this batch by {filed_slugs[slug]} "
+                    "(a distinct code with the same n, k, d)",
+                    "hint": f"./qldpc submit {row['path']} ... --slug {slug}-b",
+                },
+            )
+            continue
+        filed_axes.setdefault(axes, row["path"])
+        filed_slugs.setdefault(slug, row["path"])
+        if args.dry_run:
+            row["status"] = "dry-run"
+            continue
+        if not args.open_pr:
+            row["status"] = "written"
+            row["next_steps"] = rec.get("next_steps")
+            continue
+        with quiet:
+            rc = open_pr(
+                slug,
+                rec["code_path"],
+                rec.get("note_path"),
+                rec.get("title"),
+                rec.get("body_file"),
+                root=_ROOT,
+                circuits_dir=rec.get("circuits_dir"),
+                pr_author=rec.get("pr_author"),
+                base_ref=rec.get("base_ref"),
+                res=rec,
+            )
+        if rc != 0:
+            row["status"] = "error"
+            row["error"] = rec.get("error") or {"stage": "open-pr", "message": f"exit {rc}"}
+            written = (rec.get("code_path"), rec.get("note_path"), rec.get("circuits_dir"))
+            row["unfiled_files"] = [path for path in written if path]
+            stopped = True
+            continue
+        row.update(status="filed", pr_url=rec.get("pr_url"), pr_number=rec.get("pr_number"), branch=rec.get("branch"))
+
+    # 4. the summary
+    counts = Counter(row["status"] for row in rows)
+    res.update(
+        stage="done",
+        candidates=rows,
+        counts=dict(sorted(counts.items())),
+        filed=[row["pr_url"] for row in rows if row.get("pr_url")],
+        stopped_early=stopped,
+        settings={
+            "circuit": bool(args.circuit),
+            "trials": args.trials,
+            "fast_trials": args.fast_trials,
+            "base_ref": args.base_ref or None,
+            "open_pr": bool(args.open_pr),
+            "dry_run": bool(args.dry_run),
+            "against_open_prs": bool(args.against_open_prs),
+        },
+    )
+    bad = [row for row in rows if row["status"] not in BATCH_OK]
+    if stopped:
+        unfiled = [p for row in rows for p in row.get("unfiled_files", [])]
+        res["error"] = {
+            "stage": "open-pr",
+            "message": "a pull request could not be opened; the batch stopped so the next PR would not carry "
+            "the files already written",
+            "unfiled_files": unfiled,
+            "hint": "finish that candidate's steps by hand (its error names the command), then re-run the batch "
+            "on the candidates marked not-run",
+        }
+    elif bad:
+        res["error"] = {
+            "stage": "submit",
+            "message": f"{len(bad)} of {len(rows)} candidate(s) were refused or failed; see candidates[].error",
+        }
+    rc = 1 if (bad or stopped) else 0
+    res.update(ok=rc == 0, exit_code=rc)  # what _run_json would add; the summary file carries it in either mode
+    if args.summary_file:
+        with open(args.summary_file, "w", encoding="utf-8") as f:
+            json.dump(res, f, indent=1, default=str)
+            f.write("\n")
+        say(f"  summary written to {args.summary_file}")
+    summary = ", ".join(f"{v} {k}" for k, v in sorted(counts.items()))
+    say(f"\nsubmit-batch: {len(rows)} candidate(s): {summary}")
+    if not args.json:
+        print(_batch_table(rows))
+    return rc
+
+
 def _history_is_shallow(root):
     """Return True when the clone's history is truncated, so a replay would misdate it."""
     try:
@@ -3777,15 +4173,13 @@ def cmd_preflight(args):
     print("preflight: OK")
 
 
-def main(argv=None):
-    _default_board_memo()
-    # Windows consoles default to a legacy code page, and the summaries print
-    # "≤" (d <= 12, weight ≤ 6). Without this the run dies in the final print,
-    # after the search and the verification have already succeeded.
-    for stream in (sys.stdout, sys.stderr):
-        if hasattr(stream, "reconfigure") and (stream.encoding or "").lower().replace("-", "") != "utf8":
-            stream.reconfigure(encoding="utf-8", errors="replace")
+def build_parser():
+    """Return the command-line parser.
 
+    `main` parses with it; `submit-batch` parses each candidate's `submit`
+    argument list through it as well, so the per-code defaults live in one
+    place (issue #7449).
+    """
     p = argparse.ArgumentParser(
         prog="qldpc",
         description="qLDPC challenge submission tool",
@@ -4056,6 +4450,102 @@ def main(argv=None):
     )
     s.set_defaults(func=cmd_submit)
 
+    sb = sub.add_parser(
+        "submit-batch",
+        help="dedup, gate, and file a batch of candidates, one independent PR per code",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        description=(
+            "The bulk path as one command (issue #7449). The candidates are "
+            "loaded, deduplicated inside the batch (same code, or a probable "
+            "permutation of one) and against the board, then each survivor is "
+            "run through `submit` with the shared flags and, with --open-pr, "
+            "filed as its own pull request from --base-ref. A second code with "
+            "the same (n, k, d, w) as one already filed in the batch is dropped "
+            "(AGENTS.md: one PR per (n, k, d, w)). The record lists every "
+            "candidate with its status: filed, written, dry-run, duplicate, "
+            "parameter-tie, refused (the gate or the frontier rule), error, or "
+            "not-run (after an --open-pr failure stopped the batch). Exit 0 when "
+            "every candidate was filed, written, or dropped as a duplicate; 1 "
+            "otherwise."
+        ),
+        epilog=(
+            "Typical run (code tier only; circuits are added later with the circuit tools):\n"
+            "  ./qldpc submit-batch research/candidates/<run>/*.json --authors @handle \\\n"
+            "      --open-pr --json --summary-file batch.json\n"
+            "The accelerator pass runs at submit's own default; pass --fast-trials 0\n"
+            "only to file shallow claims knowingly (the PR body then says so)."
+        ),
+    )
+    sb.add_argument("candidates", nargs="+", help=".npz/.json candidates, directories of them, or globs")
+    sb.add_argument("--authors", nargs="+", required=True, help="one or more: @github-handle and/or 'First Last'")
+    sb.add_argument("--anonymous", action="store_true", help="as for submit")
+    sb.add_argument("--model", default="", help="as for submit; one value for the whole batch")
+    sb.add_argument("--harness", default="", help="as for submit; one value for the whole batch")
+    sb.add_argument("--construction", default="", help="as for submit; one value for the whole batch")
+    sb.add_argument("--family", default="", help="as for submit; one value for the whole batch")
+    sb.add_argument(
+        "--note-dir",
+        default="",
+        metavar="DIR",
+        help="DIR/<candidate file stem>.md is passed as --note-file when it exists; otherwise submit stages its stub",
+    )
+    sb.add_argument(
+        "--circuit",
+        action="store_true",
+        help="generate the circuit tier too (default: code tier only, --no-circuit, with circuits added later)",
+    )
+    sb.add_argument("--trials", type=int, default=20000, help="RIS trials for the distance witness search")
+    sb.add_argument(
+        "--fast-trials",
+        type=int,
+        default=2_000_000,
+        help="accelerator trials per side, submit's own default; 0 skips the pass "
+        "and the PR body says so (CI runs the accelerator at depth, so a shallow "
+        "claim is what it refutes)",
+    )
+    sb.add_argument("--seed", type=int, default=0)
+    sb.add_argument("--allow-non-frontier", action="store_true", help="as for submit")
+    sb.add_argument(
+        "--keep-wl-matches",
+        action="store_true",
+        help="file a candidate whose WL signature matches an earlier one in the batch "
+        "(a probable permutation) instead of dropping it as a duplicate",
+    )
+    sb.add_argument(
+        "--keep-parameter-ties",
+        action="store_true",
+        help="file a second code with the same (n, k, d, w) as one already filed in this batch",
+    )
+    sb.add_argument(
+        "--against-open-prs",
+        action="store_true",
+        help="also dedup against the codes in open pull requests (fetched with gh, cached by "
+        "research/kit/dedup_oracle.py)",
+    )
+    sb.add_argument(
+        "--open-pr-limit", type=int, default=200, help="open pull requests to index with --against-open-prs"
+    )
+    sb.add_argument("--out", default=os.path.join(_ROOT, "codes"))
+    sb.add_argument("--force", action="store_true", help="as for submit")
+    sb.add_argument("--dry-run", action="store_true", help="build and verify every candidate, write nothing")
+    sb.add_argument(
+        "--base-ref",
+        default="origin/main",
+        help="start every submission branch from this ref so the PRs are independent "
+        "(default origin/main; pass '' to branch from the checked-out commit)",
+    )
+    sb.add_argument(
+        "--open-pr", action="store_true", help="branch, commit, push, and open a PR for each filed candidate"
+    )
+    sb.add_argument("--summary-file", default="", metavar="PATH", help="also write the summary record to this path")
+    sb.add_argument(
+        "--json",
+        action="store_true",
+        help="print exactly one JSON record on stdout (per-candidate status, PR URLs, "
+        "counts) and move every step's prose to stderr",
+    )
+    sb.set_defaults(func=cmd_submit_batch)
+
     pf = sub.add_parser("preflight", help="run pre-submission checks (scope, ruff, family tag, board tests, prose)")
     pf.add_argument("--body-file", default="", help="PR body file to also run the prose check against")
     pf.add_argument("--base-ref", default="", help="base ref to diff against (default: upstream/main or origin/main)")
@@ -4264,6 +4754,19 @@ def main(argv=None):
     b.set_defaults(func=cmd_brief)
 
     p.epilog = _json_epilog(sub)
+    return p
+
+
+def main(argv=None):
+    _default_board_memo()
+    # Windows consoles default to a legacy code page, and the summaries print
+    # "≤" (d <= 12, weight ≤ 6). Without this the run dies in the final print,
+    # after the search and the verification have already succeeded.
+    for stream in (sys.stdout, sys.stderr):
+        if hasattr(stream, "reconfigure") and (stream.encoding or "").lower().replace("-", "") != "utf8":
+            stream.reconfigure(encoding="utf-8", errors="replace")
+
+    p = build_parser()
     args = p.parse_args(argv)
     if getattr(args, "json", False):
         return _run_json(args)
