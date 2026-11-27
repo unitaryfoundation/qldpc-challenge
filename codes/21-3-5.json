@@ -246,7 +246,7 @@
   "construction": "priced calculus transform transform of codes/priced calculus E-PUNCTURE transform of codes/23-1-7.json",
   "references": [],
   "date": "2026-11-01",
-  "notes": "",
+  "notes": "Layout added 2026-11-17 by @vprusso: single-layer coordinates with interaction radius 3.6056 (research/local2d/layout_sweep.py, fold stage).",
   "model": "Beam 1.0"
  },
  "circuit": {
@@ -337,6 +337,103 @@
      ]
     }
    ]
+  }
+ },
+ "locality": {
+  "coordinates": [
+   [
+    1.0,
+    2.0
+   ],
+   [
+    2.0,
+    3.0
+   ],
+   [
+    0.0,
+    2.0
+   ],
+   [
+    3.0,
+    3.0
+   ],
+   [
+    3.0,
+    2.0
+   ],
+   [
+    0.0,
+    3.0
+   ],
+   [
+    4.0,
+    2.0
+   ],
+   [
+    1.0,
+    4.0
+   ],
+   [
+    2.0,
+    4.0
+   ],
+   [
+    3.0,
+    4.0
+   ],
+   [
+    0.0,
+    4.0
+   ],
+   [
+    0.0,
+    0.0
+   ],
+   [
+    3.0,
+    0.0
+   ],
+   [
+    0.0,
+    1.0
+   ],
+   [
+    1.0,
+    0.0
+   ],
+   [
+    2.0,
+    0.0
+   ],
+   [
+    2.0,
+    1.0
+   ],
+   [
+    2.0,
+    2.0
+   ],
+   [
+    3.0,
+    1.0
+   ],
+   [
+    1.0,
+    3.0
+   ],
+   [
+    1.0,
+    1.0
+   ]
+  ],
+  "layers": 1,
+  "interaction_radius": 3.6056,
+  "contributed_by": {
+   "by": [
+    "@vprusso"
+   ],
+   "date": "2026-11-17",
+   "method": "fold_layout.anneal on a 5 x 5 integer grid, 1 per site, seed 5, 100000 iterations (research/local2d/layout_sweep.py)"
   }
  }
 }
