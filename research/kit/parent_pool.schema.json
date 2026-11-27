@@ -1,0 +1,414 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/unitaryfoundation/qldpc-challenge/research/kit/parent_pool.schema.json",
+  "title": "qLDPC challenge parent-pool manifest",
+  "description": "Board entries exported as parents for code-calculus consumers (research/kit/parent_pool.py, issue #7440). Each parent is a presentation CodeState.from_challenge accepts (n, k, checks) plus the entry's parameters, binding hash, distance tier, and provenance.",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "generated_at",
+    "board_commit",
+    "codes",
+    "filters",
+    "count",
+    "parents"
+  ],
+  "additionalProperties": true,
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "generated_at": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$"
+    },
+    "board_commit": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "codes": {
+      "type": "string"
+    },
+    "filters": {
+      "type": "object",
+      "properties": {
+        "n_min": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "n_max": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "k_min": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "d_min": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "w_max": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "families": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "type": "string"
+          }
+        },
+        "localities": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "type": "string"
+          }
+        },
+        "code_types": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "enum": [
+              "CSS",
+              "stabilizer"
+            ]
+          }
+        },
+        "tiers": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "enum": [
+              "exact",
+              "lower_bounded",
+              "upper_bound"
+            ]
+          }
+        },
+        "slugs": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "type": "string"
+          }
+        },
+        "since_commit": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "count": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "skipped_not_ok": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "parents": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/parent"
+      }
+    }
+  },
+  "definitions": {
+    "support": {
+      "type": "array",
+      "items": {
+        "type": "integer",
+        "minimum": 0
+      }
+    },
+    "side": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "confidence": {
+          "type": "string"
+        },
+        "witness": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/support"
+            },
+            {
+              "$ref": "#/definitions/pauli"
+            }
+          ]
+        }
+      }
+    },
+    "parent": {
+      "type": "object",
+      "required": [
+        "slug",
+        "n",
+        "k",
+        "d",
+        "w",
+        "code_type",
+        "weight_class",
+        "locality_class",
+        "checks_sha256",
+        "distance",
+        "provenance"
+      ],
+      "properties": {
+        "slug": {
+          "type": "string",
+          "pattern": "^[0-9]+-[0-9]+-[0-9]+[A-Za-z0-9_-]*$",
+          "description": "the file name under codes/ without .json: n-k-d, with any suffix the board uses"
+        },
+        "name": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "n": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "k": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "d": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "w": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 1
+        },
+        "code_type": {
+          "enum": [
+            "CSS",
+            "stabilizer"
+          ]
+        },
+        "family": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "weight_class": {
+          "enum": [
+            "weight-4",
+            "weight-6",
+            "weight-8",
+            "weight-9plus",
+            null
+          ]
+        },
+        "locality_class": {
+          "enum": [
+            "local-2d-single",
+            "local-2d-bilayer",
+            "unrestricted",
+            null
+          ]
+        },
+        "kd2_over_n": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "checks_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "checks": {
+          "type": "object",
+          "oneOf": [
+            {
+              "required": [
+                "X",
+                "Z"
+              ],
+              "properties": {
+                "X": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/support"
+                  }
+                },
+                "Z": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/support"
+                  }
+                }
+              }
+            },
+            {
+              "required": [
+                "S"
+              ],
+              "properties": {
+                "S": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/pauli"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "distance": {
+          "type": "object",
+          "required": [
+            "d",
+            "tier",
+            "lower_bound"
+          ],
+          "properties": {
+            "d": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "tier": {
+              "enum": [
+                "exact",
+                "lower_bounded",
+                "upper_bound"
+              ]
+            },
+            "lower_bound": {
+              "type": [
+                "integer",
+                "null"
+              ]
+            },
+            "X": {
+              "$ref": "#/definitions/side"
+            },
+            "Z": {
+              "$ref": "#/definitions/side"
+            },
+            "P": {
+              "$ref": "#/definitions/side"
+            }
+          }
+        },
+        "locality": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "properties": {
+            "layers": {
+              "type": [
+                "integer",
+                "null"
+              ]
+            },
+            "interaction_radius": {
+              "type": [
+                "number",
+                "null"
+              ]
+            }
+          }
+        },
+        "provenance": {
+          "type": "object",
+          "properties": {
+            "construction": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "origin": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "model": {
+              "description": "the self-reported model, a list when several models produced the entry",
+              "oneOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "date": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "authors": {
+              "type": [
+                "array",
+                "null"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "pauli": {
+      "type": "object",
+      "description": "a Pauli operator by its X and Z supports (a stabilizer entry's witness)",
+      "properties": {
+        "X": {
+          "$ref": "#/definitions/support"
+        },
+        "Z": {
+          "$ref": "#/definitions/support"
+        }
+      }
+    }
+  }
+}
