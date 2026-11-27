@@ -61,7 +61,13 @@ solve (600 s by default), until the job budget is spent (four hours by
 default). Each entry runs in a subprocess
 under a hard wall clock of six solves plus five minutes, because the solver's
 own limit is advisory: CryptoMiniSat checks it between search rounds, and a
-442-qubit instance ran nine minutes past a 60 s limit in testing. Each entry
+442-qubit instance ran nine minutes past a 60 s limit in testing. The
+tropidist backend's `--time-limit` is advisory in the same way (its runs
+measured 2 to 2.5 times the limit, Fanerst/tropidist#2), so
+`research/certs/tropidist_certify.py` kills each solve at `1.1 x tlim + 5 s`
+and records the side as `TIMEOUT` with whatever the tool had written; the
+per-entry wall clock of two solves plus five minutes stays as the outer net
+(issue #7404). Each entry
 opened is one line of `attempts.jsonl`, committed to `main` by the workflow:
 
 | field | meaning |

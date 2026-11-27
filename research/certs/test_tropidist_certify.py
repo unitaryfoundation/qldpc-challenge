@@ -10,6 +10,7 @@ import itertools
 import json
 import os
 import sys
+import time
 
 import numpy as np
 import pytest
@@ -198,6 +199,64 @@ def test_the_record_is_a_solver_level_certificate_the_schema_and_checker_accept(
     stab = T.certify(_five_qubit(), root=None, tlim=60, threads=1, runner=runner)
     assert set(stab["sides"]) == {"P"} and stab["encoding"] == "pauli-mechanisms" and stab["d_exact"]
     jsonschema.validate(stab, schema)
+
+
+def _fake_tool_root(tmp_path, body):
+    """Make a directory holding a ``cdist`` module that ``python -m cdist`` finds through the cwd."""
+    root = tmp_path / "tool"
+    root.mkdir(parents=True)
+    (root / "cdist.py").write_text(
+        "import json, sys, time\n"
+        "args = sys.argv[1:]\n"
+        "out = args[args.index('--out') + 1]\n"
+        "tlim = float(args[args.index('--time-limit') + 1])\n" + body
+    )
+    return str(root)
+
+
+def test_a_solve_is_killed_at_the_deadline_and_reads_as_a_timeout(tmp_path, monkeypatch):
+    """The tool's --time-limit is advisory (Fanerst/tropidist#2); the wrapper holds it to tlim (issue #7404)."""
+    T = _module()
+    monkeypatch.setattr(T, "TLIM_FLOOR", 0.5)
+    # writes its record only after sleeping four times the limit, as the real tool has been seen to
+    root = _fake_tool_root(
+        tmp_path,
+        "time.sleep(4 * tlim)\n"
+        "json.dump({'lower_bound': 9, 'upper_bound': None, 'witness': None, 'seconds': 4 * tlim}, open(out, 'w'))\n",
+    )
+    H = [[1, 1, 0], [0, 1, 1]]
+    L = [[1, 0, 1]]
+    t0 = time.time()
+    rec = T.run_cdist(H, L, root=root, tlim=0.5, python=sys.executable, tag="t")
+    elapsed = time.time() - t0
+    assert rec["status"] == "killed" and rec["lower_bound"] is None
+    assert elapsed < 0.5 * 4, f"the wrapper waited for the tool instead of killing it ({elapsed:.1f} s)"
+    assert elapsed >= T.deadline(0.5) - 0.05
+    blk = T.side_block(G.steane(), "X", 3, rec, tlim=0.5)
+    assert blk["status"] == "TIMEOUT" and blk["lower_bound"] is None and blk["exact"] is False
+    assert "killed at the 1.05 s deadline" in blk["note"] and "nothing proved" in blk["note"]
+    # a record the tool wrote before the kill is kept, and the side says it was cut short
+    root2 = _fake_tool_root(
+        tmp_path / "second",
+        "json.dump({'lower_bound': 2, 'upper_bound': None, 'witness': None, 'seconds': 0.1}, open(out, 'w'))\n"
+        "time.sleep(4 * tlim)\n",
+    )
+    rec2 = T.run_cdist(H, L, root=root2, tlim=0.5, python=sys.executable, tag="t")
+    assert rec2["lower_bound"] == 2 and rec2.get("killed_at") is not None
+    blk2 = T.side_block(G.steane(), "X", 3, rec2, tlim=0.5)
+    assert blk2["status"] == "TIMEOUT" and blk2["lower_bound"] == 2 and "from the record it had written" in blk2["note"]
+    # a tool that finishes in time is untouched
+    root3 = _fake_tool_root(
+        tmp_path / "third",
+        "json.dump({'lower_bound': 3, 'upper_bound': 3, 'witness': [0, 1, 2], 'seconds': 0.1}, open(out, 'w'))\n",
+    )
+    rec3 = T.run_cdist(H, L, root=root3, tlim=0.5, python=sys.executable, tag="t")
+    assert rec3 == {"lower_bound": 3, "upper_bound": 3, "witness": [0, 1, 2], "seconds": 0.1}
+
+
+def test_the_deadline_is_the_limit_plus_the_tools_slack():
+    T = _module()
+    assert T.deadline(600) == pytest.approx(665.0) and T.deadline(30) == pytest.approx(38.0)
 
 
 @pytest.mark.skipif(not os.environ.get("TROPIDIST_ROOT"), reason="needs a tropidist checkout in TROPIDIST_ROOT")
