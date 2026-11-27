@@ -1187,3 +1187,132 @@ def test_the_split_survives_a_journal_round_trip(tmp_path):
     assert back.frontier_survivors() == []
     assert back.non_frontier_survivors()[0]["dominated_by"] == ["[[72,12,6]] w=6 72-12-6.json"]
     assert back.summary()["non_frontier_survivors"] == 1
+
+
+# -- the discovery block (issue #7445) ---------------------------------------
+#
+# A code-discovery campaign pins the parents it started from to a board
+# commit and records the funnel from the constructor to the board as data, so
+# whether it made good use of its constructor is read off the summary.
+
+from campaign import check_parent_snapshot, discovery_block, validate_discovery, validate_summary  # noqa: E402
+
+
+def _board_head():
+    import subprocess
+
+    out = subprocess.run(["git", "rev-parse", "HEAD"], cwd=_ROOT, capture_output=True, text=True, check=False)
+    return out.stdout.strip() if out.returncode == 0 else None
+
+
+def test_a_discovery_block_pins_its_parents_to_a_commit_and_validates():
+    head = _board_head()
+    if not head:
+        pytest.skip("not a git checkout")
+    block = discovery_block(
+        ["72-12-6", "7-1-3"],
+        board_commit=head,
+        root=_ROOT,
+        selection="two baselines, by hand",
+        tools=[
+            {
+                "name": "code-calculus-dev",
+                "repo": "github.com/MathysRennela/code-calculus-dev",
+                "commit": "830767f96aa3",
+                "role": "planner",
+            }
+        ],
+        counts={
+            "children_planned": 10,
+            "screened": 4,
+            "gate_passed": 1,
+            "board_advancing": 1,
+            "new_slugs": ["71-13-4"],
+        },
+        corrections=[
+            {
+                "candidate": "[[71,13,6]] E-PUNCTURE qubit 3 of 72-12-6",
+                "parent": "72-12-6",
+                "stage": "screen",
+                "d_claimed": 6,
+                "d_verified": 4,
+                "trials": 14000,
+            }
+        ],
+        collisions=[{"candidate": "[[71,12,6]]", "with": "[[71,13,4]] w=8 72-12-6.json", "kind": "within-batch"}],
+        refusals=[{"candidate": "[[14,2,3]] direct sum", "stage": "packaging", "reason": "direct sum", "count": 15}],
+    )
+    assert block["board_commit"] == head and block["parents"]["count"] == 2
+    assert set(block["parents"]["sha256"]) == {"72-12-6", "7-1-3"}
+    assert check_parent_snapshot(block, root=_ROOT) == []
+    # the block rides in the summary and the manifest when recorded, and nowhere otherwise
+    led = Ledger(Campaign(validate_campaign(camp())))
+    assert "discovery" not in led.summary(status="abandoned")
+    led.record_discovery(block)
+    summary = led.summary(status="abandoned")
+    validate_summary(summary)
+    assert summary["discovery"] == block and led.manifest()["discovery"] == block
+
+
+def test_a_tampered_parent_snapshot_is_named():
+    head = _board_head()
+    if not head:
+        pytest.skip("not a git checkout")
+    block = discovery_block(["7-1-3"], board_commit=head, root=_ROOT)
+    block["parents"]["sha256"]["7-1-3"] = "0" * 64
+    (problem,) = check_parent_snapshot(block, root=_ROOT)
+    assert "7-1-3" in problem and "recorded 000000000000" in problem
+    missing = dict(block, parents={"count": 1, "slugs": ["no-such-entry"], "sha256": {}})
+    assert check_parent_snapshot(missing, root=_ROOT) == [f"codes/no-such-entry.json is not at {head[:12]}"]
+    unknown = dict(block, board_commit="f" * 40)
+    assert "not in this checkout's history" in check_parent_snapshot(unknown, root=_ROOT)[0]
+    with pytest.raises(CampaignError, match="is not at"):
+        discovery_block(["no-such-entry"], board_commit=head, root=_ROOT)
+
+
+@pytest.mark.parametrize(
+    "bad",
+    [
+        {"board_commit": "abc"},
+        {"counts": {"screened": 1}},
+        {"collisions": [{"candidate": "x", "with": "y", "kind": "same-ish"}]},
+        {"refusals": [{"candidate": "x", "stage": "vibes", "reason": "no"}]},
+        {"parents": {"count": 1, "slugs": ["7-1-3"], "extra": 1}},
+        {"surprise": True},
+    ],
+)
+def test_a_malformed_discovery_block_is_refused(bad):
+    good = {
+        "board_commit": "a" * 40,
+        "parents": {"count": 1, "slugs": ["7-1-3"]},
+        "counts": {"screened": 1, "gate_passed": 1, "board_advancing": 0},
+    }
+    with pytest.raises(CampaignError, match="discovery/"):
+        validate_discovery({**good, **bad})
+
+
+@pytest.mark.parametrize("path", sorted(glob.glob(os.path.join(_ROOT, "research", "campaigns", "*", "summary.json"))))
+def test_every_committed_summary_validates(path):
+    """The summary schema is the committed outcome's contract, so every committed summary meets it."""
+    with open(path, encoding="utf-8") as f:
+        validate_summary(json.load(f))
+
+
+@pytest.mark.parametrize("path", sorted(glob.glob(os.path.join(_ROOT, "research", "campaigns", "*", "summary.json"))))
+def test_a_committed_discovery_snapshot_reproduces_from_its_commit(path):
+    """Acceptance criterion of issue #7445: the parents are recoverable from the recorded commit."""
+    with open(path, encoding="utf-8") as f:
+        summary = json.load(f)
+    if "discovery" not in summary:
+        pytest.skip("no discovery block")
+    problems = check_parent_snapshot(summary["discovery"], root=_ROOT)
+    if problems and "not in this checkout's history" in problems[0]:
+        pytest.skip(problems[0])
+    assert problems == []
+
+
+def test_at_least_one_committed_summary_carries_a_discovery_block():
+    paths = glob.glob(os.path.join(_ROOT, "research", "campaigns", "*", "summary.json"))
+    assert any("discovery" in json.load(open(p, encoding="utf-8")) for p in paths), (
+        "issue #7445 asks for one conforming report"
+    )

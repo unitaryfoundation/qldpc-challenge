@@ -137,6 +137,122 @@ def repo_snapshot(root=_ROOT):
     }
 
 
+def _git_bytes(root, *args):
+    """Return a git command's raw stdout, or None when git or the object is unavailable."""
+    try:
+        out = subprocess.run(["git", *args], cwd=root, capture_output=True, check=False)
+    except (OSError, ValueError):
+        return None
+    return out.stdout if out.returncode == 0 else None
+
+
+def parent_bytes(slug, board_commit, *, root=_ROOT):
+    """Return ``codes/<slug>.json`` as it is at ``board_commit``, or None when git cannot produce it."""
+    return _git_bytes(root, "show", f"{board_commit}:codes/{slug}.json")
+
+
+def discovery_block(
+    parents,
+    *,
+    board_commit=None,
+    root=_ROOT,
+    selection="",
+    tools=(),
+    counts=None,
+    corrections=(),
+    collisions=(),
+    refusals=(),
+):
+    """Return the summary's ``discovery`` block for a code-discovery campaign (issue #7445).
+
+    ``parents`` are board slugs; ``board_commit`` is the commit whose codes/
+    they were read from (HEAD of ``root`` when omitted), and every parent's
+    bytes at that commit are hashed into ``parents.sha256`` so the pin is
+    checkable with or without the git history (:func:`check_parent_snapshot`).
+    ``tools`` are ``{name, commit, repo?, role?}`` rows for code outside this
+    repository; ``counts`` the funnel ``children_planned, prefiltered_dominated,
+    screened, gate_passed, board_advancing, new_slugs``; ``corrections``,
+    ``collisions`` and ``refusals`` the rows schema/campaign_summary.schema.json
+    types under ``$defs/discovery``. The block is validated against that
+    definition before it is returned, so a malformed one fails here and not
+    at the end of the run.
+    """
+    slugs = [str(x) for x in parents]
+    commit = board_commit or _git(root, "rev-parse", "HEAD")
+    if not commit:
+        raise CampaignError("discovery_block: no board_commit given and root is not a git checkout")
+    hashes = {}
+    for slug in slugs:
+        data = parent_bytes(slug, commit, root=root)
+        if data is None:
+            raise CampaignError(f"discovery_block: codes/{slug}.json is not at {commit[:12]} in {root}")
+        hashes[slug] = hashlib.sha256(data).hexdigest()
+    block = {
+        "board_commit": commit,
+        "parents": {"count": len(slugs), "slugs": slugs, "sha256": hashes},
+        "counts": dict(counts or {"screened": 0, "gate_passed": 0, "board_advancing": 0}),
+    }
+    if selection:
+        block["parents"]["selection"] = selection
+    if tools:
+        block["tools"] = [dict(t) for t in tools]
+    if corrections:
+        block["corrections"] = [dict(r) for r in corrections]
+    if collisions:
+        block["collisions"] = [dict(r) for r in collisions]
+    if refusals:
+        block["refusals"] = [dict(r) for r in refusals]
+    validate_discovery(block)
+    return block
+
+
+def validate_discovery(block):
+    """Validate a ``discovery`` block against its definition in the summary schema."""
+    if jsonschema is None:  # pragma: no cover
+        raise CampaignError("jsonschema is required to validate a discovery block")
+    schema = _schema(SUMMARY_SCHEMA_PATH)
+    sub = {"$schema": schema.get("$schema"), "$defs": schema["$defs"], "$ref": "#/$defs/discovery"}
+    try:
+        jsonschema.Draft202012Validator(sub).validate(block)
+    except jsonschema.ValidationError as e:
+        where = "/".join(str(x) for x in e.absolute_path) or "(root)"
+        raise CampaignError(f"discovery/{where}: {e.message}") from None
+    return block
+
+
+def check_parent_snapshot(discovery, *, root=_ROOT):
+    """Return the ways the recorded parent snapshot fails to reproduce, empty when it does.
+
+    Each parent is read back as ``codes/<slug>.json`` at ``board_commit`` and
+    hashed; a commit git cannot see, a parent missing at it, and a hash that
+    differs from the recorded one are each one line. The acceptance criterion
+    of issue #7445 in a function: the parents a campaign started from are
+    recoverable from the summary alone.
+    """
+    problems = []
+    commit = (discovery or {}).get("board_commit")
+    if not commit:
+        return ["no board_commit recorded"]
+    if _git_bytes(root, "cat-file", "-e", f"{commit}^{{commit}}") is None:
+        return [
+            f"board_commit {commit[:12]} is not in this checkout's history "
+            "(fetch it, or the snapshot cannot be checked here)"
+        ]
+    parents = (discovery or {}).get("parents") or {}
+    want = parents.get("sha256") or {}
+    for slug in parents.get("slugs") or []:
+        data = parent_bytes(slug, commit, root=root)
+        if data is None:
+            problems.append(f"codes/{slug}.json is not at {commit[:12]}")
+            continue
+        got = hashlib.sha256(data).hexdigest()
+        if slug in want and want[slug] != got:
+            problems.append(
+                f"codes/{slug}.json at {commit[:12]} hashes to {got[:12]}, the summary recorded {want[slug][:12]}"
+            )
+    return problems
+
+
 def read_log_excerpt(path, *, limit=MAX_LOG_EXCERPT):
     """Read a log tail for promotion into a manifest.
 
@@ -595,6 +711,10 @@ class Ledger:
         # a clean double negative while having measured nothing (#2761).
         self.errors = []
         self.frontier_advances = 0
+        # The discovery block (issue #7445): what a code-discovery campaign
+        # started from and what became of it, set once by record_discovery
+        # and written into the summary and the manifest when present.
+        self.discovery = None
         self._current = None
         self._exp_t0 = None
         self._mark = (0, 0, 0)
@@ -865,6 +985,8 @@ class Ledger:
                 "the same task and adding them up would say nothing"
             )
         out = Ledger(self.campaign)
+        # the discovery block is campaign-level: whichever executor recorded it
+        out.discovery = self.discovery if self.discovery is not None else other.discovery
         seen, dropped = set(), []
         for src in (self, other):
             for exp in src.experiments:
@@ -1069,6 +1191,11 @@ class Ledger:
     mark_retracted = retract_survivor
     record_restate = restate_survivor
 
+    def record_discovery(self, block):
+        """Attach the ``discovery`` block (:func:`discovery_block`) to this campaign's summary."""
+        self.discovery = validate_discovery(dict(block))
+        return self.discovery
+
     def record_negative(self, what, detail, *, assumptions=None, revisit_if=None, family=None, params=None):
         """Record something that did not work, and why.
 
@@ -1222,6 +1349,7 @@ class Ledger:
             "started_at": self.started_at,
             "written_at": datetime.now(timezone.utc).isoformat(),
             "snapshot": self.snapshot,
+            **({"discovery": self.discovery} if self.discovery is not None else {}),
             "params": self.params,
             "seeds": [e.get("seed") for e in self.experiments if e.get("seed") is not None],
             "experiments": len(self.experiments),
@@ -1269,6 +1397,7 @@ class Ledger:
             # history. The manifest holds the same two fields, so a summary
             # separated from its manifest still identifies its own run.
             "snapshot": self.snapshot,
+            **({"discovery": self.discovery} if self.discovery is not None else {}),
             "params": self.params,
             "objective": self.campaign.c["objective"],
             # Why this campaign at all: the direction card (issue #4028),
