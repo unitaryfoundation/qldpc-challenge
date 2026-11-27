@@ -414,7 +414,7 @@
   "construction": "2BGA (arXiv:2306.16400) on SmallGroup(21,2), from github.com/QEC-pages/2BGA-codes @ 403d194c3f98f0cadc236aecbc4a8b6139ccf23c, abelian.zip, diswtabelian_wt7wtL3_order21_k16.txt, line 1. nonidentity supports a=[2, 4], b=[3, 6, 12].",
   "references": [],
   "date": "2026-09-19",
-  "notes": "Literature reproduction of a published 2BGA code (arXiv:2306.16400; github.com/QEC-pages/2BGA-codes @ 403d194c3f98f0cadc236aecbc4a8b6139ccf23c). Checked against the live board: not equivalent to any existing entry.",
+  "notes": "Literature reproduction of a published 2BGA code (arXiv:2306.16400; github.com/QEC-pages/2BGA-codes @ 403d194c3f98f0cadc236aecbc4a8b6139ccf23c). Checked against the live board: not equivalent to any existing entry. Layout added 2026-11-17 by @vprusso: bilayer coordinates with interaction radius 6.3246 (research/local2d/layout_sweep.py, screen stage).",
   "model": "DeepSeek V4 Flash 0731",
   "origin": "submission"
  },
@@ -447,6 +447,187 @@
    ],
    "date": "2026-11-18",
    "method": "circuit_autogen schedule search (two-block interleaved, then layout, then generic), verified by verify/circuit_verify.py before writing"
+  }
+ },
+ "locality": {
+  "coordinates": [
+   [
+    0.0,
+    0.0
+   ],
+   [
+    0.0,
+    1.0
+   ],
+   [
+    0.0,
+    2.0
+   ],
+   [
+    0.0,
+    3.0
+   ],
+   [
+    0.0,
+    4.0
+   ],
+   [
+    0.0,
+    5.0
+   ],
+   [
+    0.0,
+    6.0
+   ],
+   [
+    1.0,
+    0.0
+   ],
+   [
+    1.0,
+    1.0
+   ],
+   [
+    1.0,
+    2.0
+   ],
+   [
+    1.0,
+    3.0
+   ],
+   [
+    1.0,
+    4.0
+   ],
+   [
+    1.0,
+    5.0
+   ],
+   [
+    1.0,
+    6.0
+   ],
+   [
+    2.0,
+    0.0
+   ],
+   [
+    2.0,
+    1.0
+   ],
+   [
+    2.0,
+    2.0
+   ],
+   [
+    2.0,
+    3.0
+   ],
+   [
+    2.0,
+    4.0
+   ],
+   [
+    2.0,
+    5.0
+   ],
+   [
+    2.0,
+    6.0
+   ],
+   [
+    0.0,
+    0.0
+   ],
+   [
+    0.0,
+    1.0
+   ],
+   [
+    0.0,
+    2.0
+   ],
+   [
+    0.0,
+    3.0
+   ],
+   [
+    0.0,
+    4.0
+   ],
+   [
+    0.0,
+    5.0
+   ],
+   [
+    0.0,
+    6.0
+   ],
+   [
+    1.0,
+    0.0
+   ],
+   [
+    1.0,
+    1.0
+   ],
+   [
+    1.0,
+    2.0
+   ],
+   [
+    1.0,
+    3.0
+   ],
+   [
+    1.0,
+    4.0
+   ],
+   [
+    1.0,
+    5.0
+   ],
+   [
+    1.0,
+    6.0
+   ],
+   [
+    2.0,
+    0.0
+   ],
+   [
+    2.0,
+    1.0
+   ],
+   [
+    2.0,
+    2.0
+   ],
+   [
+    2.0,
+    3.0
+   ],
+   [
+    2.0,
+    4.0
+   ],
+   [
+    2.0,
+    5.0
+   ],
+   [
+    2.0,
+    6.0
+   ]
+  ],
+  "layers": 2,
+  "interaction_radius": 6.3246,
+  "contributed_by": {
+   "by": [
+    "@vprusso"
+   ],
+   "date": "2026-11-17",
+   "method": "torus_grid.py: the two-block index convention read off as a Z_3 x Z_7 grid, one qubit of each block per site, no search; radius measured with the verifier's rule (research/local2d/layout_sweep.py)"
   }
  }
 }
