@@ -180,7 +180,161 @@
   "construction": "C-ADD-CHECK strict improvement (code calculus v0.2rc): added one check killing all weight-1 logicals of parent codes/35-21-1.json",
   "origin": "submission",
   "date": "2026-11-07",
-  "model": "Beam 1.0"
+  "model": "Beam 1.0",
+  "notes": "Layout added 2026-11-17 by @vprusso: bilayer coordinates with interaction radius 3.1623 (research/local2d/layout_sweep.py, fold stage)."
  },
- "family": "other"
+ "family": "other",
+ "locality": {
+  "coordinates": [
+   [
+    3.0,
+    2.0
+   ],
+   [
+    3.0,
+    1.0
+   ],
+   [
+    3.0,
+    2.0
+   ],
+   [
+    4.0,
+    2.0
+   ],
+   [
+    3.0,
+    3.0
+   ],
+   [
+    4.0,
+    3.0
+   ],
+   [
+    1.0,
+    2.0
+   ],
+   [
+    1.0,
+    0.0
+   ],
+   [
+    0.0,
+    1.0
+   ],
+   [
+    2.0,
+    1.0
+   ],
+   [
+    1.0,
+    1.0
+   ],
+   [
+    2.0,
+    0.0
+   ],
+   [
+    1.0,
+    2.0
+   ],
+   [
+    1.0,
+    0.0
+   ],
+   [
+    0.0,
+    1.0
+   ],
+   [
+    2.0,
+    1.0
+   ],
+   [
+    1.0,
+    1.0
+   ],
+   [
+    2.0,
+    0.0
+   ],
+   [
+    1.0,
+    3.0
+   ],
+   [
+    2.0,
+    3.0
+   ],
+   [
+    1.0,
+    3.0
+   ],
+   [
+    2.0,
+    4.0
+   ],
+   [
+    1.0,
+    4.0
+   ],
+   [
+    0.0,
+    4.0
+   ],
+   [
+    2.0,
+    3.0
+   ],
+   [
+    0.0,
+    2.0
+   ],
+   [
+    0.0,
+    3.0
+   ],
+   [
+    2.0,
+    4.0
+   ],
+   [
+    1.0,
+    4.0
+   ],
+   [
+    0.0,
+    3.0
+   ],
+   [
+    2.0,
+    2.0
+   ],
+   [
+    3.0,
+    1.0
+   ],
+   [
+    2.0,
+    2.0
+   ],
+   [
+    4.0,
+    2.0
+   ],
+   [
+    3.0,
+    3.0
+   ]
+  ],
+  "layers": 2,
+  "interaction_radius": 3.1623,
+  "contributed_by": {
+   "by": [
+    "@vprusso"
+   ],
+   "date": "2026-11-17",
+   "method": "fold_layout.anneal on a 5 x 5 integer grid, 2 per site, seed 5, 100000 iterations (research/local2d/layout_sweep.py)"
+  }
+ }
 }

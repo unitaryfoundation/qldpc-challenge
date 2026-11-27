@@ -340,7 +340,8 @@
   "construction": "C-DELETE-CHECK b1 from 37-21-3.json",
   "origin": "submission",
   "date": "2026-10-19",
-  "model": "Beam 1.0"
+  "model": "Beam 1.0",
+  "notes": "Layout added 2026-11-17 by @vprusso: bilayer coordinates with interaction radius 4.2427 (research/local2d/layout_sweep.py, fold stage)."
  },
  "circuit": {
   "d_circ": {
@@ -372,6 +373,167 @@
    ],
    "date": "2026-10-31",
    "method": "Johnson-coil + 4 span flags sequential extraction (max_flags=10 per check, 20 X + 20 Z edge-colored data CX layers per round)"
+  }
+ },
+ "locality": {
+  "coordinates": [
+   [
+    3.0,
+    3.0
+   ],
+   [
+    2.0,
+    2.0
+   ],
+   [
+    2.0,
+    1.0
+   ],
+   [
+    3.0,
+    1.0
+   ],
+   [
+    2.0,
+    3.0
+   ],
+   [
+    1.0,
+    3.0
+   ],
+   [
+    4.0,
+    3.0
+   ],
+   [
+    2.0,
+    4.0
+   ],
+   [
+    4.0,
+    3.0
+   ],
+   [
+    2.0,
+    4.0
+   ],
+   [
+    3.0,
+    2.0
+   ],
+   [
+    2.0,
+    2.0
+   ],
+   [
+    0.0,
+    2.0
+   ],
+   [
+    4.0,
+    2.0
+   ],
+   [
+    2.0,
+    3.0
+   ],
+   [
+    1.0,
+    2.0
+   ],
+   [
+    2.0,
+    0.0
+   ],
+   [
+    0.0,
+    3.0
+   ],
+   [
+    0.0,
+    2.0
+   ],
+   [
+    2.0,
+    0.0
+   ],
+   [
+    3.0,
+    0.0
+   ],
+   [
+    4.0,
+    1.0
+   ],
+   [
+    1.0,
+    2.0
+   ],
+   [
+    1.0,
+    0.0
+   ],
+   [
+    3.0,
+    0.0
+   ],
+   [
+    2.0,
+    1.0
+   ],
+   [
+    1.0,
+    3.0
+   ],
+   [
+    3.0,
+    3.0
+   ],
+   [
+    3.0,
+    4.0
+   ],
+   [
+    3.0,
+    2.0
+   ],
+   [
+    3.0,
+    4.0
+   ],
+   [
+    4.0,
+    1.0
+   ],
+   [
+    1.0,
+    4.0
+   ],
+   [
+    3.0,
+    1.0
+   ],
+   [
+    1.0,
+    1.0
+   ],
+   [
+    1.0,
+    1.0
+   ],
+   [
+    4.0,
+    2.0
+   ]
+  ],
+  "layers": 2,
+  "interaction_radius": 4.2427,
+  "contributed_by": {
+   "by": [
+    "@vprusso"
+   ],
+   "date": "2026-11-17",
+   "method": "fold_layout.anneal on a 5 x 5 integer grid, 2 per site, seed 5, 100000 iterations (research/local2d/layout_sweep.py)"
   }
  }
 }
