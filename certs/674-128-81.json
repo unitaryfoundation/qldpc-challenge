@@ -1,0 +1,33 @@
+{
+  "d": 81,
+  "d_exact": false,
+  "d_lower": 16,
+  "encoding": "css-sides",
+  "logical_classes": 128,
+  "name": "[[674,128,<=81]] cyclic GB over Z_337",
+  "sides": {
+    "X": {
+      "exact": false,
+      "note": "lower bound 16 after 3600.0 s",
+      "proved_min": 16,
+      "secs": 3600.3,
+      "status": "TIMEOUT",
+      "value": 81
+    },
+    "Z": {
+      "exact": false,
+      "note": "lower bound 16 after 3600.0 s",
+      "proved_min": 16,
+      "secs": 3600.2,
+      "status": "TIMEOUT",
+      "value": 81
+    }
+  },
+  "solver": "tropidist b03ec2d4077f (arXiv:2611.08247) exhaustive search",
+  "tlim_per_solve": 3600.0,
+  "verification": {
+    "checks_sha256": "c2f17e4bdc6a171c732f92ce320ce5b2f157b36ce191a238d3fae7e38f9ee3e1",
+    "level": "solver",
+    "note": "tropidist's lower bound is exhaustion inside its kernel (cut-rank dynamic program, weight-truncated DP, weight-bounded search; completeness proved in the paper, no replayable artifact), so this is a solver verdict; the vector it returned was re-verified by verify/heuristic_distance.py"
+  }
+}

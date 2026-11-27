@@ -1,25 +1,26 @@
 {
   "d": 16,
   "d_exact": false,
-  "d_lower": 12,
+  "d_lower": 14,
   "encoding": "pauli-mechanisms",
   "logical_classes": 35,
   "name": "[[160,35,16]] halved CPM pair-partition, (J,L)=(4,10), P=32",
+  "raised_from": 12,
   "sides": {
     "P": {
       "exact": false,
-      "note": "lower bound 12 after 300.0 s",
-      "proved_min": 12,
-      "secs": 300.0,
+      "note": "lower bound 14 after 1200.0 s",
+      "proved_min": 14,
+      "secs": 1200.1,
       "status": "TIMEOUT",
       "value": 16
     }
   },
   "solver": "tropidist b03ec2d4077f (arXiv:2611.08247) exhaustive search",
-  "tlim_per_solve": 300.0,
+  "tlim_per_solve": 1200.0,
   "verification": {
     "checks_sha256": "751ba2d3ee0da96558bef72dc767078d3dc4336e9f0bc585648b0251c4ee7023",
     "level": "solver",
-    "note": "tropidist's lower bound is exhaustion inside its kernel (cut-rank dynamic program, weight-truncated DP, weight-bounded search; completeness proved in the paper, no replayable artifact), so this is a solver verdict; the vector it returned was re-verified by verify/heuristic_distance.py"
+    "note": "raised by a later run of the tool that started at the filed bound; solver verdicts on both runs"
   }
 }

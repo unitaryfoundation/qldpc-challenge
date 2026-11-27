@@ -1,34 +1,33 @@
 {
   "d": 28,
   "d_exact": false,
-  "d_lower": 11,
-  "ladder": {
-    "budget_per_side": 120.0
-  },
+  "d_lower": 14,
+  "encoding": "css-sides",
+  "logical_classes": 212,
   "name": "[[700,212,28]] check-deletion of the [[700,206,28]] board entry",
   "sides": {
     "X": {
       "exact": false,
-      "note": "lower bound 11",
-      "proved_min": 11,
-      "secs": 13.4,
+      "note": "lower bound 14 after 1200.0 s",
+      "proved_min": 14,
+      "secs": 1200.1,
       "status": "TIMEOUT",
       "value": 28
     },
     "Z": {
       "exact": false,
-      "note": "lower bound 11",
-      "proved_min": 11,
-      "secs": 13.4,
+      "note": "lower bound 14 after 1200.0 s",
+      "proved_min": 14,
+      "secs": 1200.1,
       "status": "TIMEOUT",
       "value": 28
     }
   },
-  "solver": "QEDist 0.1 aeb7006147b7 (yeon-lee/QEDist) exhaustive search",
-  "tlim_per_solve": 120.0,
+  "solver": "tropidist b03ec2d4077f (arXiv:2611.08247) exhaustive search",
+  "tlim_per_solve": 1200.0,
   "verification": {
     "checks_sha256": "b8fd8c903f0cf1f6f6fb8e727c217710c3d1972ed9af94f5753583dcd9d43e85",
     "level": "solver",
-    "note": "QEDist's lower bound is exhaustive search inside its kernel (tree search with bounds and symmetries); the vector it returned was re-verified by verify/heuristic_distance.py. Solver verdict only. No symmetry generators supplied."
+    "note": "tropidist's lower bound is exhaustion inside its kernel (cut-rank dynamic program, weight-truncated DP, weight-bounded search; completeness proved in the paper, no replayable artifact), so this is a solver verdict; the vector it returned was re-verified by verify/heuristic_distance.py"
   }
 }
