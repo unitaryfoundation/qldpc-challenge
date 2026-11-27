@@ -8,15 +8,15 @@ The whole submission is one command. Everything else is optional.
 ./qldpc submit code.npz --authors @yourhandle --json
 ```
 
-Fast path (code tier only, no circuit search, no accelerator tightening):
+Dry runs and staging only: `--no-circuit --fast-trials 0` skips the circuit search and the accelerator tightening, so its witness comes from a shallow search. Do not file its output as a submission.
 
 ```bash
-./qldpc submit code.npz --authors @yourhandle --no-circuit --fast-trials 0 --json
+./qldpc submit code.npz --authors @yourhandle --no-circuit --fast-trials 0 --dry-run --json
 ```
 
 ## Performance notes
 
-- First run on a fresh worktree loads the board (~minutes, ~4s warm). The
+- First run on a fresh worktree loads the board (about five minutes on a laptop, about four seconds warm). The
   per-entry memo lives inside the checkout; `./qldpc targets`/`submit` print
   the measured time so you can tell warm from cold.
 - A full checkout is ~8 GB (mostly `circuits/`). Use the sparse checkout in
@@ -35,7 +35,7 @@ Machine mode: always pass `--json`. Exit code 0 = success. On failure, `res.erro
 - `--family bivariate-bicycle` — construction family tag.
 - `--construction "..."` — how it was built.
 - `--coords coords.npz --layers 2` — 2D layout (layers required with coords).
-- `--note-file note.md` — research note staged as `notes/<slug>.md` (10 KiB cap). If omitted, a minimal stub is auto-staged (replace TODOs before review).
+- `--note-file note.md` — research note staged as `notes/<slug>.md` (10 KiB cap). If omitted, the CLI warns that no note was given and ships none; submissions should always pass one.
 - `--no-circuit` — skip the circuit tier (faster; code tier only).
 - `--open-pr` — create branch, commit, push, open PR automatically.
 - `--base-ref origin/main` — independent PRs from one checkout.
@@ -64,7 +64,7 @@ Both must exit 0. In a fork, add `upstream` first:
 - **d-only gain over an entry** (same n,k,w) needs `--peer-audit <file>` from `research/audits/leader_audit.py pair`.
 - **Dominated code** is refused unless `--allow-non-frontier` (filed as a non-frontier record).
 - **Revision** (changing an existing slug's d) must fold the old note forward (>=70% of body lines) or reclassify into `fieldnotes/`.
-- **Family tag** must match `provenance.construction` (kit infers it; mismatch fails `test_family_tag_consistency.py`).
+- **Family tag** must match `provenance.construction`. `verify/test_family_tag_consistency.py` checks the declared tag against the construction text, so a mismatch fails it.
 - **One new code per PR.** No stray files under `research/` or directories under `repro/`.
 - **No committed `.dem` files** — derived from `.stim`.
 - **Code artifact is one file** `codes/<slug>.json`, never a directory.
