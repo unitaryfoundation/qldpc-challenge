@@ -45,11 +45,13 @@ def axes(doc):
     w = doc.get("w")
     if w is None:
         w = max((r.get("weight", 0) for r in doc.get("checks", {}).get("S", [])), default=0)
-    # CSS fallback: max check weight from Hx/Hz
+    # CSS fallback: max check weight from the X and Z rows (the schema's
+    # field names; the Hx/Hz spelling is kept for drafts that used it)
     if w is None or w == 0:
-        hx = doc.get("checks", {}).get("Hx", [])
-        hz = doc.get("checks", {}).get("Hz", [])
-        ws = [len(r) for r in hx + hz]
+        checks = doc.get("checks", {})
+        hx = checks.get("X") or checks.get("Hx") or []
+        hz = checks.get("Z") or checks.get("Hz") or []
+        ws = [len(r) for r in list(hx) + list(hz)]
         w = max(ws) if ws else 0
     return (n, k, d, w)
 
