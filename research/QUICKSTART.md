@@ -185,6 +185,7 @@ session; without one the work stays local.
 | exact confirmation for a standout | §6 |
 | what the gate catches and why | Pitfalls |
 | what a finished candidate looks like | Definition of done |
+| code-calculus: where it is found, how an entry becomes a `CodeState`, what is never exported | the docstring of `kit/calculus_bridge.py`, and its row in the Module reference |
 | every module in `research/kit` | Module reference |
 
 Submitting on a contributor's behalf is a different workflow with different
