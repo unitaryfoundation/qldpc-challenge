@@ -1,6 +1,6 @@
 {
  "schema_version": "0.2",
- "name": "[[395,10,33]]",
+ "name": "[[395,10,32]]",
  "code_type": "CSS",
  "n": 395,
  "k": 10,
@@ -5445,7 +5445,7 @@
   ]
  },
  "distance": {
-  "d": 33,
+  "d": 32,
   "X": {
    "value": 33,
    "confidence": "upper_bound",
@@ -5494,50 +5494,52 @@
    }
   },
   "Z": {
-   "value": 33,
+   "value": 32,
    "confidence": "upper_bound",
    "witness": [
-    197,
-    203,
-    209,
-    215,
-    221,
-    227,
-    233,
-    239,
-    245,
-    251,
-    257,
-    267,
-    273,
-    279,
-    285,
-    291,
-    297,
-    303,
-    309,
-    315,
-    321,
-    327,
-    331,
-    337,
-    343,
-    349,
-    355,
-    361,
-    367,
-    373,
-    379,
-    385,
-    391
+    5,
+    11,
+    17,
+    23,
+    29,
+    35,
+    41,
+    47,
+    53,
+    59,
+    65,
+    71,
+    77,
+    83,
+    89,
+    95,
+    101,
+    107,
+    113,
+    119,
+    125,
+    330,
+    336,
+    342,
+    348,
+    354,
+    360,
+    366,
+    372,
+    378,
+    384,
+    390
    ],
    "witness_provenance": {
     "found_by": [
-     "@vprusso"
+     "@FarLab"
     ],
-    "date": "2026-11-20",
-    "found_at_samples": 13385728,
-    "tool": "QEDist 0.1 aeb7006147b7 exhaustive search (found_at_samples = nodes)"
+    "date": "2026-11-27",
+    "found_at_samples": 756580,
+    "tool": "sisyphus-qec 0.2.1 side_distance, 4 workers, 60 s per side",
+    "seeds": [
+     0
+    ]
    }
   }
  },
@@ -5549,6 +5551,6 @@
   "origin": "submission",
   "date": "2026-11-17",
   "model": "Beam 1.0",
-  "notes": "Z-side value lowered from 62 to 33 by @vprusso on 2026-11-20: QEDist's exhaustive search (yeon-lee/QEDist, through research/certs/qedist_certify.py) exhibited a weight-33 Z-logical; found_at_samples counts the tool's search nodes (issue #6867); d = 33 is unchanged."
+  "notes": "Z-side value lowered from 62 to 33 by @vprusso on 2026-11-20: QEDist's exhaustive search (yeon-lee/QEDist, through research/certs/qedist_certify.py) exhibited a weight-33 Z-logical; found_at_samples counts the tool's search nodes (issue #6867); d = 33 is unchanged. Distance revision 2026-11-27 (witness by @FarLab): Z side 33 -> 32 (Sisyphus low-weight codeword search (PyPI package sisyphus-qec 0.2.1, side_distance on this side's kernel and dual check matrices), 60 s on this side with 4 workers, 756,580 search steps, seed 0)."
  }
 }
