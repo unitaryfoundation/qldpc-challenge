@@ -1771,6 +1771,7 @@ def cmd_submit(args):
             "stage": "verify",
             "message": "verification failed",
             "failed_checks": [{"check": c["check"], "detail": c["detail"]} for c in report["checks"] if not c["ok"]],
+            "hint": "fix the failed checks above, then re-run submit",
         }
         return 1
     n, k, d = doc["n"], doc["k"], doc["distance"]["d"]
@@ -1863,10 +1864,17 @@ def cmd_submit(args):
         if os.path.abspath(args.out) == os.path.join(os.path.abspath(_ROOT), "codes"):
             note_out = os.path.join(_ROOT, "notes", f"{slug}.md")
             os.makedirs(os.path.dirname(note_out), exist_ok=True)
+            family = (getattr(args, "family", "") or "").strip() or "TODO"
+            construction = (getattr(args, "construction", "") or "").strip() or "TODO"
+            model = (getattr(args, "model", "") or "").strip() or "TODO"
+            harness = (getattr(args, "harness", "") or "").strip() or "TODO"
+            authors = " ".join(getattr(args, "authors", []) or []) or "TODO"
+            w = doc.get("weight", "")
             stub = (
                 "# [[{n},{k},{d}]] — submitted via qldpc submit\n\n"
                 "## Direction & hypothesis\n\n"
-                "TODO: track cell, construction family, and why this code was tried.\n\n"
+                "Family: {family}. Construction: {construction}.\n"
+                "TODO: track cell and why this code was tried.\n\n"
                 "## What was searched\n\n"
                 "TODO: constructions, sweep sizes, screening method, seeds.\n\n"
                 "## Evidence trail\n\n"
@@ -1874,10 +1882,13 @@ def cmd_submit(args):
                 "## Dead ends\n\n"
                 "TODO: families/approaches that screened well and collapsed.\n\n"
                 "## Tools\n\n"
-                "TODO: model/harness/tooling used.\n\n"
+                "Authors: {authors}. Model: {model}. Harness: {harness}. "
+                "Max check weight: {w}.\n"
+                "TODO: tooling used.\n\n"
                 "## Reproduction\n\n"
                 "TODO: parameters to rebuild H_X, H_Z.\n"
-            ).format(n=n, k=k, d=d)
+            ).format(n=n, k=k, d=d, family=family, construction=construction,
+                     authors=authors, model=model, harness=harness, w=w)
             with open(note_out, "w", encoding="utf-8", newline="\n") as f:
                 f.write(stub)
             print(
@@ -3859,6 +3870,11 @@ def main(argv=None):
         "origin/main) and return to the current branch "
         "afterwards, so successive --open-pr runs from one "
         "checkout produce independent one-code PRs",
+    )
+    s.epilog = (
+        "Fast path (code tier only, no circuits, no accelerator tightening):\n"
+        "  ./qldpc submit code.npz --authors @handle --no-circuit --fast-trials 0 --json\n"
+        "Machine mode: pass --json for one record on stdout (errors carry a 'hint')."
     )
     s.set_defaults(func=cmd_submit)
 
