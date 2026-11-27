@@ -709,6 +709,18 @@ stages the verified document and prints the `pair` command to run.
 
 ## Tips
 
+The board memo. Every `./qldpc` command that compares a code with the board
+runs the verifier's structural pass over `codes/`, about 44 s on 3,900
+entries when nothing is memoized and about 2 s when it is. The verifier
+memoizes per entry on disk, keyed on the entry's bytes and the validator
+closure, and the CLI points that memo at one per-user directory,
+`$XDG_CACHE_HOME/qldpc/boardcache` or `~/.cache/qldpc/boardcache`, shared by
+every checkout and worktree on the machine, so only the first run on a
+machine is cold (issue #7381). `QLDPC_BOARD_CACHE=<dir>` overrides the
+location and an empty value turns the memo off; CI never uses it unless the
+job names a directory of its own.
+
+
 - Pre-submission: `./qldpc preflight` runs the scope, ruff, family-tag,
   board-marked, and prose checks in one command. `scripts/prepush_check.sh`
   does the same inside a clean worktree of HEAD.
