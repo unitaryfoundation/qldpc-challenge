@@ -93,6 +93,28 @@ def _inside_tree(art):
 from qldpc_verify import checks_sha256  # noqa: E402, F401
 
 
+def codes_dir_problem(root=None):
+    """Return why no certificate can be bound in this checkout, or None.
+
+    Every rule below that names codes/<slug>.json reads the entry from the
+    tree the checker runs in. A cone-mode sparse worktree that holds certs/
+    but not codes/ would report each partial or formal certificate as not on
+    the board, which is the wrong diagnosis: the board is there and the
+    checkout is not. Say so once instead of once per certificate, and refuse
+    to run; the recipe in AGENTS.md under "Worktrees" keeps codes/ in the
+    sparse set for this reason (issue #7405).
+    """
+    root = ROOT if root is None else root
+    codes = os.path.join(root, "codes")
+    if os.path.isdir(codes):
+        return None
+    return (
+        f"codes/ is not in this checkout ({codes}), so no certificate can be "
+        "bound to its entry; in a sparse worktree run "
+        "`git sparse-checkout add codes` and rerun (issue #7405)"
+    )
+
+
 def _code_doc(slug):
     """Return the board entry this certificate is about, or None."""
     path = os.path.join(ROOT, "codes", f"{slug}.json")
@@ -301,6 +323,12 @@ def main(argv):
         help="print the binding hash of codes/<SLUG>.json for a formal certificate and exit",
     )
     a = ap.parse_args(argv)
+    if not a.level:
+        # --level only counts; every other mode binds certificates to entries.
+        missing = codes_dir_problem()
+        if missing:
+            print(missing)
+            return 2
     if a.checks_sha256:
         doc = _code_doc(a.checks_sha256)
         if doc is None:

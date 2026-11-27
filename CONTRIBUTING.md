@@ -577,7 +577,9 @@ codes. Goal: find a CSS qLDPC code that advances a frontier, and submit it.
    site, receipts, and decode is about 225 MB; add circuits/<slug> only for
    a circuit-tier PR. The recipe, and the cleanup rule (remove the worktree
    once the branch is pushed), are in AGENTS.md under "Worktrees" (issue
-   #6515).
+   #6515). Keep codes/ in the set: verify/check_certs.py binds certificates
+   to their entries and refuses to run in a checkout without it (issue
+   #7405).
 
 Report the [[n,k,d]], which track it advances, and that the distance held under
 deep re-verification.
