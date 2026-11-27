@@ -90,7 +90,8 @@
   "construction": "C-ADD-CHECK strict improvement (code calculus v0.2rc): added one check killing all weight-1 logicals of parent codes/14-9-1.json",
   "origin": "submission",
   "date": "2026-10-19",
-  "model": "Beam 1.0"
+  "model": "Beam 1.0",
+  "notes": "Layout added 2026-11-17 by @vprusso: bilayer coordinates with interaction radius 6.0 (research/local2d/layout_sweep.py, screen stage)."
  },
  "circuit": {
   "d_circ": {
@@ -120,6 +121,75 @@
    ],
    "date": "2026-11-18",
    "method": "circuit_autogen schedule search (two-block interleaved, then layout, then generic), verified by verify/circuit_verify.py before writing"
+  }
+ },
+ "locality": {
+  "coordinates": [
+   [
+    0.0,
+    0.0
+   ],
+   [
+    0.0,
+    1.0
+   ],
+   [
+    0.0,
+    2.0
+   ],
+   [
+    0.0,
+    3.0
+   ],
+   [
+    0.0,
+    4.0
+   ],
+   [
+    0.0,
+    5.0
+   ],
+   [
+    0.0,
+    6.0
+   ],
+   [
+    0.0,
+    0.0
+   ],
+   [
+    0.0,
+    1.0
+   ],
+   [
+    0.0,
+    2.0
+   ],
+   [
+    0.0,
+    3.0
+   ],
+   [
+    0.0,
+    4.0
+   ],
+   [
+    0.0,
+    5.0
+   ],
+   [
+    0.0,
+    6.0
+   ]
+  ],
+  "layers": 2,
+  "interaction_radius": 6.0,
+  "contributed_by": {
+   "by": [
+    "@vprusso"
+   ],
+   "date": "2026-11-17",
+   "method": "torus_grid.py: the two-block index convention read off as a Z_1 x Z_7 grid, one qubit of each block per site, no search; radius measured with the verifier's rule (research/local2d/layout_sweep.py)"
   }
  }
 }

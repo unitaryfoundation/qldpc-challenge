@@ -200,7 +200,8 @@
   "construction": "contributed via qldpc submit",
   "origin": "submission",
   "date": "2026-11-09",
-  "model": "Beam 1.0"
+  "model": "Beam 1.0",
+  "notes": "Layout added 2026-11-17 by @vprusso: bilayer coordinates with interaction radius 4.1232 (research/local2d/layout_sweep.py, screen stage)."
  },
  "circuit": {
   "d_circ": {
@@ -292,6 +293,99 @@
      ]
     }
    ]
+  }
+ },
+ "locality": {
+  "coordinates": [
+   [
+    0.0,
+    0.0
+   ],
+   [
+    0.0,
+    1.0
+   ],
+   [
+    0.0,
+    2.0
+   ],
+   [
+    0.0,
+    3.0
+   ],
+   [
+    0.0,
+    4.0
+   ],
+   [
+    1.0,
+    0.0
+   ],
+   [
+    1.0,
+    1.0
+   ],
+   [
+    1.0,
+    2.0
+   ],
+   [
+    1.0,
+    3.0
+   ],
+   [
+    1.0,
+    4.0
+   ],
+   [
+    0.0,
+    0.0
+   ],
+   [
+    0.0,
+    1.0
+   ],
+   [
+    0.0,
+    2.0
+   ],
+   [
+    0.0,
+    3.0
+   ],
+   [
+    0.0,
+    4.0
+   ],
+   [
+    1.0,
+    0.0
+   ],
+   [
+    1.0,
+    1.0
+   ],
+   [
+    1.0,
+    2.0
+   ],
+   [
+    1.0,
+    3.0
+   ],
+   [
+    1.0,
+    4.0
+   ]
+  ],
+  "layers": 2,
+  "interaction_radius": 4.1232,
+  "contributed_by": {
+   "by": [
+    "@vprusso"
+   ],
+   "date": "2026-11-17",
+   "method": "torus_grid.py: the two-block index convention read off as a Z_2 x Z_5 grid, one qubit of each block per site, no search; radius measured with the verifier's rule (research/local2d/layout_sweep.py)"
   }
  }
 }
