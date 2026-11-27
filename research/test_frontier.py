@@ -156,5 +156,36 @@ def test_the_rule_agrees_with_does_it_advance_on_random_boards():
         mirror = does_it_advance.novelty(
             board, cand["n"], cand["k"], cand["d"], cand["w"], code_type=cand["code_type"], lc=cand["locality_class"]
         )
-        assert sorted(F.dominators(cand, board)) == sorted(F.describe(b) for b in mirror["dominated_by"])
+        assert sorted(F.dominators(cand, board)) == sorted(mirror["dominated_by"])
         assert (not F.dominators(cand, board)) == mirror["board_advancing"]
+        assert mirror == F.novelty(cand, board)
+
+
+def test_novelty_names_the_axes_gained_and_keeps_the_two_d_only_questions_apart():
+    board = [
+        row(72, 12, 5, 6, slug="peer"),  # tied on n, k, w; beaten on d alone
+        row(80, 12, 6, 6, slug="bigger"),  # beaten on n
+        row(72, 12, 1, 6, slug="placeholder"),  # d = 1: beaten on d, not a peer
+        row(60, 20, 8, 10, slug="heavy"),  # another cell
+        row(72, 12, 6, 6, slug="twin"),  # a tie: neither beaten nor dominating
+    ]
+    nov = F.novelty(CAND, board)
+    assert nov["board_advancing"] and nov["dominated_by"] == [] and nov["cell"] == ["weight-6", "unrestricted"]
+    assert nov["advances_by"] == ["d", "n"]
+    assert nov["d_only_peers"] == ["[[72,12,5]] w=6 peer.json"]
+    assert not nov["d_only_gain"]  # the board also yielded on n, so the gain is not d-only
+    assert dict((desc, gains) for desc, gains in nov["beaten"]) == {
+        "[[72,12,5]] w=6 peer.json": ["d"],
+        "[[80,12,6]] w=6 bigger.json": ["n"],
+        "[[72,12,1]] w=6 placeholder.json": ["d"],
+    }
+    only_d = F.novelty(CAND, [row(72, 12, 5, 6, slug="peer")])
+    assert only_d["d_only_gain"] and only_d["advances_by"] == ["d"]
+    assert not F.novelty(CAND, [row(72, 12, 1, 6, slug="placeholder")])["d_only_gain"]
+
+
+def test_novelty_of_a_dominated_candidate_still_lists_what_it_beats():
+    nov = F.novelty(CAND, [row(72, 12, 7, 6, slug="better"), row(80, 12, 6, 6, slug="bigger")])
+    assert not nov["board_advancing"] and nov["dominated_by"] == ["[[72,12,7]] w=6 better.json"]
+    assert nov["advances_by"] == ["n"] and nov["beaten"] == [["[[80,12,6]] w=6 bigger.json", ["n"]]]
+    assert F.novelty(dict(CAND, w=None), [row(80, 12, 6, 6)])["beaten"] == []
