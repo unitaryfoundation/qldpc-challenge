@@ -483,7 +483,7 @@
   "model": "Beam 1.0",
   "harness": "opencode"
  },
- "family": "other",
+ "family": "pair-partition-cpm",
  "circuit": {
   "d_circ": {
    "Z": {
