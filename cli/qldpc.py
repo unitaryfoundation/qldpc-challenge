@@ -3688,26 +3688,43 @@ def cmd_preflight(args):
 
     base = args.base_ref or ""
     if not base:
-        # prefer upstream/main when available, fall back to origin/main (only
-        # when origin is the canonical repository, matching prepush_prose_check.sh)
+        # prefer upstream/main when available, fall back to origin/main
+        # (mirroring verify/prepush_prose_check.sh). Refuse, rather than
+        # silently diff against a fork's stale main, when there is no
+        # upstream remote and origin is not the canonical repository.
         try:
             _sp.run(["git", "remote", "get-url", "upstream"], check=True, capture_output=True, cwd=_ROOT)
             base = "upstream/main"
         except Exception:
             origin_url = ""
             try:
-                r = _sp.run(["git", "remote", "get-url", "origin"], check=True, capture_output=True, text=True, cwd=_ROOT)
-                origin_url = r.stdout.strip()
-            except Exception:
-                pass
-            if "unitaryfoundation/qldpc-challenge" in origin_url:
-                base = "origin/main"
-            else:
-                print(
-                    "preflight: no upstream remote and origin is not the canonical "
-                    "repository; add upstream or pass --base-ref", file=sys.stderr,
+                r = _sp.run(
+                    ["git", "remote", "get-url", "origin"],
+                    check=True, capture_output=True, text=True, cwd=_ROOT,
                 )
+                origin_url = (r.stdout or "").strip()
+            except Exception:
+                origin_url = ""
+            canonical = "unitaryfoundation/qldpc-challenge"
+            if canonical not in origin_url:
+                print("ERROR: no upstream remote, and origin is not the canonical repository:", file=sys.stderr)
+                print("       %s" % (origin_url or "(none)"), file=sys.stderr)
+                print("       Add the canonical repository as a remote and fetch it:", file=sys.stderr)
+                print(
+                    "         git remote add upstream https://github.com/unitaryfoundation/qldpc-challenge.git",
+                    file=sys.stderr,
+                )
+                print("         git fetch upstream", file=sys.stderr)
+                print("       or pass --base-ref <remote>/main explicitly.", file=sys.stderr)
                 raise SystemExit(2)
+            base = "origin/main"
+    # verify the base ref exists before degrading behavior on it
+    if not _sp.run(
+        ["git", "rev-parse", "--verify", "--quiet", base],
+        cwd=_ROOT, capture_output=True, check=False,
+    ).returncode == 0:
+        print("ERROR: base ref '%s' not found; fetch or pass --base-ref <ref>." % base, file=sys.stderr)
+        raise SystemExit(2)
 
     def run(label, cmd):
         print(f"== {label} ==")

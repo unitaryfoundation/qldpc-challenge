@@ -1,9 +1,11 @@
 #!/usr/bin/env bash
+# Opt-in: git config core.hooksPath .githooks
 # Local guard for the CI gates that most often fail on submission PRs:
 #   - codes format (json.dumps(doc, indent=1))
 #   - validator integrity (trusted stack pin)
 #   - prose (cited paths must resolve)
-#   - ruff on newly added Python files (modified legacy files stay advisory)
+#   - ruff on newly added Python files (modified legacy files stay advisory,
+#     matching the CI lint job)
 set -e
 
 # Codes format
@@ -15,16 +17,21 @@ fi
 # Family tag consistency: a construction that names a family must carry that
 # tag (verify/test_family_tag_consistency.py). The selected test scans every
 # codes/*.json on disk (not just the staged ones) and reads the working tree,
-# so a contradiction anywhere in the checkout blocks the commit. It is triggered
-# only when a code file is staged, and avoids optional deps (stim) used by the
-# companion test.
+# so a contradiction anywhere in the checkout blocks the commit. Triggered only
+# when a code file is staged; avoids optional deps (stim) used by the companion
+# test. Reuses changed_codes from the codes-format step above.
 if [ -n "$changed_codes" ]; then
     uv run --frozen python -m pytest verify/test_family_tag_consistency.py::test_a_construction_that_names_its_family_carries_that_tag -q
 fi
 
 # Validator integrity (trusted stack pin). Fast (<1s): fails if a critical file
-# changed without re-pinning verify/validator_manifest.json.
-python3 verify/check_validator_integrity.py
+# changed without re-pinning verify/validator_manifest.json. Skipped in a sparse
+# checkout that lacks .github/workflows (the check needs the full tree).
+if [ -d .github/workflows ]; then
+    python3 verify/check_validator_integrity.py
+else
+    echo "note: skipping validator-integrity check (sparse checkout, no .github/)" >&2
+fi
 
 # Prose (file-level paths; PR-body citations are checked by prepush_prose_check.sh)
 changed_md=$(git diff --cached --name-only --diff-filter=AMR -- 'notes/*.md' 'fieldnotes/*.md' || true)
@@ -32,8 +39,8 @@ if [ -n "$changed_md" ]; then
     python3 verify/check_prose.py --files $changed_md
 fi
 
-# Ruff on newly added Python files only.
-files=$(git diff --cached --name-only --diff-filter=A -- '*.py' || true)
+# Ruff on newly added Python files only
+files=$(git diff --cached --name-only --diff-filter=A -- '*.py')
 if [ -n "$files" ]; then
     uv run --frozen --only-group dev ruff check $files
     uv run --frozen --only-group dev ruff format --check $files
