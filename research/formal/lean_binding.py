@@ -1,0 +1,376 @@
+"""Bind a Lean definition of a board entry's check matrices to the entry (issue #7254).
+
+    uv run python research/formal/lean_binding.py emit codes/<slug>.json --name BB144 [--out FILE]
+    uv run python research/formal/lean_binding.py check codes/<slug>.json --lean FILE [--name BB144]
+    uv run python research/formal/lean_binding.py relabel codes/<slug>.json --name BB144 [--out FILE] [--json FILE]
+
+A ``formal`` certificate (``certs/<slug>.json``, ``verification.level:
+formal``) is a theorem about a code defined inside a Lean development, and
+``verification.checks_sha256`` binds the theorem to this entry's exact
+matrix pair. The hash is not permutation-invariant: a development that
+numbers the qubits differently proves a theorem about a relabeled code, and
+``verify/check_certs.py`` refuses the certificate. Two conventions are in
+use. The challenge's (``research/kit/bb.py``, ``codes/<slug>.json``) is
+block-major: qubit ``block * (l * m) + (a * m + b)`` for the group element
+``(a, b)`` of ``Z_l x Z_m``, ``H_X = [A | B]``, ``H_Z = [B^T | A^T]``.
+QECLean's bivariate-bicycle chain complex (``BBChainComplex.lean``) numbers
+the qubits ``2 * (a * m + b) + block``, interleaved by group element.
+
+``emit`` writes the entry's matrices as the two ``BitVec`` literals the
+Lean-QEC examples use (row-major, bit ``i * n + j`` of a ``BitVec (rows *
+n)``), generated from the JSON rather than transcribed, with the entry's
+``checks_sha256`` in the header, so a theorem about those definitions is
+about this entry by construction. ``check`` reads the literals back out of
+a Lean file and compares them with the entry row by row: this is how the
+binding of a cited development is verified, and it is what makes the
+``checks_sha256`` of a formal certificate a checked claim rather than a
+sentence. ``relabel``, for a bivariate-bicycle entry, builds the same code
+in QECLean's numbering and finds the qubit permutation that carries it onto
+the entry, as a table a Lean adapter theorem can state and as JSON, after
+checking that the permuted matrices are the entry's row for row.
+
+Nothing here runs Lean. The tool makes the binding checkable and the
+relabeling explicit; the theorem that transports a distance along the
+relabeling is Lean work in the development that holds the proof.
+"""
+
+import argparse
+import json
+import os
+import re
+import sys
+
+import numpy as np
+
+_HERE = os.path.dirname(os.path.abspath(__file__))
+_ROOT = os.path.dirname(os.path.dirname(_HERE))
+for _p in (os.path.join(_ROOT, "verify"), os.path.join(_ROOT, "research", "kit")):
+    if _p not in sys.path:
+        sys.path.insert(0, _p)
+
+import gf2  # noqa: E402
+from qldpc_verify import checks_sha256  # noqa: E402
+
+LITERAL = re.compile(
+    r"def\s+(?P<name>[A-Za-z0-9_']+)\s*:\s*BitVec\s*\(\s*(?P<rows>\d+)\s*\*\s*(?P<cols>\d+)\s*\)\s*:=\s*0x(?P<hex>[0-9a-fA-F]+)"
+)
+CONSTRUCTION = re.compile(
+    r"orders\s*\(\s*(?P<l>\d+)\s*,\s*(?P<m>\d+)\s*\).*?A\s*=\s*(?P<A>[^,]+),\s*B\s*=\s*(?P<B>[^(]+?)\s*(?:\(|$)"
+)
+MONOMIAL = re.compile(r"^(?:(?P<x>x)(?:\*\*|\^)?(?P<xa>\d+)?)?\s*(?:(?P<y>y)(?:\*\*|\^)?(?P<yb>\d+)?)?$")
+
+
+def load_entry(path):
+    with open(path, encoding="utf-8") as f:
+        return json.load(f)
+
+
+def rows_of(doc):
+    """Return ``(X rows, Z rows)`` as sorted support lists in the entry's own order."""
+    checks = doc.get("checks") or {}
+    if "X" not in checks:
+        raise ValueError(
+            "a CSS entry with checks.X and checks.Z is needed; stabilizer entries have no two literals to bind"
+        )
+    return [sorted(int(q) for q in r) for r in checks["X"]], [sorted(int(q) for q in r) for r in checks["Z"]]
+
+
+# -- the Lean-QEC literal form ----------------------------------------------------
+
+
+def encode(rows, n):
+    """Return the integer of the ``BitVec (len(rows) * n)`` whose bit ``i * n + j`` is row i's entry at qubit j."""
+    v = 0
+    for i, row in enumerate(rows):
+        for j in row:
+            if not 0 <= j < n:
+                raise ValueError(f"qubit {j} outside 0..{n - 1}")
+            v |= 1 << (i * n + j)
+    return v
+
+
+def decode(value, rows, cols):
+    """Return the support lists of the ``rows x cols`` matrix the literal ``value`` encodes (bit ``i * cols + j``)."""
+    if value >> (rows * cols):
+        raise ValueError(f"the literal has bits above {rows} * {cols}")
+    return [[j for j in range(cols) if (value >> (i * cols + j)) & 1] for i in range(rows)]
+
+
+def literal(name, rows, n):
+    """Return the Lean ``def`` line for ``rows`` as a ``BitVec (len(rows) * n)``."""
+    return f"def {name} : BitVec ({len(rows)} * {n}) := 0x{encode(rows, n):x}"
+
+
+def emit(doc, name, *, slug=None):
+    """Return the Lean source defining ``<name>_X`` and ``<name>_Z`` for the entry, with the binding in its header."""
+    xs, zs = rows_of(doc)
+    n = int(doc["n"])
+    slug = slug or f"{doc['n']}-{doc['k']}-{doc['distance']['d']}"
+    lines = [
+        f"-- {name}: the check matrices of codes/{slug}.json, generated by research/formal/lean_binding.py emit",
+        f"-- checks_sha256 {checks_sha256(doc)}",
+        f"-- Labeling: the entry's own. Row i of each literal is the entry's row i; bit i * {n} + j of the",
+        f"-- BitVec ({len(xs)} * {n}) is qubit j of that row, qubits numbered as in codes/{slug}.json",
+        "-- (block-major for a bivariate-bicycle entry: block * (l * m) + (a * m + b)). A theorem about",
+        f"-- {name}_X and {name}_Z is a theorem about this entry; `lean_binding.py check` reads them back.",
+        literal(f"{name}_X", xs, n),
+        literal(f"{name}_Z", zs, n),
+        "",
+    ]
+    return "\n".join(lines)
+
+
+def literals_in(text):
+    """Return ``{name: (rows, cols, value)}`` for every BitVec literal definition in a Lean source."""
+    out = {}
+    for m in LITERAL.finditer(text):
+        out[m.group("name")] = (int(m.group("rows")), int(m.group("cols")), int(m.group("hex"), 16))
+    return out
+
+
+def check(doc, text, *, name=None, x_name=None, z_name=None):
+    """Compare the literals in a Lean source with the entry; return the report dict.
+
+    ``x_name``/``z_name`` name the two definitions; with ``name`` they default
+    to ``<name>_X`` and ``<name>_Z``. ``ok`` is True when both decode to the
+    entry's rows in the entry's order; ``rowspace_equal`` says whether they
+    at least generate the same stabilizer group side by side (a different
+    row order or a different generating set), which a formal certificate
+    may not rely on, since ``checks_sha256`` is of the presentation.
+    """
+    xs, zs = rows_of(doc)
+    n = int(doc["n"])
+    found = literals_in(text)
+    x_name = x_name or (f"{name}_X" if name else None)
+    z_name = z_name or (f"{name}_Z" if name else None)
+    report = {"checks_sha256": checks_sha256(doc), "literals": sorted(found), "ok": False, "problems": []}
+    for side, want, lit in (("X", xs, x_name), ("Z", zs, z_name)):
+        if lit is None or lit not in found:
+            report["problems"].append(f"no literal named {lit!r} in the Lean source (found {sorted(found)})")
+            continue
+        rows, cols, value = found[lit]
+        if cols != n or rows != len(want):
+            report["problems"].append(f"{lit} is {rows} x {cols}; the entry's {side} side is {len(want)} x {n}")
+            continue
+        try:
+            got = decode(value, rows, cols)
+        except ValueError as e:
+            report["problems"].append(f"{lit} is not a {rows} x {cols} literal: {e}")
+            continue
+        if got != want:
+            same_set = sorted(map(tuple, got)) == sorted(map(tuple, want))
+            same_space = _same_rowspace(got, want, n)
+            first = next((i for i, (a, b) in enumerate(zip(got, want)) if a != b), None)
+            report["problems"].append(
+                f"{lit} decodes to a different {side} matrix: first differing row {first} is {got[first]} "
+                f"against the entry's {want[first]}"
+                + ("; same rows in another order" if same_set else "; same stabilizer group" if same_space else "")
+            )
+            report[f"rowspace_equal_{side}"] = same_space
+        else:
+            report[f"rowspace_equal_{side}"] = True
+    report["ok"] = not report["problems"]
+    return report
+
+
+def _matrix(rows, n):
+    M = np.zeros((len(rows), n), dtype=np.int8)
+    for i, r in enumerate(rows):
+        M[i, list(r)] = 1
+    return M
+
+
+def _same_rowspace(rows_a, rows_b, n):
+    A, B = _matrix(rows_a, n), _matrix(rows_b, n)
+    ra, rb = gf2.rank(A), gf2.rank(B)
+    return ra == rb == gf2.rank(np.concatenate([A, B], axis=0))
+
+
+# -- the QECLean relabeling for bivariate-bicycle entries --------------------------
+
+
+def parse_construction(text):
+    """Return ``(l, m, A_terms, B_terms)`` from a construction string like the board's BB entries carry."""
+    hit = CONSTRUCTION.search(text or "")
+    if not hit:
+        raise ValueError("the construction string does not read 'orders (l, m), A=..., B=...'")
+    return int(hit.group("l")), int(hit.group("m")), parse_poly(hit.group("A")), parse_poly(hit.group("B"))
+
+
+def parse_poly(text):
+    """Return the exponent pairs of a bivariate polynomial written like ``x**3 + y**2 + y`` or ``x^3 + y + 1``."""
+    terms = []
+    for raw in text.replace(" ", "").split("+"):
+        if raw in ("1", ""):
+            if raw == "1":
+                terms.append((0, 0))
+            continue
+        m = MONOMIAL.match(raw)
+        if not m or (m.group("x") is None and m.group("y") is None):
+            raise ValueError(f"cannot read monomial {raw!r}")
+        a = int(m.group("xa") or 1) if m.group("x") else 0
+        b = int(m.group("yb") or 1) if m.group("y") else 0
+        terms.append((a, b))
+    return terms
+
+
+def qeclean_rows(l_order, m_order, A_terms, B_terms):
+    """Return QECLean's X and Z checks of the BB chain complex, as supports in QECLean's qubit numbering.
+
+    ``BBChainComplex.lean``: qubits are ``G x Fin 2`` for ``G = Z_l x Z_m``,
+    numbered ``2 * (a * m + b) + block``. The X-check of face ``f`` is
+    ``d2(delta_f)``, with ``(A * delta_f)(h) = A(h - f)``: qubit ``(f + s, 0)``
+    for ``s`` in the support of ``A`` and ``(f + t, 1)`` for ``t`` in the
+    support of ``B``. The Z-check of vertex ``v`` is the transpose of
+    ``d1(c)(v) = (B * c_L)(v) + (A * c_R)(v)``: qubit ``(v - t, 0)`` for ``t``
+    in ``B`` and ``(v - s, 1)`` for ``s`` in ``A``. Faces and vertices are
+    listed in the order ``a * m + b`` of their group element.
+    """
+    l, m = l_order, m_order  # noqa: E741
+
+    def idx(a, b):
+        return (a % l) * m + (b % m)
+
+    def q(a, b, block):
+        return 2 * idx(a, b) + block
+
+    xs, zs = [], []
+    for a in range(l):
+        for b in range(m):
+            xs.append(sorted({q(a + s, b + t, 0) for s, t in A_terms} | {q(a + s, b + t, 1) for s, t in B_terms}))
+            zs.append(sorted({q(a - s, b - t, 0) for s, t in B_terms} | {q(a - s, b - t, 1) for s, t in A_terms}))
+    return xs, zs
+
+
+def qeclean_to_entry(l_order, m_order):
+    """Return the table ``entry index of QECLean qubit q`` for ``q`` in ``0 .. 2 * l * m - 1``."""
+    size = l_order * m_order
+    table = [0] * (2 * size)
+    for g in range(size):
+        for block in range(2):
+            table[2 * g + block] = block * size + g
+    return table
+
+
+def relabel(doc, name, *, l_order=None, m_order=None, A_terms=None, B_terms=None):
+    """Return the relabeling record for a bivariate-bicycle entry, checked against the entry's rows.
+
+    The record carries the two conventions, the permutation ``map`` (entry
+    index for each QECLean index) and its inverse, whether the permuted
+    QECLean matrices are the entry's matrices row for row (``rows_identical``)
+    or at least generate the same groups (``rowspace_equal``), and the Lean
+    source of the table.
+    """
+    if l_order is None:
+        l_order, m_order, A_terms, B_terms = parse_construction((doc.get("provenance") or {}).get("construction"))
+    l, m = l_order, m_order  # noqa: E741
+    n = 2 * l * m
+    if int(doc["n"]) != n:
+        raise ValueError(f"the entry has n = {doc['n']} but l * m * 2 = {n}")
+    xs_e, zs_e = rows_of(doc)
+    xs_q, zs_q = qeclean_rows(l, m, A_terms, B_terms)
+    table = qeclean_to_entry(l, m)
+    inverse = [0] * n
+    for q_idx, e_idx in enumerate(table):
+        inverse[e_idx] = q_idx
+    xs_p = [sorted(table[q] for q in row) for row in xs_q]
+    zs_p = [sorted(table[q] for q in row) for row in zs_q]
+    identical = xs_p == xs_e and zs_p == zs_e
+    rec = {
+        "slug": f"{doc['n']}-{doc['k']}-{doc['distance']['d']}",
+        "checks_sha256": checks_sha256(doc),
+        "l": l,
+        "m": m,
+        "A_terms": [list(t) for t in A_terms],
+        "B_terms": [list(t) for t in B_terms],
+        "conventions": {
+            "entry": "block * (l * m) + (a * m + b)  (research/kit/bb.py, codes/<slug>.json)",
+            "qeclean": "2 * (a * m + b) + block  (QEC/Stabilizer/Framework/Homological/BBChainComplex.lean)",
+        },
+        "map": table,
+        "inverse": inverse,
+        "rows_identical": identical,
+        "rowspace_equal": identical or (_same_rowspace(xs_p, xs_e, n) and _same_rowspace(zs_p, zs_e, n)),
+    }
+    rec["lean"] = "\n".join(
+        [
+            f"-- {name}: QECLean's qubit (a, b, block), numbered 2 * (a * {m} + b) + block, is the entry's qubit",
+            f"-- block * {l * m} + (a * {m} + b). {name}_fromQECLean sends QECLean's index to the entry's;",
+            f"-- {name}_toQECLean is its inverse. Generated by research/formal/lean_binding.py relabel from",
+            f"-- codes/{rec['slug']}.json (checks_sha256 {rec['checks_sha256']}); the permuted QECLean X and Z checks "
+            + ("are the entry's rows, row for row." if identical else "generate the entry's stabilizer groups."),
+            f"def {name}_fromQECLean : Fin {n} → Fin {n} := ![" + ", ".join(str(x) for x in table) + "]",
+            f"def {name}_toQECLean : Fin {n} → Fin {n} := ![" + ", ".join(str(x) for x in inverse) + "]",
+            "",
+        ]
+    )
+    return rec
+
+
+# -- the command -------------------------------------------------------------------
+
+
+def main(argv=None):
+    ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    sub = ap.add_subparsers(dest="cmd", required=True)
+    e = sub.add_parser("emit", help="write the entry's matrices as Lean BitVec literals")
+    e.add_argument("entry")
+    e.add_argument("--name", required=True, help="definition prefix, e.g. BB144 for BB144_X and BB144_Z")
+    e.add_argument("--out", help="write here instead of stdout")
+    c = sub.add_parser("check", help="decode the literals of a Lean file and compare them with the entry")
+    c.add_argument("entry")
+    c.add_argument("--lean", required=True, help="the Lean source holding the two literals")
+    c.add_argument("--name", help="definition prefix; the literals are <name>_X and <name>_Z")
+    c.add_argument("--x", dest="x_name", help="the X literal's name, when it is not <name>_X")
+    c.add_argument("--z", dest="z_name", help="the Z literal's name, when it is not <name>_Z")
+    r = sub.add_parser("relabel", help="the QECLean-to-entry qubit permutation of a bivariate-bicycle entry")
+    r.add_argument("entry")
+    r.add_argument("--name", required=True)
+    r.add_argument("--out", help="write the Lean table here")
+    r.add_argument("--json", help="write the record here")
+    a = ap.parse_args(argv)
+    doc = load_entry(a.entry)
+    slug = os.path.basename(a.entry)[:-5]
+    if a.cmd == "emit":
+        text = emit(doc, a.name, slug=slug)
+        if a.out:
+            with open(a.out, "w", encoding="utf-8") as f:
+                f.write(text)
+            print(f"wrote {a.out}; checks_sha256 {checks_sha256(doc)}")
+        else:
+            sys.stdout.write(text)
+        return 0
+    if a.cmd == "check":
+        with open(a.lean, encoding="utf-8") as f:
+            text = f.read()
+        rep = check(doc, text, name=a.name, x_name=a.x_name, z_name=a.z_name)
+        if rep["ok"]:
+            print(f"{slug}: the literals are the entry's matrices, row for row; checks_sha256 {rep['checks_sha256']}")
+            return 0
+        print(f"{slug}: the literals are not the entry's matrices:")
+        for p in rep["problems"]:
+            print("  " + p)
+        return 1
+    rec = relabel(doc, a.name)
+    if a.out:
+        with open(a.out, "w", encoding="utf-8") as f:
+            f.write(rec["lean"])
+    if a.json:
+        with open(a.json, "w", encoding="utf-8") as f:
+            json.dump({k: v for k, v in rec.items() if k != "lean"}, f, indent=2, sort_keys=True)
+            f.write("\n")
+    verdict = (
+        "identical to the entry row for row"
+        if rec["rows_identical"]
+        else ("generate the same groups" if rec["rowspace_equal"] else "DO NOT match the entry")
+    )
+    print(
+        f"{slug}: QECLean qubit 2 * (a * {rec['m']} + b) + block is the entry's "
+        f"block * {rec['l'] * rec['m']} + (a * {rec['m']} + b); permuted checks {verdict}"
+        + (f"; table written to {a.out}" if a.out else "")
+    )
+    return 0 if rec["rowspace_equal"] else 1
+
+
+if __name__ == "__main__":
+    sys.exit(main())
