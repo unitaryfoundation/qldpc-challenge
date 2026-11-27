@@ -1,0 +1,83 @@
+{
+  "d": 4,
+  "d_exact": true,
+  "d_lower": 4,
+  "encoding": "selector",
+  "ladder": {
+    "budget_per_side": 60.0,
+    "start": 1
+  },
+  "logical_classes": 4,
+  "name": "[[20,4,4]]",
+  "sides": {
+    "X": {
+      "exact": true,
+      "ladder": [
+        {
+          "W": 1,
+          "cnf_sha256": "ee88ec21193e6350d304647c98655b98be0be7f663ea5d8029fc5a36198584e5",
+          "proof": "[Errno 2] No such file or directory: 'kissat'",
+          "secs": 0.0,
+          "status": "UNSAT"
+        },
+        {
+          "W": 2,
+          "cnf_sha256": "803c742430860cf583bad052b5d0c3d7b4bd9ff549cce6e60397314d582dfb6c",
+          "proof": "[Errno 2] No such file or directory: 'kissat'",
+          "secs": 0.0,
+          "status": "UNSAT"
+        },
+        {
+          "W": 3,
+          "cnf_sha256": "a6cd0e82865cbeb5e1ea76c787e0441a7c963def757614c959ae7f7411a1d1d3",
+          "proof": "[Errno 2] No such file or directory: 'kissat'",
+          "secs": 0.0,
+          "status": "UNSAT"
+        }
+      ],
+      "note": "no logical < 4 exists",
+      "proved_min": 4,
+      "secs": 0.0,
+      "status": "UNSAT",
+      "value": 4
+    },
+    "Z": {
+      "exact": true,
+      "ladder": [
+        {
+          "W": 1,
+          "cnf_sha256": "ee88ec21193e6350d304647c98655b98be0be7f663ea5d8029fc5a36198584e5",
+          "proof": "[Errno 2] No such file or directory: 'kissat'",
+          "secs": 0.0,
+          "status": "UNSAT"
+        },
+        {
+          "W": 2,
+          "cnf_sha256": "803c742430860cf583bad052b5d0c3d7b4bd9ff549cce6e60397314d582dfb6c",
+          "proof": "[Errno 2] No such file or directory: 'kissat'",
+          "secs": 0.0,
+          "status": "UNSAT"
+        },
+        {
+          "W": 3,
+          "cnf_sha256": "a6cd0e82865cbeb5e1ea76c787e0441a7c963def757614c959ae7f7411a1d1d3",
+          "proof": "[Errno 2] No such file or directory: 'kissat'",
+          "secs": 0.0,
+          "status": "UNSAT"
+        }
+      ],
+      "note": "no logical < 4 exists",
+      "proved_min": 4,
+      "secs": 0.0,
+      "status": "UNSAT",
+      "value": 4
+    }
+  },
+  "solver": "CryptoMiniSat 5.14 SAT",
+  "symmetry": false,
+  "tlim_per_solve": 120,
+  "verification": {
+    "level": "solver",
+    "note": "proof path did not complete: [Errno 2] No such file or directory: 'kissat'"
+  }
+}
