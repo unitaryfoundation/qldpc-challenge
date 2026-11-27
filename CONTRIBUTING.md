@@ -101,7 +101,10 @@ Useful flags:
   title, body file, branch, the remaining commands, the PR URL, or an
   error with a class and a stage) and move the human output to stderr,
   so a script drives the tool without parsing prose; with `--dry-run` the
-  record carries the full submission under `doc`;
+  record carries the full submission under `doc`. A run that leaves the flag
+  out while its stdout is not a terminal gets a one-line reminder on stderr
+  (`QLDPC_NO_JSON_TIP=1` silences it), and `./qldpc --help` lists the
+  subcommands that take the flag;
 - `--base-ref origin/main` start the submission branch from that ref and
   return to your current branch afterwards, so a loop of `--open-pr` runs
   from one checkout opens one independent PR per code;
