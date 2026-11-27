@@ -121,7 +121,7 @@
   },
   "layouts": {
    "batches": 24,
-   "count": 935,
+   "count": 930,
    "prs": [
     7394,
     7396,
@@ -168,6 +168,10 @@
   {
    "detail": "research/local2d/sweep_attempts.jsonl records each with its best radius, so a later run at this budget skips them",
    "what": "954 of 1,893 layoutless entries not placed at 600 s"
+  },
+  {
+   "detail": "160-32-10, 160-36-6, 170-34-8, 180-36-8, 190-38-8 have golden-pinned gate verdicts (verify/fixtures/validation_gate/golden); a layout moves the verdict, so filing them needs a deliberate golden re-record (Tier 1)",
+   "what": "5 placed layouts not filed"
   }
  ],
  "non_frontier_survivors": 0,

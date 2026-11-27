@@ -23,7 +23,7 @@ Three NERSC Perlmutter jobs on 2026-11-17 from main at cfca5690b1db: 61479479 (`
 This campaign produces evidence for existing entries, not new codes, so the gate's survivor list is empty by construction. What was filed:
 
 - Certificates: 178 partial certificates in PR #7392, 160 raising a lower bound already on main and 18 on entries that had none. The 614 exact records were overtaken: between 2026-11-17 and the filing the QEDist sweeps (#7109, #6197) certified those entries, and the Perlmutter records carry no checks_sha256 binding (the sweep version predated it), so they were not filed.
-- Layouts: 935 first 2D-local layouts in 24 PRs of at most 40 (#7394, #7396, #7397, #7398, #7399, #7400, #7401, #7402, #7407, #7408, #7409, #7411, #7412, #7413, #7414, #7415, #7416, #7417, #7418, #7419, #7420, #7421, #7422, #7423); 4 of the 939 were left alone because the entry had gained a layout or left the board since the sweep. The attempt log is PR #7395.
+- Layouts: 930 first 2D-local layouts in 24 PRs of at most 40 (#7394, #7396, #7397, #7398, #7399, #7400, #7401, #7402, #7407, #7408, #7409, #7411, #7412, #7413, #7414, #7415, #7416, #7417, #7418, #7419, #7420, #7421, #7422, #7423); 4 of the 939 were left alone because the entry had gained a layout or left the board since the sweep, and 5 (160-32-10, 160-36-6, 170-34-8, 180-36-8, 190-38-8) were dropped after the first CI run because their gate verdicts are golden-pinned in `verify/fixtures/validation_gate/golden` and a layout moves the verdict; those wait for a golden re-record. The attempt log is PR #7395.
 - The sweep tool fix that the campaign surfaced: `certify_sweep.py` skipped no d = 1 entries and the weekly job had failed three weeks running on their W = 0 rung; PR #7393.
 
 ## Negative results
