@@ -1,34 +1,33 @@
 {
   "d": 25,
   "d_exact": false,
-  "d_lower": 16,
-  "ladder": {
-    "budget_per_side": 120.0
-  },
+  "d_lower": 19,
+  "encoding": "css-sides",
+  "logical_classes": 8,
   "name": "[[717,8,25]] five-qubit reduction of planar tile code",
   "sides": {
     "X": {
       "exact": false,
-      "note": "lower bound 16",
-      "proved_min": 16,
-      "secs": 25.9,
+      "note": "lower bound 20 after 1200.0 s",
+      "proved_min": 20,
+      "secs": 1200.1,
       "status": "TIMEOUT",
       "value": 25
     },
     "Z": {
       "exact": false,
-      "note": "lower bound 16",
-      "proved_min": 16,
-      "secs": 25.9,
+      "note": "lower bound 19 after 1200.0 s",
+      "proved_min": 19,
+      "secs": 1200.0,
       "status": "TIMEOUT",
       "value": 25
     }
   },
-  "solver": "QEDist 0.1 aeb7006147b7 (yeon-lee/QEDist) exhaustive search",
-  "tlim_per_solve": 120.0,
+  "solver": "tropidist b03ec2d4077f (arXiv:2611.08247) exhaustive search",
+  "tlim_per_solve": 1200.0,
   "verification": {
     "checks_sha256": "c06e61c6ae88df84af133ecbd17e2477ea80e6b5a0dafa6b7dd2d5d1d87a50e5",
     "level": "solver",
-    "note": "QEDist's lower bound is exhaustive search inside its kernel (tree search with bounds and symmetries); the vector it returned was re-verified by verify/heuristic_distance.py. Solver verdict only. No symmetry generators supplied."
+    "note": "tropidist's lower bound is exhaustion inside its kernel (cut-rank dynamic program, weight-truncated DP, weight-bounded search; completeness proved in the paper, no replayable artifact), so this is a solver verdict; the vector it returned was re-verified by verify/heuristic_distance.py"
   }
 }

@@ -1,34 +1,33 @@
 {
   "d": 64,
   "d_exact": false,
-  "d_lower": 15,
-  "ladder": {
-    "budget_per_side": 120.0
-  },
+  "d_lower": 18,
+  "encoding": "css-sides",
+  "logical_classes": 170,
   "name": "[[674,170,d<=64]] Z_337 cyclic-ideal generalized-bicycle code",
   "sides": {
     "X": {
       "exact": false,
-      "note": "lower bound 15",
-      "proved_min": 15,
-      "secs": 7.7,
+      "note": "lower bound 18 after 3600.0 s",
+      "proved_min": 18,
+      "secs": 3600.1,
       "status": "TIMEOUT",
       "value": 64
     },
     "Z": {
       "exact": false,
-      "note": "lower bound 15",
-      "proved_min": 15,
-      "secs": 7.7,
+      "note": "lower bound 18 after 3600.0 s",
+      "proved_min": 18,
+      "secs": 3600.1,
       "status": "TIMEOUT",
       "value": 64
     }
   },
-  "solver": "QEDist 0.1 aeb7006147b7 (yeon-lee/QEDist) exhaustive search",
-  "tlim_per_solve": 120.0,
+  "solver": "tropidist b03ec2d4077f (arXiv:2611.08247) exhaustive search",
+  "tlim_per_solve": 3600.0,
   "verification": {
     "checks_sha256": "b6ccfb00aa0781202122a40af4535467bd14b6ee5e357d8d8a2afe2c11313f5d",
     "level": "solver",
-    "note": "QEDist's lower bound is exhaustive search inside its kernel (tree search with bounds and symmetries); the vector it returned was re-verified by verify/heuristic_distance.py. Solver verdict only. 1 Tanner-graph symmetry generators supplied and verified by the tool."
+    "note": "tropidist's lower bound is exhaustion inside its kernel (cut-rank dynamic program, weight-truncated DP, weight-bounded search; completeness proved in the paper, no replayable artifact), so this is a solver verdict; the vector it returned was re-verified by verify/heuristic_distance.py"
   }
 }
