@@ -14005,7 +14005,7 @@
       "n": 152,
       "k": 42,
       "d": 8,
-      "tier": "ub",
+      "tier": "exact",
       "code_type": "CSS"
     },
     {
@@ -15213,7 +15213,7 @@
       "n": 176,
       "k": 48,
       "d": 10,
-      "tier": "ub",
+      "tier": "exact",
       "code_type": "CSS"
     },
     {
@@ -15517,7 +15517,7 @@
       "n": 180,
       "k": 42,
       "d": 12,
-      "tier": "ub",
+      "tier": "exact",
       "code_type": "CSS"
     },
     {
@@ -16333,7 +16333,7 @@
       "n": 196,
       "k": 28,
       "d": 10,
-      "tier": "ub",
+      "tier": "exact",
       "code_type": "CSS"
     },
     {
@@ -22285,7 +22285,7 @@
       "n": 360,
       "k": 94,
       "d": 14,
-      "tier": "ub",
+      "tier": "exact",
       "code_type": "CSS"
     },
     {
