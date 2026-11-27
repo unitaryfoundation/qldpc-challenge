@@ -317,7 +317,7 @@
   "construction": "Priced construction calculus E-PEEL of codes/35-8-5.json ([[35,8,5]], max check weight 8; itself Mathys Rennela's priced-calculus E-PEEL of codes/36-8-6.json, a generalized bicycle code reconstructed from qecdb record 67a542959d65c7b409826a52): delete qubit 20 (0-based index in the parent file) together with its unique Z check b11, and relabel the surviving qubits in increasing order of their parent indices. Consumer: github.com/unitaryfoundation/code-calculus @ 1b9a942, machine/priced_calculus.py.",
   "references": [],
   "date": "2026-11-04",
-  "notes": "Single-step priced-calculus E-PEEL child of board entry 35-8-5. verify/validate_candidate.py found no board entry sharing this code's fingerprint or Weisfeiler-Leman signature, local-Hadamard images included.",
+  "notes": "Single-step priced-calculus E-PEEL child of board entry 35-8-5. verify/validate_candidate.py found no board entry sharing this code's fingerprint or Weisfeiler-Leman signature, local-Hadamard images included. Layout added 2026-11-17 by @vprusso: bilayer coordinates with interaction radius 4.0 (research/local2d/layout_sweep.py, fold stage).",
   "model": "Claude Fable 5.1",
   "origin": "submission",
   "search_budget": {
@@ -358,6 +358,155 @@
    ],
    "date": "2026-11-18",
    "method": "circuit_autogen schedule search (two-block interleaved, then layout, then generic), verified by verify/circuit_verify.py before writing"
+  }
+ },
+ "locality": {
+  "coordinates": [
+   [
+    1.0,
+    1.0
+   ],
+   [
+    2.0,
+    3.0
+   ],
+   [
+    2.0,
+    2.0
+   ],
+   [
+    3.0,
+    3.0
+   ],
+   [
+    1.0,
+    2.0
+   ],
+   [
+    3.0,
+    1.0
+   ],
+   [
+    4.0,
+    2.0
+   ],
+   [
+    2.0,
+    3.0
+   ],
+   [
+    2.0,
+    0.0
+   ],
+   [
+    1.0,
+    3.0
+   ],
+   [
+    1.0,
+    4.0
+   ],
+   [
+    0.0,
+    1.0
+   ],
+   [
+    2.0,
+    4.0
+   ],
+   [
+    2.0,
+    2.0
+   ],
+   [
+    1.0,
+    0.0
+   ],
+   [
+    0.0,
+    2.0
+   ],
+   [
+    0.0,
+    1.0
+   ],
+   [
+    0.0,
+    2.0
+   ],
+   [
+    3.0,
+    3.0
+   ],
+   [
+    1.0,
+    3.0
+   ],
+   [
+    1.0,
+    1.0
+   ],
+   [
+    3.0,
+    1.0
+   ],
+   [
+    4.0,
+    2.0
+   ],
+   [
+    2.0,
+    1.0
+   ],
+   [
+    2.0,
+    0.0
+   ],
+   [
+    1.0,
+    2.0
+   ],
+   [
+    1.0,
+    4.0
+   ],
+   [
+    0.0,
+    3.0
+   ],
+   [
+    0.0,
+    3.0
+   ],
+   [
+    2.0,
+    4.0
+   ],
+   [
+    3.0,
+    2.0
+   ],
+   [
+    1.0,
+    0.0
+   ],
+   [
+    3.0,
+    2.0
+   ],
+   [
+    2.0,
+    1.0
+   ]
+  ],
+  "layers": 2,
+  "interaction_radius": 4.0,
+  "contributed_by": {
+   "by": [
+    "@vprusso"
+   ],
+   "date": "2026-11-17",
+   "method": "fold_layout.anneal on a 5 x 5 integer grid, 2 per site, seed 5, 100000 iterations (research/local2d/layout_sweep.py)"
   }
  }
 }
