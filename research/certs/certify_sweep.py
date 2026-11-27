@@ -287,6 +287,14 @@ def select(
         if not os.path.exists(os.path.join(codes_dir, slug + ".json")):
             skip(slug, "not_on_board", "no codes/ file: the queue is older than the board")
             continue
+        if r.get("d") is not None and int(r["d"]) < 2:
+            # d = 1 is a placeholder distance (TRACKS.md): the claim is a
+            # weight-1 logical, so there is no W = d - 1 >= 1 to ask about,
+            # the ladder has no rung, and a record written for it carries
+            # W = 0, which the certificate schema refuses (the certify-weekly
+            # runs of 2026-11-09 to 2026-11-23 failed on exactly that).
+            skip(slug, "d_one", "d = 1: nothing to certify below the claim")
+            continue
         on_file = _cert_on_file(certs_dir, slug)
         if on_file is not None and (on_file.get("d_exact") or not on_file.get("d_lower")):
             skip(slug, "certified", "certs/ already has a file for it")

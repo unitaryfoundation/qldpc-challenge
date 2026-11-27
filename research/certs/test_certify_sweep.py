@@ -50,7 +50,8 @@ def _write(path, obj):
 def test_selection_skips_what_the_sweep_cannot_use(tmp_path):
     S = _script()
     codes, certs = str(tmp_path / "codes"), str(tmp_path / "certs")
-    for slug in ("plain", "filed", "mismatch", "timed", "errored", "refuted", "landed", "stale", "stab", "short"):
+    slugs = ("plain", "filed", "mismatch", "timed", "errored", "refuted", "landed", "stale", "stab", "short", "one")
+    for slug in slugs:
         _write(os.path.join(codes, slug + ".json"), {"n": 12})
     _write(os.path.join(certs, "filed.json"), {"d_exact": True})
     queue = {
@@ -65,6 +66,7 @@ def test_selection_skips_what_the_sweep_cannot_use(tmp_path):
             _row("stale"),
             _row("gone"),
             _row("short"),
+            _row("one", d=1, x=1, z=1),
             _row("plain"),
         ]
     }
@@ -89,8 +91,12 @@ def test_selection_skips_what_the_sweep_cannot_use(tmp_path):
         "refuted": 1,
         "awaiting_pr": 1,
         "not_on_board": 1,
+        "d_one": 1,
     }
     assert "differ from d" in reasons["mismatch"] and "timeout at 600" in reasons["timed"]
+    # a d = 1 placeholder has no W = d - 1 to ask about: the weekly runs of
+    # November 2026 failed on the W = 0 rung such an entry produced
+    assert "d = 1" in reasons["one"]
     # --retry reopens what timed out or errored, never what was refuted or already certified
     chosen, skipped, _ = S.select(queue, last=last, tlim=600, certs_dir=certs, codes_dir=codes, retry=True, today=today)
     assert [r["slug"] for r in chosen] == ["timed", "errored", "stale", "short", "plain"]
@@ -365,7 +371,7 @@ def test_a_real_certificate_on_a_tiny_board_entry_passes_the_certificate_checker
         for r in queue["entries"]
         if r["code_type"] == "CSS"
         and r["n"] <= 20
-        and r["d"] <= 3
+        and 2 <= r["d"] <= 3
         and all(v["value"] == r["d"] for v in r["sides"].values())
         and os.path.exists(os.path.join(_ROOT, "codes", r["slug"] + ".json"))
     ]
