@@ -1,6 +1,10 @@
 # Agent guide
 
 This repo is a public, automatically verified leaderboard for quantum LDPC (qLDPC) codes.
+
+**Submitting a code?** Read [`SUBMIT.md`](SUBMIT.md) first — it is the compact, machine-oriented
+spec (one command, `--json` mode, pre-push checklist, common failure modes). The long-form
+rules below and in `CONTRIBUTING.md` are the source of truth; `SUBMIT.md` is the short view.
 The `verify/` stack machine-checks submissions; `research/` is a starter kit for constructing
 and searching for new codes.
 

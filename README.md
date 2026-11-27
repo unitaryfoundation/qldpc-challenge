@@ -42,6 +42,7 @@ See [`AGENTS.md`](AGENTS.md) for the precedence rule.
 |---|---|
 | Submit a code you already have | [`CONTRIBUTING.md`](CONTRIBUTING.md) — one command: `./qldpc submit` |
 | Have an LLM find and submit a code on your behalf | [Contribute with an LLM](CONTRIBUTING.md#contribute-with-an-llm) (a ready-to-paste prompt) |
+| Submitting from an agent / harness (compact spec) | [`SUBMIT.md`](SUBMIT.md) — one command, machine mode, pre-push checklist |
 | Have an agent search without publishing | [`research/AUTORESEARCH.md`](research/AUTORESEARCH.md) (stage-only research workflow) |
 | See which track cells are open right now | one command: `./qldpc targets` (add `--n 200` for what a code that size needs, `--claim <cell>` to note where you are aiming) |
 | Get one snapshot of a cell before searching it | `./qldpc brief --cell weight-6/unrestricted --family <tag>`: frontier and bar, what was screened, what landed, the fieldnotes |
