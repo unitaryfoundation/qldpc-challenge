@@ -14,6 +14,16 @@ Fast path (code tier only, no circuit search, no accelerator tightening):
 ./qldpc submit code.npz --authors @yourhandle --no-circuit --fast-trials 0 --json
 ```
 
+## Performance notes
+
+- First run on a fresh worktree loads the board (~minutes, ~4s warm). The
+  per-entry memo lives inside the checkout; `./qldpc targets`/`submit` print
+  the measured time so you can tell warm from cold.
+- A full checkout is ~8 GB (mostly `circuits/`). Use the sparse checkout in
+  AGENTS.md; the pre-commit hook needs the full tree (`.github/`) to run the
+  validator-integrity check.
+- Machine mode: pass `--json`. Errors carry a `hint` with the exact rerun command.
+
 `code.npz` holds `hx`, `hz` (dense 0/1 or scipy sparse). For stabilizer codes use key `s` (or `a`,`b`). The command computes n,k,d, finds the distance witness, runs the verifier, writes `codes/<n>-<k>-<d>.json`, drafts the PR body, and prints a JSON record on stdout (human prose on stderr).
 
 Machine mode: always pass `--json`. Exit code 0 = success. On failure, `res.error` names the stage, the failed checks, and a `hint` with the exact rerun command; fix and rerun, do not parse prose.
