@@ -1,0 +1,25 @@
+{
+  "d": 13,
+  "d_exact": false,
+  "d_lower": 9,
+  "encoding": "pauli-mechanisms",
+  "logical_classes": 59,
+  "name": "[[168,59,13]] reversing-fold CPM pair-partition, (J,L)=(4,12), P=28",
+  "sides": {
+    "P": {
+      "exact": false,
+      "note": "lower bound 9 after 2.0 s",
+      "proved_min": 9,
+      "secs": 2.0,
+      "status": "TIMEOUT",
+      "value": 13
+    }
+  },
+  "solver": "tropidist b03ec2d4077f (arXiv:2611.08247) exhaustive search",
+  "tlim_per_solve": 2.0,
+  "verification": {
+    "checks_sha256": "d29cfac6f49965be1fc203349d919207e48dc23f7e1d9956308023dd84ae08da",
+    "level": "solver",
+    "note": "tropidist's lower bound is exhaustion inside its kernel (cut-rank dynamic program, weight-truncated DP, weight-bounded search; completeness proved in the paper, no replayable artifact), so this is a solver verdict; the vector it returned was re-verified by verify/heuristic_distance.py"
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "d": 12,
+  "d_exact": false,
+  "d_lower": 10,
+  "encoding": "pauli-mechanisms",
+  "logical_classes": 49,
+  "name": "[[188,49,12]] plain-fold CPM pair-partition, (J,L)=(3,8), P=47",
+  "sides": {
+    "P": {
+      "exact": false,
+      "note": "lower bound 10 after 2.0 s",
+      "proved_min": 10,
+      "secs": 2.0,
+      "status": "TIMEOUT",
+      "value": 12
+    }
+  },
+  "solver": "tropidist b03ec2d4077f (arXiv:2611.08247) exhaustive search",
+  "tlim_per_solve": 2.0,
+  "verification": {
+    "checks_sha256": "0e9f12973230c71f626cdfcfbb4ccb8ab7e09cd01d54f6a8cfac1197c83f1f1b",
+    "level": "solver",
+    "note": "tropidist's lower bound is exhaustion inside its kernel (cut-rank dynamic program, weight-truncated DP, weight-bounded search; completeness proved in the paper, no replayable artifact), so this is a solver verdict; the vector it returned was re-verified by verify/heuristic_distance.py"
+  }
+}
