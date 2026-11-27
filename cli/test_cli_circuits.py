@@ -126,3 +126,15 @@ def test_pr_body_states_the_circuit_tier():
     assert "- Circuit tier: d_circ <= 2 (X 2, Z 2) at rounds 2" in body
     assert "`circuits/12-4-2/`" in body
     assert "- [x] `python verify/circuit_verify.py codes/12-4-2.json` passes locally" in body
+
+
+def test_the_default_circuit_cap_is_the_gates(capsys):
+    """--circuit-seconds defaults to the gate's own wall-clock cap, read from it (issue #7383)."""
+    from gate_changed import _circuit_budget
+
+    _, cap = _circuit_budget(1, True)
+    assert cap == 180.0, "the gate's cap moved; the help text below should say so too"
+    with pytest.raises(SystemExit):
+        qldpc.main(["submit", "--help"])
+    out = capsys.readouterr().out
+    assert f"(default {cap:g}, the CI gate's own cap" in " ".join(out.split())
