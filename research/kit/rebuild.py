@@ -25,17 +25,28 @@ for p in (_HERE, os.path.join(_ROOT, "verify")):
         sys.path.insert(0, p)
 
 
-def rebuild(constructor, params):
-    """Call ``<module>.<function>(**params)`` from research/kit; return (HX, HZ)."""
-    if "." not in constructor:
+def resolve(constructor):
+    """Return the callable ``<module>.<function>`` names under research/kit, or raise ValueError saying why not.
+
+    The check promote.py runs before it commits a manifest (issue #7443): a
+    constructor that does not resolve here cannot be replayed by
+    ``qldpc reproduce --construction`` either.
+    """
+    if not isinstance(constructor, str) or "." not in constructor:
         raise ValueError("constructor must be '<module>.<function>'")
     mod_name, fn_name = constructor.rsplit(".", 1)
     if not mod_name.replace("_", "").isalnum() or not os.path.exists(os.path.join(_HERE, mod_name + ".py")):
         raise ValueError(f"constructor module {mod_name!r} is not a module under research/kit")
     mod = importlib.import_module(mod_name)
     fn = getattr(mod, fn_name, None)
-    if fn is None:
+    if fn is None or not callable(fn):
         raise ValueError(f"{mod_name} has no function {fn_name}")
+    return fn
+
+
+def rebuild(constructor, params):
+    """Call ``<module>.<function>(**params)`` from research/kit; return (HX, HZ)."""
+    fn = resolve(constructor)
     HX, HZ = fn(**params)
     HX = np.asarray(HX, dtype=np.int8) % 2
     HZ = np.asarray(HZ, dtype=np.int8) % 2

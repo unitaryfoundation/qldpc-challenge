@@ -356,11 +356,9 @@ def save_submission(doc, path, *, on_collision="error", preflight=True, spec=Non
     # A submission is one file, codes/<slug>.json. A directory or a nested path
     # is a packaging mistake (issue #3810 / PR 6849) and must never be written.
     if os.path.isdir(path):
-        raise ValueError(f"{path} is a directory; a code submission must be a "
-                         "single file codes/<slug>.json")
+        raise ValueError(f"{path} is a directory; a code submission must be a single file codes/<slug>.json")
     if not str(path).endswith(".json"):
-        raise ValueError(f"{path} must end in .json; a code submission is a "
-                         "single file codes/<slug>.json")
+        raise ValueError(f"{path} must end in .json; a code submission is a single file codes/<slug>.json")
     if on_collision == "error" and os.path.exists(path) and not holds_same_candidate(path, doc):
         raise CandidateCollision(
             f"{path} already holds a different candidate. Overwriting it would "
@@ -458,16 +456,38 @@ def recipe_from_spec(spec):
     return {"constructor": c, "params": p}
 
 
-def write_repro_manifest(doc, slug, spec, *, repro_dir, artifact_path=None, budget_seconds=300, notes=""):
-    """Write <repro_dir>/<slug>.json. Construction stage runs rebuild.py with
-    the recipe from spec, or is declared not_reproducible; other stages follow
-    what the entry carries. Returns the path.
-    """
-    import hashlib
+def external_source(spec):
+    """Return the ``{repo, commit}`` pin a spec records for code outside this repository, or None.
 
+    A spec whose constructor lives elsewhere (a planner in another repository,
+    a solver) names it under ``source``; the manifest then says the
+    construction is not replayable by the kit and says by what it was built.
+    """
+    src = (spec or {}).get("source") if isinstance(spec, dict) else None
+    if not isinstance(src, dict):
+        return None
+    repo, commit = src.get("repo"), src.get("commit")
+    if not isinstance(repo, str) or not repo or not isinstance(commit, str):
+        return None
+    if not re.fullmatch(r"[0-9a-f]{7,64}", commit):
+        return None
+    return {"repo": repo, "commit": commit}
+
+
+def construction_stage(spec, *, budget_seconds=300):
+    """Return the manifest's construction stage for a spec.
+
+    ``applicable`` with the rebuild.py arguments when the spec carries a
+    ``{constructor, params}`` recipe the kit can replay; otherwise
+    ``not_reproducible`` with the reason: the external source the spec pins,
+    or the absence of a recipe. Whether a named constructor actually resolves
+    under research/kit is promote.py's refusal (issue #7443); this writes
+    what the spec says.
+    """
     recipe = recipe_from_spec(spec)
-    if recipe:
-        construction = {
+    pin = external_source(spec)
+    if recipe and pin is None:
+        return {
             "status": "applicable",
             "script": "research/kit/rebuild.py",
             "args": [
@@ -478,11 +498,27 @@ def write_repro_manifest(doc, slug, spec, *, repro_dir, artifact_path=None, budg
             ],
             "budget_seconds": int(budget_seconds),
         }
-    else:
-        construction = {
+    if pin is not None:
+        what = f"{recipe['constructor']} of " if recipe else ""
+        return {
             "status": "not_reproducible",
-            "reason": "the spec recorded for this entry carries no {constructor, params} recipe the kit can replay",
+            "reason": f"built by {what}{pin['repo']} @ {pin['commit']}, which the kit has no replay for; "
+            "the pin is the reproduction",
         }
+    return {
+        "status": "not_reproducible",
+        "reason": "the spec recorded for this entry carries no {constructor, params} recipe the kit can replay",
+    }
+
+
+def write_repro_manifest(doc, slug, spec, *, repro_dir, artifact_path=None, budget_seconds=300, notes=""):
+    """Write <repro_dir>/<slug>.json. Construction stage runs rebuild.py with
+    the recipe from spec, or is declared not_reproducible; other stages follow
+    what the entry carries. Returns the path.
+    """
+    import hashlib
+
+    construction = construction_stage(spec, budget_seconds=budget_seconds)
     circ = doc.get("circuit") or {}
     stages = {
         "verify": {"status": "applicable"},

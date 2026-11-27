@@ -21,6 +21,7 @@ about this module and not about what happens to be on the board that day; the
 verifier and its refutation are the real ones throughout.
 """
 
+import glob
 import json
 import os
 import subprocess
@@ -243,8 +244,11 @@ def test_equivalence_box_is_ticked_from_the_gates_own_dedup():
 
 def test_wl_equivalent_peer_without_a_note_is_a_blocker(monkeypatch):
     # the audit did not decide the pair, so the human rule applies (issue #6186)
-    monkeypatch.setattr(P.equivalence, "decide_pair", lambda d, s, root=None: {
-        "against": "72-12-6", "verdict": "undecided", "reason": "over budget"})
+    monkeypatch.setattr(
+        P.equivalence,
+        "decide_pair",
+        lambda d, s, root=None: {"against": "72-12-6", "verdict": "undecided", "reason": "over budget"},
+    )
     ticked, reason = P.equivalence_finding(
         _verdict({"exact_duplicate_of": None, "wl_equivalent_of": "72-12-6.json"}), _doc()
     )
@@ -253,8 +257,11 @@ def test_wl_equivalent_peer_without_a_note_is_a_blocker(monkeypatch):
 
 
 def test_wl_equivalent_peer_with_a_note_is_ticked(monkeypatch):
-    monkeypatch.setattr(P.equivalence, "decide_pair", lambda d, s, root=None: {
-        "against": "72-12-6", "verdict": "undecided", "reason": "over budget"})
+    monkeypatch.setattr(
+        P.equivalence,
+        "decide_pair",
+        lambda d, s, root=None: {"against": "72-12-6", "verdict": "undecided", "reason": "over budget"},
+    )
     doc = _doc()
     doc["provenance"]["notes"] = "Compared against 72-12-6.json; different code."
     ticked, reason = P.equivalence_finding(
@@ -268,28 +275,46 @@ def test_an_exhibited_permutation_refuses_the_candidate_even_with_a_note(monkeyp
     """Issue #6186: the audit decides the WL flag; a permutation means it is that code."""
     doc = _doc()
     doc["provenance"]["notes"] = "Compared against 72-12-6.json; different code."
-    monkeypatch.setattr(P.equivalence, "decide_pair", lambda d, s, root=None: {
-        "against": "72-12-6", "verdict": "equivalent", "found_by": "tanner",
-        "permutation": list(range(d["n"]))})
+    monkeypatch.setattr(
+        P.equivalence,
+        "decide_pair",
+        lambda d, s, root=None: {
+            "against": "72-12-6",
+            "verdict": "equivalent",
+            "found_by": "tanner",
+            "permutation": list(range(d["n"])),
+        },
+    )
     ticked, reason = P.equivalence_finding(
-        _verdict({"exact_duplicate_of": None, "wl_equivalent_of": "72-12-6.json"}), doc)
+        _verdict({"exact_duplicate_of": None, "wl_equivalent_of": "72-12-6.json"}), doc
+    )
     assert not ticked
     assert "permutation" in reason and "72-12-6" in reason and "withdraw" in reason
 
 
 def test_a_separating_invariant_ticks_the_box_without_a_note(monkeypatch):
-    monkeypatch.setattr(P.equivalence, "decide_pair", lambda d, s, root=None: {
-        "against": "72-12-6", "verdict": "inequivalent",
-        "reason": "hull_X differs in both orientations"})
+    monkeypatch.setattr(
+        P.equivalence,
+        "decide_pair",
+        lambda d, s, root=None: {
+            "against": "72-12-6",
+            "verdict": "inequivalent",
+            "reason": "hull_X differs in both orientations",
+        },
+    )
     ticked, reason = P.equivalence_finding(
-        _verdict({"exact_duplicate_of": None, "wl_equivalent_of": "72-12-6.json"}), _doc())
+        _verdict({"exact_duplicate_of": None, "wl_equivalent_of": "72-12-6.json"}), _doc()
+    )
     assert ticked
     assert "permutation_audit" in reason and "hull_X differs" in reason
 
 
 def test_an_undecided_pair_keeps_the_notes_rule(monkeypatch):
-    monkeypatch.setattr(P.equivalence, "decide_pair", lambda d, s, root=None: {
-        "against": "72-12-6", "verdict": "undecided", "reason": "over budget"})
+    monkeypatch.setattr(
+        P.equivalence,
+        "decide_pair",
+        lambda d, s, root=None: {"against": "72-12-6", "verdict": "undecided", "reason": "over budget"},
+    )
     verdict = _verdict({"exact_duplicate_of": None, "wl_equivalent_of": "72-12-6.json"})
     ticked, reason = P.equivalence_finding(verdict, _doc())
     assert not ticked and "72-12-6.json" in reason
@@ -300,12 +325,13 @@ def test_an_undecided_pair_keeps_the_notes_rule(monkeypatch):
 
 
 def test_a_precomputed_record_is_used_without_deciding_again(monkeypatch):
-    monkeypatch.setattr(P.equivalence, "decide_pair",
-                        lambda *a, **k: (_ for _ in ()).throw(AssertionError("decided twice")))
+    monkeypatch.setattr(
+        P.equivalence, "decide_pair", lambda *a, **k: (_ for _ in ()).throw(AssertionError("decided twice"))
+    )
     audit = {"against": "72-12-6", "verdict": "inequivalent", "reason": "low_X differs"}
     ticked, reason = P.equivalence_finding(
-        _verdict({"exact_duplicate_of": None, "wl_equivalent_of": "72-12-6.json"}), _doc(),
-        audit=audit)
+        _verdict({"exact_duplicate_of": None, "wl_equivalent_of": "72-12-6.json"}), _doc(), audit=audit
+    )
     assert ticked and "low_X differs" in reason
 
 
@@ -842,3 +868,108 @@ def test_build_doc_omits_harness_without_tools_harness():
     facts = P.ladder_facts(SETTLED, 6)
     doc = P.build_doc(_doc(), ev, facts, authors=["@tester"])
     assert "harness" not in doc["provenance"]
+
+
+# ------------------------------------------------- the recipe round trip (#7443)
+
+
+def test_a_constructor_the_kit_cannot_import_is_refused_unless_pinned_elsewhere(tmp_path, monkeypatch):
+    monkeypatch.setattr(P.gate, "validate_candidate", _passing_verdict)
+    root = _farm(tmp_path)
+    foreign = {"constructor": "planner.plan", "params": {"operation": {"op": "E-PUNCTURE", "qubit": 3}}}
+    rep = P.promote(_doc(), _evidence(), recipe=foreign, root=root, write=False)
+    assert not rep["ok"]
+    assert any("does not resolve under research/kit" in b and "source" in b for b in rep["blocked_by"])
+    assert "validate_candidate" not in rep["gates"], "the recipe is checked before the gate is paid for"
+    pinned = dict(foreign, source={"repo": "github.com/MathysRennela/code-calculus-dev", "commit": "830767f96aa3"})
+    rep = P.promote(_doc(), _evidence(), recipe=pinned, root=root, body_dir=str(tmp_path / "bodies"))
+    assert rep["ok"], rep["blocked_by"]
+    assert rep["recipe"]["construction"]["status"] == "not_reproducible"
+    with open(os.path.join(root, rep["files"]["repro"]), encoding="utf-8") as f:
+        m = json.load(f)
+    assert "code-calculus-dev @ 830767f96aa3" in m["stages"]["construction"]["reason"]
+    assert m["spec_context"]["source"] == pinned["source"]
+    assert P.validate_repro_manifest(os.path.join(root, rep["files"]["repro"])) == []
+    with open(rep["body_file"], encoding="utf-8") as f:
+        assert (
+            "declared not reproducible: built by planner.plan of github.com/MathysRennela/code-calculus-dev" in f.read()
+        )
+
+
+def test_a_malformed_source_pin_is_refused():
+    bad = dict(RECIPE_72, source={"repo": "github.com/x/y", "commit": "not-hex"})
+    assert any("source must be" in b for b in P.recipe_blockers(bad, _doc(), root=ROOT))
+
+
+@pytest.mark.parametrize(
+    "params,needle",
+    [
+        ({"model_path": "research/candidates/run/sat/models/5x5.json"}, "gitignored working output"),
+        ({"model_path": "research/kit/no-such-model.json"}, "does not exist in the tree"),
+        ({"table": "research/kit/groups/smallgroup_64_47.json"}, None),
+    ],
+)
+def test_a_path_parameter_must_be_committed_in_the_tree(params, needle):
+    recipe = {"constructor": "bb.build_bb", "params": {**RECIPE_72["params"], **params}, "family": "bivariate-bicycle"}
+    problems = P.recipe_blockers(recipe, _doc(), root=ROOT)
+    path_problems = [b for b in problems if "params." in b]
+    if needle is None:
+        # a committed path raises no path problem; the round trip itself then
+        # fails, since build_bb takes no `table`, and that is the next check's business
+        assert path_problems == [], problems
+    else:
+        assert any(needle in b for b in path_problems), problems
+
+
+def test_an_uncommitted_path_parameter_is_refused(tmp_path):
+    stray = os.path.join(ROOT, "research", "kit", "stray-recipe-input-7443.json")
+    with open(stray, "w", encoding="utf-8") as f:
+        f.write("{}\n")
+    try:
+        recipe = {
+            "constructor": "bb.build_bb",
+            "params": {**RECIPE_72["params"], "aux": "research/kit/stray-recipe-input-7443.json"},
+        }
+        problems = P.recipe_blockers(recipe, _doc(), root=ROOT)
+    finally:
+        os.remove(stray)
+    assert any("not committed" in b and "#3810" in b for b in problems), problems
+
+
+def test_a_commit_parameter_must_be_hex_and_known_or_pinned_to_its_repository():
+    base = {"constructor": "bb.build_bb", "params": dict(RECIPE_72["params"])}
+    assert any(
+        "not a hex commit" in b
+        for b in P.recipe_blockers({**base, "params": {**base["params"], "parent_commit": "v1.2"}}, _doc(), root=ROOT)
+    )
+    unknown = {**base, "params": {**base["params"], "parent_commit": "f" * 40}}
+    assert any("not in this repository's history" in b for b in P.recipe_blockers(unknown, _doc(), root=ROOT))
+    pinned = dict(unknown, source={"repo": "github.com/x/y", "commit": "f" * 40})
+    # an external pin makes the manifest not_reproducible and asks nothing of this repository's history
+    assert P.recipe_blockers(pinned, _doc(), root=ROOT) == []
+    assert P.construction_stage(pinned)["status"] == "not_reproducible"
+
+
+def test_a_recipe_that_rebuilds_another_code_does_not_round_trip():
+    other = {
+        "constructor": "bb.build_bb",
+        "params": {"l": 6, "m": 6, "A_terms": [[3, 0], [0, 1], [0, 2]], "B_terms": [[0, 3], [1, 0], [2, 1]]},
+    }
+    problems = P.recipe_blockers(other, _doc(), root=ROOT)
+    assert len(problems) == 1 and "does not round-trip" in problems[0] and "different code" in problems[0], problems
+    assert P.recipe_blockers(RECIPE_72, _doc(), root=ROOT) == []
+
+
+def test_no_recipe_and_a_recipe_without_a_constructor_are_not_blockers():
+    assert P.recipe_blockers(None, _doc(), root=ROOT) == []
+    assert P.recipe_blockers({"note": "hand-built"}, _doc(), root=ROOT) == []
+    assert any(
+        "not '<module>.<function>'" in b
+        for b in P.recipe_blockers({"constructor": "bb", "params": {}}, _doc(), root=ROOT)
+    )
+
+
+@pytest.mark.parametrize("path", sorted(glob.glob(os.path.join(ROOT, "repro", "*.json"))))
+def test_every_committed_manifest_validates(path):
+    """The manifest schema is the contract qldpc reproduce reads; every committed manifest meets it."""
+    assert P.validate_repro_manifest(path) == []

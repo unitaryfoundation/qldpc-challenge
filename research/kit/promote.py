@@ -67,6 +67,7 @@ import copy
 import datetime
 import json
 import os
+import re
 import shlex
 import subprocess
 import sys
@@ -80,14 +81,27 @@ for _rel in ("verify", "site", "cli", os.path.join("research", "kit")):
     if _p not in sys.path:
         sys.path.insert(0, _p)
 
+import check_prose  # noqa: E402
 import equivalence  # noqa: E402
 import escalation  # noqa: E402
 import frontier  # noqa: E402
 import peer_audit  # noqa: E402
 import qldpc as cli  # noqa: E402
 import qldpc_verify  # noqa: E402
+import rebuild  # noqa: E402
 import validate_candidate as gate  # noqa: E402
-from submit import read_recipe, recipe_from_spec, write_repro_manifest  # noqa: E402
+from submit import (  # noqa: E402
+    construction_stage,
+    external_source,
+    read_recipe,
+    recipe_from_spec,
+    write_repro_manifest,
+)
+
+try:
+    import jsonschema
+except ImportError:  # pragma: no cover
+    jsonschema = None
 
 REPORT_SCHEMA = "qldpc-promote/1"
 
@@ -589,6 +603,7 @@ def pr_body(
     note_rel,
     repro_rel=None,
     reproducible=False,
+    repro_reason=None,
     frontier_record=None,
     equivalence_record=None,
 ):
@@ -659,13 +674,199 @@ def pr_body(
                 "from its recipe with `research/kit/rebuild.py` and compares "
                 "fingerprints."
                 if reproducible
-                else "; its construction stage is declared not reproducible, since the "
-                "recorded spec carries no constructor and params for "
-                "`research/kit/rebuild.py` to run."
+                else "; its construction stage is declared not reproducible: "
+                + (
+                    repro_reason
+                    or "the recorded spec carries no constructor and params for `research/kit/rebuild.py` to run"
+                )
+                + "."
             ),
             "",
         ]
     return "\n".join(lines)
+
+
+# ----------------------------------------------------------------------------
+# the recipe round trip (issue #7443)
+#
+# A recipe becomes repro/<slug>.json, and that manifest is what a reviewer and
+# `qldpc reproduce --construction` run. A constructor the kit cannot import, a
+# parameter naming a file under gitignored staging output, or a commit this
+# repository does not have would be committed as evidence nobody can replay,
+# and the prose check would fail the note that cites it in CI. So before the
+# gate runs, the recipe is resolved the way the reproduction would resolve it,
+# the constructor is actually run and its fingerprint compared, and the written
+# manifest is validated against schema/reproduction.schema.json.
+
+RECIPE_ROUNDTRIP_SECONDS = 120
+REPRO_SCHEMA_PATH = os.path.join(_ROOT, "schema", "reproduction.schema.json")
+_COMMIT_KEY = re.compile(r"(^|_)commit$")
+_HEX_COMMIT = re.compile(r"^[0-9a-f]{7,64}$")
+
+
+def _recipe_strings(value, path=""):
+    """Yield ``(key path, string)`` for every string inside a nested recipe value."""
+    if isinstance(value, str):
+        yield path, value
+    elif isinstance(value, dict):
+        for k, v in value.items():
+            yield from _recipe_strings(v, f"{path}.{k}" if path else str(k))
+    elif isinstance(value, (list, tuple)):
+        for i, v in enumerate(value):
+            yield from _recipe_strings(v, f"{path}[{i}]")
+
+
+def _git(root, *args):
+    """Return ``(returncode, stdout)`` of a git command in ``root``, or ``(None, "")`` when git is unavailable."""
+    try:
+        run = subprocess.run(["git", *args], cwd=root, capture_output=True, text=True, check=False)
+    except (OSError, ValueError):
+        return None, ""
+    return run.returncode, run.stdout
+
+
+def _tracked(root, rel):
+    """Return True/False when git can say whether ``rel`` is committed in ``root``, None when it cannot."""
+    code, _ = _git(root, "rev-parse", "--is-inside-work-tree")
+    if code != 0:
+        return None
+    code, _ = _git(root, "ls-files", "--error-unmatch", "--", rel)
+    return code == 0
+
+
+def _commit_known(root, sha):
+    """Return True/False when git can say whether ``sha`` is in ``root``'s history, None when it cannot."""
+    code, _ = _git(root, "rev-parse", "--is-inside-work-tree")
+    if code != 0:
+        return None
+    code, _ = _git(root, "cat-file", "-e", f"{sha}^{{commit}}")
+    return code == 0
+
+
+def recipe_roundtrip(recipe, doc, *, root=_ROOT, budget_seconds=RECIPE_ROUNDTRIP_SECONDS):
+    """Rebuild the code from ``recipe`` the way ``qldpc reproduce`` does and return ``(ok, detail)``.
+
+    Runs ``research/kit/rebuild.py`` in a subprocess with the recipe's own
+    arguments and compares the fingerprint it prints with the fingerprint the
+    verifier computes for ``doc``, which is the comparison the reproduction
+    stage makes (row order is not part of it).
+    """
+    script = os.path.join(root, "research", "kit", "rebuild.py")
+    cmd = [
+        sys.executable,
+        script,
+        "--constructor",
+        recipe["constructor"],
+        "--params",
+        json.dumps(recipe["params"], separators=(",", ":")),
+    ]
+    try:
+        run = subprocess.run(cmd, cwd=root, capture_output=True, text=True, timeout=budget_seconds, check=False)
+    except subprocess.TimeoutExpired:
+        return False, f"research/kit/rebuild.py did not finish within {budget_seconds} s"
+    if run.returncode != 0:
+        return False, f"research/kit/rebuild.py exited {run.returncode}: {run.stderr.strip()[:300]}"
+    got = None
+    for line in (run.stdout or "").splitlines():
+        if line.strip().startswith("fingerprint="):
+            got = line.strip().split("=", 1)[1].strip()
+    want = (qldpc_verify.verify(doc, refute=False) or {}).get("fingerprint")
+    if got is None:
+        return False, "research/kit/rebuild.py printed no fingerprint= line"
+    if got != want:
+        return (
+            False,
+            f"the recipe rebuilt a different code (fingerprint {got[:16]} against the candidate's {str(want)[:16]})",
+        )
+    return True, "the recipe rebuilt the candidate's stabilizer code"
+
+
+def recipe_blockers(recipe, doc, *, root=_ROOT, budget_seconds=RECIPE_ROUNDTRIP_SECONDS):
+    """Return why ``recipe`` cannot become a committed manifest, empty when it can (issue #7443).
+
+    No recipe, or a spec without a constructor, is not a blocker: the manifest
+    then says ``not_reproducible``, which is honest. A spec that names a
+    constructor the kit cannot import is refused unless it pins the external
+    code under ``source`` (``{repo, commit}``), in which case the manifest
+    records that pin as the reproduction. A parameter naming a repository
+    path must exist in the tree, outside the gitignored directories, and be
+    committed (a submission PR carries only its own files, issue #3810). A
+    parameter or spec field named ``commit`` must be a hex commit, and one
+    with no repository named for it must be in this repository's history.
+    When the constructor resolves, the recipe is run and must rebuild the
+    candidate's code.
+    """
+    if not isinstance(recipe, dict):
+        return []
+    out = []
+    rec = recipe_from_spec(recipe)
+    pin = external_source(recipe)
+    constructor = recipe.get("constructor")
+    if constructor is not None and rec is None:
+        out.append(
+            f"the recipe's constructor {constructor!r} is not '<module>.<function>' with a params object; "
+            "fix the spec or drop the constructor so the manifest says not_reproducible"
+        )
+    if rec and pin is None:
+        try:
+            rebuild.resolve(rec["constructor"])
+        except (ValueError, ImportError, AttributeError) as e:
+            out.append(
+                f"the recipe's constructor {rec['constructor']!r} does not resolve under research/kit ({e}); "
+                "a manifest the kit cannot replay is not committed as applicable. If the code was built "
+                "by a tool outside this repository, pin it under the spec's source as {repo, commit} and "
+                "the manifest records that pin as the reproduction"
+            )
+    if "source" in recipe and pin is None:
+        out.append("the spec's source must be {repo, commit} with a hex commit of 7 to 64 characters")
+    for key, text in _recipe_strings(recipe.get("params") or {}):
+        if not check_prose.is_repo_pathish(text):
+            continue
+        bare = check_prose.strip_rel_prefix(text)
+        if bare.startswith(check_prose.GITIGNORED):
+            out.append(
+                f"params.{key} names {text}, gitignored working output nobody can open; commit what it "
+                "names under research/ in its own PR first, or put the data in the recipe itself"
+            )
+        elif not os.path.exists(os.path.join(root, bare)):
+            out.append(f"params.{key} names {text}, which does not exist in the tree")
+        elif _tracked(root, bare) is False:
+            out.append(
+                f"params.{key} names {text}, which exists but is not committed; a submission PR carries "
+                "only its own entry, note, manifest, and certificate (issue #3810), so commit it in its "
+                "own PR first"
+            )
+    for key, text in _recipe_strings(recipe):
+        leaf = key.rsplit(".", 1)[-1]
+        if not _COMMIT_KEY.search(leaf):
+            continue
+        if not _HEX_COMMIT.match(text):
+            out.append(f"{key} is {text!r}, not a hex commit")
+        elif pin is None and _commit_known(root, text) is False:
+            out.append(
+                f"{key} names commit {text[:12]}, which is not in this repository's history and names no "
+                "repository of its own; pin the repository under the spec's source as {repo, commit}"
+            )
+    if rec and pin is None and not out:
+        ok, detail = recipe_roundtrip(rec, doc, root=root, budget_seconds=budget_seconds)
+        if not ok:
+            out.append(f"the recipe does not round-trip: {detail}")
+    return out
+
+
+def validate_repro_manifest(path):
+    """Return the problems ``schema/reproduction.schema.json`` finds with the manifest at ``path``; empty when none."""
+    if jsonschema is None:  # pragma: no cover
+        return ["jsonschema is not installed, so the manifest could not be validated"]
+    with open(path, encoding="utf-8") as f:
+        manifest = json.load(f)
+    with open(REPRO_SCHEMA_PATH, encoding="utf-8") as f:
+        schema = json.load(f)
+    problems = []
+    for e in sorted(jsonschema.Draft202012Validator(schema).iter_errors(manifest), key=lambda e: list(e.path)):
+        where = "/".join(str(x) for x in e.absolute_path) or "(root)"
+        problems.append(f"{where}: {e.message}")
+    return problems
 
 
 # ----------------------------------------------------------------------------
@@ -812,6 +1013,12 @@ def promote(
             f"candidate's provenance.model ({prov_model!r}) "
             f"disagree; notes/TEMPLATE.md requires them to match"
         )
+    # The recipe round trip (issue #7443): the manifest this bundle would
+    # commit must resolve and rebuild the code before anything is written.
+    recipe_problems = recipe_blockers(recipe, candidate, root=root)
+    if recipe is not None:
+        report["recipe"] = {"ok": not recipe_problems, "construction": construction_stage(recipe)}
+    blocked.extend(recipe_problems)
     if blocked:
         return report
 
@@ -935,7 +1142,8 @@ def promote(
         code_rel=code_rel,
         note_rel=note_rel,
         repro_rel=repro_rel,
-        reproducible=recipe_from_spec(recipe) is not None,
+        reproducible=construction_stage(recipe)["status"] == "applicable" if recipe is not None else False,
+        repro_reason=construction_stage(recipe).get("reason") if recipe is not None else None,
         frontier_record=report["frontier"],
         equivalence_record=audit,
     )
@@ -956,7 +1164,16 @@ def promote(
         with open(note_path, "w", encoding="utf-8", newline="\n") as f:
             f.write(note_md)
         if repro_rel:
-            write_repro_manifest(doc, slug, recipe, repro_dir=os.path.join(root, "repro"), artifact_path=code_path)
+            manifest_path = write_repro_manifest(
+                doc, slug, recipe, repro_dir=os.path.join(root, "repro"), artifact_path=code_path
+            )
+            manifest_problems = validate_repro_manifest(manifest_path)
+            report["gates"]["repro_manifest"] = {"ok": not manifest_problems, "problems": manifest_problems}
+            if manifest_problems:
+                blocked.append(
+                    f"{repro_rel} does not validate against schema/reproduction.schema.json: "
+                    + "; ".join(manifest_problems)
+                )
         with open(body_file, "w", encoding="utf-8", newline="\n") as f:
             f.write(body)
         report["body_file"] = body_file
