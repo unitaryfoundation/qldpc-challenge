@@ -49,6 +49,10 @@
         }
       }
     },
+    "spec_context": {
+      "type": "object",
+      "description": "The screening spec's fields other than constructor and params, as research/kit/submit.write_repro_manifest keeps them (the family, a source pin for code outside this repository, a note): context for the reader, read by no stage."
+    },
     "notes": { "type": "string", "maxLength": 2000 }
   },
   "$defs": {
