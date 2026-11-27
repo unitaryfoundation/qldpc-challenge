@@ -299,3 +299,51 @@ def test_fold_rand_witness_matches_python_fold():
     w, v = res["P"]
     assert w == 7 and H.valid_pauli_logical(v, A, B)
     assert int(H.pauli_weight_rows(v[None, :], 17)[0]) == 7
+
+
+# -- the search replays byte for byte (issue #7452) ------------------------
+#
+# A refutation verdict names its seed so a run can be replayed, and the
+# validation gate's goldens hold verdicts computed with this module. These
+# pin the witness distance_rand_witness reports for fixed seeds on three
+# small CSS codes, one thread and three, so that a change to the elimination
+# or the random stream shows up here before it shows up in a golden. The
+# values were recorded with the column-by-column elimination this module
+# used before the Method of the Four Russians replaced it; the two produce
+# the same reduced row echelon form for the same permutation, which is the
+# argument the replacement rests on, and this is the check on it.
+
+
+def _hgp(H):
+    r, n = H.shape
+    I_r, I_n = np.eye(r, dtype=np.int8), np.eye(n, dtype=np.int8)
+    HX = np.concatenate([np.kron(H, I_n), np.kron(I_r, H.T)], axis=1).astype(np.int8)
+    HZ = np.concatenate([np.kron(I_n, H), np.kron(H.T, I_r)], axis=1).astype(np.int8)
+    return HX, HZ
+
+
+_STEANE = np.array([[0, 0, 0, 1, 1, 1, 1], [0, 1, 1, 0, 0, 1, 1], [1, 0, 1, 0, 1, 0, 1]], np.int8)
+_REP3 = np.array([[1, 1, 0], [0, 1, 1]], np.int8)  # hypergraph product: the [[13,1,3]] surface code
+# hypergraph product of the [7,4,3] Hamming code: a [[58,16,3]] code whose kernel has 37 rows
+_HAMMING = np.array([[1, 0, 1, 0, 1, 0, 1], [0, 1, 1, 0, 0, 1, 1], [0, 0, 0, 1, 1, 1, 1]], np.int8)
+
+_PINNED = {
+    # (code, seed): (weight, side, support), the same for 1 and 3 threads
+    ("steane", 7): (3, "X", [0, 5, 6]),
+    ("steane", 2024): (3, "X", [2, 3, 6]),
+    ("surface13", 7): (3, "X", [3, 4, 5]),
+    ("surface13", 2024): (3, "X", [6, 7, 8]),
+    ("hgp58", 7): (3, "X", [23, 25, 26]),
+    ("hgp58", 2024): (3, "X", [7, 10, 11]),
+}
+
+
+def test_distance_rand_witness_replays_the_pinned_witnesses():
+    codes = {"steane": (_STEANE, _STEANE), "surface13": _hgp(_REP3), "hgp58": _hgp(_HAMMING)}
+    trials = {"steane": 400, "surface13": 400, "hgp58": 2000}
+    for (name, seed), want in _PINNED.items():
+        HX, HZ = codes[name]
+        for threads in (1, 3):
+            w, side, support = gf2_fast.distance_rand_witness(HX, HZ, trials[name], seed, 8, threads)
+            got = (int(w), str(side), [int(q) for q in support])
+            assert got == want, (name, seed, threads, got, want)
