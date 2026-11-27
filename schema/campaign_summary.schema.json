@@ -83,6 +83,9 @@
     "snapshot": {
       "type": "object"
     },
+    "discovery": {
+      "$ref": "#/$defs/discovery"
+    },
     "params": {
       "type": "object"
     },
@@ -624,6 +627,122 @@
         "note": {
           "type": "string",
           "maxLength": 1000
+        }
+      }
+    },
+    "discovery": {
+      "type": "object",
+      "description": "What a code-discovery campaign derived its candidates from and what became of them, as data (issue #7445). Optional: a campaign that screens a family from its parameters has no parents to pin. When present it names the board commit the parent entries were read from, so `git show <board_commit>:codes/<slug>.json` reproduces every parent byte for byte (the sha256 recorded per parent is of exactly those bytes), the external tools by commit, and the counts from planning to the board, so whether the campaign made good use of its constructor can be read off the summary rather than the prose. Written by research/kit/campaign.py's discovery_block and read back by check_parent_snapshot.",
+      "additionalProperties": false,
+      "required": ["board_commit", "parents", "counts"],
+      "properties": {
+        "board_commit": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$",
+          "description": "The commit whose codes/ the parents were read from. The parents are those files at that commit, not the board of the day the summary is read."
+        },
+        "parents": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["count", "slugs"],
+          "properties": {
+            "count": {"type": "integer", "minimum": 0},
+            "slugs": {
+              "type": "array",
+              "items": {"type": "string", "pattern": "^[A-Za-z0-9._-]+$"},
+              "description": "Board slugs of the parent entries, codes/<slug>.json at board_commit, in the order they were processed."
+            },
+            "selection": {
+              "type": "string",
+              "maxLength": 1000,
+              "description": "How the parents were chosen, in the direction card's register: the filter a later session reruns to get the same set from the same commit."
+            },
+            "sha256": {
+              "type": "object",
+              "additionalProperties": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+              "description": "sha256 of each parent's bytes at board_commit, by slug. Lets a reader without the git history check a copy of a parent, and lets check_parent_snapshot say which parent moved when one did."
+            }
+          }
+        },
+        "tools": {
+          "type": "array",
+          "description": "The external code the campaign ran that is not in this repository: a constructor library, a planner, a certifier. Each pinned by commit so the run is reproducible from the two commits together.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["name", "commit"],
+            "properties": {
+              "name": {"type": "string", "minLength": 1, "maxLength": 100},
+              "repo": {"type": "string", "maxLength": 300, "description": "Where the tool lives, as a URL or an owner/name a reader can resolve."},
+              "commit": {"type": "string", "pattern": "^[0-9a-f]{7,64}$"},
+              "role": {"type": "string", "maxLength": 300, "description": "What the tool did in the run, e.g. the planner that enumerated the children."}
+            }
+          }
+        },
+        "counts": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["screened", "gate_passed", "board_advancing"],
+          "description": "The funnel from the constructor to the board. Each count is of candidates, not of experiments: a child planned twice from two parents is two planned and, if both were screened, two screened.",
+          "properties": {
+            "children_planned": {"type": "integer", "minimum": 0, "description": "Candidates the constructor enumerated before any filter."},
+            "prefiltered_dominated": {"type": "integer", "minimum": 0, "description": "Planned candidates dropped before screening because the board dominates them even at the constructor's optimistic distance bound."},
+            "screened": {"type": "integer", "minimum": 0, "description": "Candidates whose distance was read by a search; the depth is on the experiment rows."},
+            "gate_passed": {"type": "integer", "minimum": 0, "description": "Candidates verify/validate_candidate.py returned passed: true for."},
+            "board_advancing": {"type": "integer", "minimum": 0, "description": "Of those, the ones the gate labeled board_advancing with no dominator."},
+            "new_slugs": {
+              "type": "array",
+              "items": {"type": "string", "pattern": "^[A-Za-z0-9._-]+$"},
+              "description": "The distinct board-advancing points, as the slugs they would take; siblings at one point count once. None of them is on the board until a PR files it."
+            }
+          }
+        },
+        "corrections": {
+          "type": "array",
+          "description": "Distances the search moved below the constructor's bound: the calculus said d_claimed, the deep pass found a lighter logical. How far these fall is the measure of how much the constructor's bounds can be trusted on this family.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["candidate", "d_claimed", "d_verified"],
+            "properties": {
+              "candidate": {"type": "string", "maxLength": 300, "description": "The candidate, by its point and how it was built: e.g. `[[127,39,6]] E-PUNCTURE qubit 97 of 128-36-6`."},
+              "parent": {"type": "string", "maxLength": 100, "description": "The parent slug, when the candidate has one."},
+              "stage": {"type": "string", "enum": ["screen", "gate", "deep-verify", "audit"], "description": "Which pass found the lighter logical."},
+              "d_claimed": {"type": "integer", "minimum": 0, "description": "The constructor's or the parent's bound."},
+              "d_verified": {"type": "integer", "minimum": 0, "description": "The weight of the logical the pass found: an upper bound on the distance, never a claim about it."},
+              "trials": {"type": "integer", "minimum": 0, "description": "Information-set trials the reading rests on, when the pass sampled."},
+              "note": {"type": "string", "maxLength": 500}
+            }
+          }
+        },
+        "collisions": {
+          "type": "array",
+          "description": "Candidates that turned out to be something already present: a board entry (exact bytes or a Weisfeiler-Leman equivalence), another candidate of the same batch at a better point, or the same point as a sibling.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["candidate", "with", "kind"],
+            "properties": {
+              "candidate": {"type": "string", "maxLength": 300},
+              "with": {"type": "string", "maxLength": 300, "description": "What it collided with, in the gate's descriptor form where there is one."},
+              "kind": {"type": "string", "enum": ["board-exact", "board-wl", "within-batch", "point"]}
+            }
+          }
+        },
+        "refusals": {
+          "type": "array",
+          "description": "Candidates a stage refused outright rather than screened out: a constructor output the packaging rules reject (a direct sum, a check over the weight cap), a document the prescreen refused, a gate refusal.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["candidate", "stage", "reason"],
+            "properties": {
+              "candidate": {"type": "string", "maxLength": 300},
+              "stage": {"type": "string", "enum": ["constructor", "prescreen", "gate", "packaging"]},
+              "reason": {"type": "string", "maxLength": 500},
+              "count": {"type": "integer", "minimum": 1, "description": "How many candidates this row stands for, when one reason refused several."}
+            }
+          }
         }
       }
     }

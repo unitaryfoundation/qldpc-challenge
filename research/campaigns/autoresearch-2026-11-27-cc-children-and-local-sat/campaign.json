@@ -1,0 +1,69 @@
+{
+  "campaign": {
+    "budget": {
+      "candidates_screened": 600,
+      "walltime_hours": 3.0
+    },
+    "direction": {
+      "abandon_criterion": {
+        "flat_fresh_rungs": 2,
+        "note": "a child is dropped when its screened d puts it under a board entry; a SAT rung is dropped at 3M conflicts or 45 min",
+        "trials_cap": 2000000
+      },
+      "bar": {
+        "axes": [
+          "n",
+          "k",
+          "d",
+          "w"
+        ],
+        "note": "no single bar: a child or SAT model counts when kit/frontier.dominators finds no board entry in its cell no worse on n, k, d, and max check weight",
+        "slug": "128-36-6"
+      },
+      "budget": {
+        "candidates_screened": 600,
+        "trials_per_candidate": 14000,
+        "walltime_hours": 3.0
+      },
+      "cell": "unrestricted~weight-8",
+      "expected_value": "A child or SAT model the gate labels board_advancing with an empty dominated_by would be a new point on its cell's frontier; a single-layer weight-8 d=3 code at k above the 5x5 to 7x7 bilayer records would be the first of its kind in the single cell.",
+      "family": "other",
+      "feasibility": "planner.plan derives the children of a parent in seconds; the gf2_fast RIS screen at the reachability campaign's depth-proportional budget reads a child in 1 to 60 s; a 2D-local SAT rung at 5x5 to 7x7 with a 3M-conflict cap ends in under 45 min; 18 cores.",
+      "hypothesis": "Single-step code-calculus children of the CSS entries merged since 2026-11-24, and bounded 2D-local SAT rungs at the single-layer cells the board leaves thin, contain a code the trusted gate labels board-advancing.",
+      "novelty": {
+        "against": "the board as of e43a53888 (2026-11-27) and the open-PR dedup index",
+        "claim": "board-relative frontier points only; literature novelty unverified"
+      },
+      "what_a_negative_would_teach": "That the parents merged since 2026-11-24 have no undominated single-step child at the screening depth, and that the probed single-layer weight-4 and weight-8 cells are walled or UNSAT at these grid sizes under a 3M-conflict budget."
+    },
+    "id": "autoresearch-2026-11-27-cc-children-and-local-sat",
+    "methods": {
+      "families": [
+        "other"
+      ],
+      "generators": [
+        "machine/planner.py::plan",
+        "research/sat_rungs.py::run_rung"
+      ],
+      "screening": {
+        "seeds": [
+          1127
+        ],
+        "trials_per_candidate": 14000
+      }
+    },
+    "name": "Unattended autoresearch 2026-11-27: code-calculus children of recent parents and thin-cell 2D-local SAT probes",
+    "notes": "Unattended stage-only run; staged candidates and verdicts under research/candidates/autoresearch-2026-11-27-fable/.",
+    "objective": {
+      "direction": "maximize",
+      "metric": "kd2_over_n"
+    },
+    "schema_version": 1,
+    "status": "completed",
+    "stopping": [
+      {
+        "type": "budget_exhausted"
+      }
+    ]
+  }
+}

@@ -1,0 +1,5043 @@
+{
+  "aborted_experiments": 0,
+  "authority": "candidates listed here passed verify/validate_candidate.py; nothing here is a board entry until a human reviews and submits it",
+  "budget": {
+    "consumed": {
+      "walltime_hours": 30.275
+    },
+    "declared": {
+      "candidates_screened": 600,
+      "walltime_hours": 3.0
+    },
+    "remaining": {
+      "candidates_screened": 600,
+      "walltime_hours": -27.275
+    }
+  },
+  "campaign_id": "autoresearch-2026-11-27-cc-children-and-local-sat",
+  "campaign_name": "Unattended autoresearch 2026-11-27: code-calculus children of recent parents and thin-cell 2D-local SAT probes",
+  "contract_hash": null,
+  "direction": {
+    "abandon_criterion": {
+      "flat_fresh_rungs": 2,
+      "note": "a child is dropped when its screened d puts it under a board entry; a SAT rung is dropped at 3M conflicts or 45 min",
+      "trials_cap": 2000000
+    },
+    "bar": {
+      "axes": [
+        "n",
+        "k",
+        "d",
+        "w"
+      ],
+      "note": "no single bar: a child or SAT model counts when kit/frontier.dominators finds no board entry in its cell no worse on n, k, d, and max check weight",
+      "slug": "128-36-6"
+    },
+    "budget": {
+      "candidates_screened": 600,
+      "trials_per_candidate": 14000,
+      "walltime_hours": 3.0
+    },
+    "cell": "unrestricted~weight-8",
+    "expected_value": "A child or SAT model the gate labels board_advancing with an empty dominated_by would be a new point on its cell's frontier; a single-layer weight-8 d=3 code at k above the 5x5 to 7x7 bilayer records would be the first of its kind in the single cell.",
+    "family": "other",
+    "feasibility": "planner.plan derives the children of a parent in seconds; the gf2_fast RIS screen at the reachability campaign's depth-proportional budget reads a child in 1 to 60 s; a 2D-local SAT rung at 5x5 to 7x7 with a 3M-conflict cap ends in under 45 min; 18 cores.",
+    "hypothesis": "Single-step code-calculus children of the CSS entries merged since 2026-11-24, and bounded 2D-local SAT rungs at the single-layer cells the board leaves thin, contain a code the trusted gate labels board-advancing.",
+    "novelty": {
+      "against": "the board as of e43a53888 (2026-11-27) and the open-PR dedup index",
+      "claim": "board-relative frontier points only; literature novelty unverified"
+    },
+    "what_a_negative_would_teach": "That the parents merged since 2026-11-24 have no undominated single-step child at the screening depth, and that the probed single-layer weight-4 and weight-8 cells are walled or UNSAT at these grid sizes under a 3M-conflict budget."
+  },
+  "discovery": {
+    "board_commit": "e43a53888c07c3758002bd5b075d00b1f2e7b99a",
+    "collisions": [
+      {
+        "candidate": "[[127,39,6]] E-PUNCTURE qubit 97 of 128-36-6",
+        "kind": "within-batch",
+        "with": "[[127,41,4]] w=8 128-36-6.json"
+      },
+      {
+        "candidate": "[[127,39,6]] E-PUNCTURE qubit 46 of 128-36-6",
+        "kind": "within-batch",
+        "with": "[[127,41,4]] w=8 128-36-6.json"
+      },
+      {
+        "candidate": "[[127,36,6]] E-GRAFT qubit 46 sector X ordered_row_ids ['a14', 'a18'] of 128-36-6",
+        "kind": "within-batch",
+        "with": "[[127,36,5]] w=8 128-36-6.json"
+      },
+      {
+        "candidate": "[[127,36,6]] E-GRAFT qubit 40 sector X ordered_row_ids ['a7', 'a27'] of 128-36-6",
+        "kind": "within-batch",
+        "with": "[[127,36,5]] w=8 128-36-6.json"
+      },
+      {
+        "candidate": "[[127,36,6]] E-GRAFT qubit 106 sector X ordered_row_ids ['a2', 'a28'] of 128-36-6",
+        "kind": "within-batch",
+        "with": "[[127,36,5]] w=8 128-36-6.json"
+      },
+      {
+        "candidate": "[[255,71,12]] E-PUNCTURE qubit 19 of 256-68-12-b",
+        "kind": "within-batch",
+        "with": "[[255,73,7]] w=8 256-68-12-b.json"
+      },
+      {
+        "candidate": "[[275,105,32]] E-PUNCTURE qubit 221 of 276-98-14-b",
+        "kind": "within-batch",
+        "with": "[[275,105,9]] w=12 276-98-14-b.json"
+      },
+      {
+        "candidate": "[[275,105,32]] E-PUNCTURE qubit 44 of 276-98-14-b",
+        "kind": "within-batch",
+        "with": "[[275,105,9]] w=12 276-98-14-b.json"
+      },
+      {
+        "candidate": "[[275,105,32]] E-PUNCTURE qubit 46 of 276-98-14-b",
+        "kind": "within-batch",
+        "with": "[[275,105,9]] w=12 276-98-14-b.json"
+      },
+      {
+        "candidate": "[[275,105,14]] E-PUNCTURE qubit 254 of 276-98-14-b",
+        "kind": "within-batch",
+        "with": "[[275,105,9]] w=12 276-98-14-b.json"
+      },
+      {
+        "candidate": "[[275,105,14]] E-PUNCTURE qubit 189 of 276-98-14-b",
+        "kind": "within-batch",
+        "with": "[[275,105,9]] w=12 276-98-14-b.json"
+      },
+      {
+        "candidate": "[[275,105,14]] E-PUNCTURE qubit 204 of 276-98-14-b",
+        "kind": "within-batch",
+        "with": "[[275,105,9]] w=12 276-98-14-b.json"
+      },
+      {
+        "candidate": "[[275,105,14]] E-PUNCTURE qubit 237 of 276-98-14-b",
+        "kind": "within-batch",
+        "with": "[[275,105,9]] w=12 276-98-14-b.json"
+      },
+      {
+        "candidate": "[[275,104,32]] E-PUNCTURE qubit 0 of 276-98-14-b",
+        "kind": "within-batch",
+        "with": "[[275,105,9]] w=12 276-98-14-b.json"
+      },
+      {
+        "candidate": "[[275,104,32]] E-PUNCTURE qubit 125 of 276-98-14-b",
+        "kind": "within-batch",
+        "with": "[[275,105,9]] w=12 276-98-14-b.json"
+      },
+      {
+        "candidate": "[[275,104,32]] E-PUNCTURE qubit 82 of 276-98-14-b",
+        "kind": "within-batch",
+        "with": "[[275,105,9]] w=12 276-98-14-b.json"
+      },
+      {
+        "candidate": "[[275,104,14]] E-PUNCTURE qubit 110 of 276-98-14-b",
+        "kind": "within-batch",
+        "with": "[[275,105,9]] w=12 276-98-14-b.json"
+      },
+      {
+        "candidate": "[[275,104,14]] E-PUNCTURE qubit 80 of 276-98-14-b",
+        "kind": "within-batch",
+        "with": "[[275,105,9]] w=12 276-98-14-b.json"
+      },
+      {
+        "candidate": "[[275,104,14]] E-PUNCTURE qubit 17 of 276-98-14-b",
+        "kind": "within-batch",
+        "with": "[[275,105,9]] w=12 276-98-14-b.json"
+      },
+      {
+        "candidate": "[[275,104,14]] E-PUNCTURE qubit 175 of 276-98-14-b",
+        "kind": "within-batch",
+        "with": "[[275,105,9]] w=12 276-98-14-b.json"
+      },
+      {
+        "candidate": "[[275,103,14]] E-PUNCTURE qubit 57 of 276-98-14-b",
+        "kind": "within-batch",
+        "with": "[[275,105,9]] w=12 276-98-14-b.json"
+      },
+      {
+        "candidate": "[[275,103,14]] E-PUNCTURE qubit 25 of 276-98-14-b",
+        "kind": "within-batch",
+        "with": "[[275,105,9]] w=12 276-98-14-b.json"
+      },
+      {
+        "candidate": "127-36-5-b9dd5469528c03d6",
+        "kind": "point",
+        "with": "127-36-5"
+      },
+      {
+        "candidate": "256-69-8-736cfd7e81547940",
+        "kind": "point",
+        "with": "256-69-8"
+      },
+      {
+        "candidate": "256-69-8-2f5ea9d07767e7e2",
+        "kind": "point",
+        "with": "256-69-8"
+      },
+      {
+        "candidate": "275-103-10-94d6cc5c70c11ce7",
+        "kind": "point",
+        "with": "275-103-10"
+      },
+      {
+        "candidate": "511-137-7-1b3ab0e01ec162e8",
+        "kind": "point",
+        "with": "511-137-7"
+      },
+      {
+        "candidate": "511-137-7-4c4770776fb28d8b",
+        "kind": "point",
+        "with": "511-137-7"
+      }
+    ],
+    "corrections": [
+      {
+        "candidate": "[[27,14,2]] E-PEEL qubit 22 sector Z row_id b1 of 28-14-2-b",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "28-14-2-b",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[27,14,2]] E-PEEL qubit 11 sector Z row_id b4 of 28-14-2-b",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "28-14-2-b",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[27,14,2]] E-PEEL qubit 4 sector Z row_id b4 of 28-14-2-b",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "28-14-2-b",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[27,14,2]] E-PEEL qubit 17 sector Z row_id b5 of 28-14-2-b",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "28-14-2-b",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[28,15,2]] C-DELETE-CHECK row_id a6 of 28-14-2-b",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "28-14-2-b",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[28,15,2]] C-DELETE-CHECK row_id b5 of 28-14-2-b",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "28-14-2-b",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[28,15,2]] C-DELETE-CHECK row_id a4 of 28-14-2-b",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "28-14-2-b",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[28,15,2]] C-DELETE-CHECK row_id a2 of 28-14-2-b",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "28-14-2-b",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[35,18,2]] E-PEEL qubit 26 sector X row_id a9 of 36-18-2-b",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "36-18-2-b",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[35,18,2]] E-PEEL qubit 26 sector Z row_id b9 of 36-18-2-b",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "36-18-2-b",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[35,18,2]] E-PEEL qubit 10 sector Z row_id b1 of 36-18-2-b",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "36-18-2-b",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[35,18,2]] E-PEEL qubit 11 sector Z row_id b2 of 36-18-2-b",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "36-18-2-b",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[36,19,2]] C-DELETE-CHECK row_id a5 of 36-18-2-b",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "36-18-2-b",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[36,19,2]] C-DELETE-CHECK row_id b4 of 36-18-2-b",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "36-18-2-b",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[36,19,2]] C-DELETE-CHECK row_id a4 of 36-18-2-b",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "36-18-2-b",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[36,19,2]] C-DELETE-CHECK row_id a7 of 36-18-2-b",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "36-18-2-b",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[43,22,2]] E-PEEL qubit 12 sector Z row_id b1 of 44-22-2-b",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "44-22-2-b",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[43,22,2]] E-PEEL qubit 25 sector X row_id a4 of 44-22-2-b",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "44-22-2-b",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[43,22,2]] E-PEEL qubit 22 sector Z row_id b1 of 44-22-2-b",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "44-22-2-b",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[43,22,2]] E-PEEL qubit 22 sector X row_id a1 of 44-22-2-b",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "44-22-2-b",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[44,23,2]] C-DELETE-CHECK row_id a10 of 44-22-2-b",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "44-22-2-b",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[44,23,2]] C-DELETE-CHECK row_id b10 of 44-22-2-b",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "44-22-2-b",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[44,23,2]] C-DELETE-CHECK row_id b3 of 44-22-2-b",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "44-22-2-b",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[44,23,2]] C-DELETE-CHECK row_id a3 of 44-22-2-b",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "44-22-2-b",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[51,26,2]] E-PEEL qubit 51 sector Z row_id b12 of 52-26-2-b",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "52-26-2-b",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[51,26,2]] E-PEEL qubit 40 sector X row_id a2 of 52-26-2-b",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "52-26-2-b",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[51,26,2]] E-PEEL qubit 43 sector X row_id a5 of 52-26-2-b",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "52-26-2-b",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[51,26,2]] E-PEEL qubit 42 sector X row_id a4 of 52-26-2-b",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "52-26-2-b",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[52,27,2]] C-DELETE-CHECK row_id b12 of 52-26-2-b",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "52-26-2-b",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[52,27,2]] C-DELETE-CHECK row_id a4 of 52-26-2-b",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "52-26-2-b",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[52,27,2]] C-DELETE-CHECK row_id a13 of 52-26-2-b",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "52-26-2-b",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[52,27,2]] C-DELETE-CHECK row_id a9 of 52-26-2-b",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "52-26-2-b",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[53,36,2]] E-PEEL qubit 14 sector X row_id a6 of 54-36-2-b",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "54-36-2-b",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[53,36,2]] E-PEEL qubit 8 sector X row_id a9 of 54-36-2-b",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "54-36-2-b",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[53,36,2]] E-PEEL qubit 19 sector Z row_id b1 of 54-36-2-b",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "54-36-2-b",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[53,36,2]] E-PEEL qubit 10 sector X row_id a2 of 54-36-2-b",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "54-36-2-b",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[54,37,2]] C-DELETE-CHECK row_id a2 of 54-36-2-b",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "54-36-2-b",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[54,37,2]] C-DELETE-CHECK row_id b2 of 54-36-2-b",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "54-36-2-b",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[54,37,2]] C-DELETE-CHECK row_id b1 of 54-36-2-b",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "54-36-2-b",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[54,37,2]] C-DELETE-CHECK row_id a3 of 54-36-2-b",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "54-36-2-b",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[65,44,2]] E-PEEL qubit 15 sector Z row_id b5 of 66-44-2-b",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "66-44-2-b",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[65,44,2]] E-PEEL qubit 61 sector Z row_id b5 of 66-44-2-b",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "66-44-2-b",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[65,44,2]] E-PEEL qubit 9 sector Z row_id b10 of 66-44-2-b",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "66-44-2-b",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[65,44,2]] E-PEEL qubit 16 sector Z row_id b6 of 66-44-2-b",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "66-44-2-b",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[66,45,2]] C-DELETE-CHECK row_id a10 of 66-44-2-b",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "66-44-2-b",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[66,45,2]] C-DELETE-CHECK row_id b9 of 66-44-2-b",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "66-44-2-b",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[66,45,2]] C-DELETE-CHECK row_id b11 of 66-44-2-b",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "66-44-2-b",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[66,45,2]] C-DELETE-CHECK row_id b5 of 66-44-2-b",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "66-44-2-b",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[67,34,2]] E-PEEL qubit 62 sector Z row_id b11 of 68-34-2-b",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "68-34-2-b",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[67,34,2]] E-PEEL qubit 64 sector Z row_id b13 of 68-34-2-b",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "68-34-2-b",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[67,34,2]] E-PEEL qubit 51 sector Z row_id b17 of 68-34-2-b",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "68-34-2-b",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[67,34,2]] E-PEEL qubit 11 sector X row_id a12 of 68-34-2-b",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "68-34-2-b",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[68,35,2]] C-DELETE-CHECK row_id a8 of 68-34-2-b",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "68-34-2-b",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[68,35,2]] C-DELETE-CHECK row_id a17 of 68-34-2-b",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "68-34-2-b",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[68,35,2]] C-DELETE-CHECK row_id b16 of 68-34-2-b",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "68-34-2-b",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[68,35,2]] C-DELETE-CHECK row_id a13 of 68-34-2-b",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "68-34-2-b",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[75,38,2]] E-PEEL qubit 18 sector X row_id a19 of 76-38-2-b",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "76-38-2-b",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[75,38,2]] E-PEEL qubit 43 sector Z row_id b6 of 76-38-2-b",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "76-38-2-b",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[75,38,2]] E-PEEL qubit 49 sector Z row_id b12 of 76-38-2-b",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "76-38-2-b",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[75,38,2]] E-PEEL qubit 73 sector Z row_id b16 of 76-38-2-b",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "76-38-2-b",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[76,39,2]] C-DELETE-CHECK row_id b10 of 76-38-2-b",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "76-38-2-b",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[76,39,2]] C-DELETE-CHECK row_id a4 of 76-38-2-b",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "76-38-2-b",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[76,39,2]] C-DELETE-CHECK row_id b18 of 76-38-2-b",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "76-38-2-b",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[76,39,2]] C-DELETE-CHECK row_id a16 of 76-38-2-b",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "76-38-2-b",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[83,10,6]] E-PUNCTURE qubit 81 of 84-6-6-b",
+        "d_claimed": 6,
+        "d_verified": 1,
+        "parent": "84-6-6-b",
+        "stage": "screen",
+        "trials": 14000
+      },
+      {
+        "candidate": "[[83,10,6]] E-PUNCTURE qubit 49 of 84-6-6-b",
+        "d_claimed": 6,
+        "d_verified": 1,
+        "parent": "84-6-6-b",
+        "stage": "screen",
+        "trials": 14000
+      },
+      {
+        "candidate": "[[83,10,6]] E-PUNCTURE qubit 69 of 84-6-6-b",
+        "d_claimed": 6,
+        "d_verified": 2,
+        "parent": "84-6-6-b",
+        "stage": "screen",
+        "trials": 14000
+      },
+      {
+        "candidate": "[[83,10,6]] E-PUNCTURE qubit 75 of 84-6-6-b",
+        "d_claimed": 6,
+        "d_verified": 2,
+        "parent": "84-6-6-b",
+        "stage": "screen",
+        "trials": 14000
+      },
+      {
+        "candidate": "[[83,9,6]] E-PUNCTURE qubit 22 of 84-6-6-b",
+        "d_claimed": 6,
+        "d_verified": 1,
+        "parent": "84-6-6-b",
+        "stage": "screen",
+        "trials": 14000
+      },
+      {
+        "candidate": "[[83,9,6]] E-PUNCTURE qubit 58 of 84-6-6-b",
+        "d_claimed": 6,
+        "d_verified": 2,
+        "parent": "84-6-6-b",
+        "stage": "screen",
+        "trials": 14000
+      },
+      {
+        "candidate": "[[83,9,6]] E-PUNCTURE qubit 29 of 84-6-6-b",
+        "d_claimed": 6,
+        "d_verified": 1,
+        "parent": "84-6-6-b",
+        "stage": "screen",
+        "trials": 14000
+      },
+      {
+        "candidate": "[[83,9,6]] E-PUNCTURE qubit 76 of 84-6-6-b",
+        "d_claimed": 6,
+        "d_verified": 1,
+        "parent": "84-6-6-b",
+        "stage": "screen",
+        "trials": 14000
+      },
+      {
+        "candidate": "[[83,8,6]] E-PUNCTURE qubit 64 of 84-6-6-b",
+        "d_claimed": 6,
+        "d_verified": 3,
+        "parent": "84-6-6-b",
+        "stage": "screen",
+        "trials": 14000
+      },
+      {
+        "candidate": "[[83,8,6]] E-PUNCTURE qubit 36 of 84-6-6-b",
+        "d_claimed": 6,
+        "d_verified": 1,
+        "parent": "84-6-6-b",
+        "stage": "screen",
+        "trials": 14000
+      },
+      {
+        "candidate": "[[83,8,6]] E-PUNCTURE qubit 24 of 84-6-6-b",
+        "d_claimed": 6,
+        "d_verified": 3,
+        "parent": "84-6-6-b",
+        "stage": "screen",
+        "trials": 14000
+      },
+      {
+        "candidate": "[[83,8,6]] E-PUNCTURE qubit 48 of 84-6-6-b",
+        "d_claimed": 6,
+        "d_verified": 3,
+        "parent": "84-6-6-b",
+        "stage": "screen",
+        "trials": 14000
+      },
+      {
+        "candidate": "[[83,6,6]] E-GRAFT qubit 77 sector X ordered_row_ids ['a27'] of 84-6-6-b",
+        "d_claimed": 6,
+        "d_verified": 5,
+        "parent": "84-6-6-b",
+        "stage": "screen",
+        "trials": 14000
+      },
+      {
+        "candidate": "[[83,6,6]] E-PEEL qubit 22 sector Z row_id b26 of 84-6-6-b",
+        "d_claimed": 6,
+        "d_verified": 5,
+        "parent": "84-6-6-b",
+        "stage": "screen",
+        "trials": 14000
+      },
+      {
+        "candidate": "[[83,6,6]] E-GRAFT qubit 78 sector X ordered_row_ids ['a26'] of 84-6-6-b",
+        "d_claimed": 6,
+        "d_verified": 5,
+        "parent": "84-6-6-b",
+        "stage": "screen",
+        "trials": 14000
+      },
+      {
+        "candidate": "[[83,6,6]] E-PEEL qubit 34 sector Z row_id b37 of 84-6-6-b",
+        "d_claimed": 6,
+        "d_verified": 5,
+        "parent": "84-6-6-b",
+        "stage": "screen",
+        "trials": 14000
+      },
+      {
+        "candidate": "[[84,7,6]] C-DELETE-CHECK row_id b31 of 84-6-6-b",
+        "d_claimed": 6,
+        "d_verified": 3,
+        "parent": "84-6-6-b",
+        "stage": "screen",
+        "trials": 14000
+      },
+      {
+        "candidate": "[[84,7,6]] C-DELETE-CHECK row_id b17 of 84-6-6-b",
+        "d_claimed": 6,
+        "d_verified": 4,
+        "parent": "84-6-6-b",
+        "stage": "screen",
+        "trials": 14000
+      },
+      {
+        "candidate": "[[84,7,6]] C-DELETE-CHECK row_id a23 of 84-6-6-b",
+        "d_claimed": 6,
+        "d_verified": 3,
+        "parent": "84-6-6-b",
+        "stage": "screen",
+        "trials": 14000
+      },
+      {
+        "candidate": "[[84,7,6]] C-DELETE-CHECK row_id a32 of 84-6-6-b",
+        "d_claimed": 6,
+        "d_verified": 1,
+        "parent": "84-6-6-b",
+        "stage": "screen",
+        "trials": 14000
+      },
+      {
+        "candidate": "[[91,46,2]] E-PEEL qubit 0 sector X row_id a1 of 92-46-2-b",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "92-46-2-b",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[91,46,2]] E-PEEL qubit 57 sector X row_id a12 of 92-46-2-b",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "92-46-2-b",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[91,46,2]] E-PEEL qubit 15 sector X row_id a16 of 92-46-2-b",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "92-46-2-b",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[91,46,2]] E-PEEL qubit 58 sector Z row_id b13 of 92-46-2-b",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "92-46-2-b",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[92,47,2]] C-DELETE-CHECK row_id b16 of 92-46-2-b",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "92-46-2-b",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[92,47,2]] C-DELETE-CHECK row_id b11 of 92-46-2-b",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "92-46-2-b",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[92,47,2]] C-DELETE-CHECK row_id b15 of 92-46-2-b",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "92-46-2-b",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[92,47,2]] C-DELETE-CHECK row_id b7 of 92-46-2-b",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "92-46-2-b",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[101,68,2]] E-PEEL qubit 3 sector X row_id a4 of 102-68-2",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "102-68-2",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[101,68,2]] E-PEEL qubit 97 sector X row_id a13 of 102-68-2",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "102-68-2",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[101,68,2]] E-PEEL qubit 23 sector X row_id a7 of 102-68-2",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "102-68-2",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[101,68,2]] E-PEEL qubit 48 sector Z row_id b14 of 102-68-2",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "102-68-2",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[102,69,2]] C-DELETE-CHECK row_id b17 of 102-68-2",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "102-68-2",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[102,69,2]] C-DELETE-CHECK row_id b4 of 102-68-2",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "102-68-2",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[102,69,2]] C-DELETE-CHECK row_id b10 of 102-68-2",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "102-68-2",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[102,69,2]] C-DELETE-CHECK row_id a9 of 102-68-2",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "102-68-2",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[113,76,2]] E-PEEL qubit 10 sector Z row_id b11 of 114-76-2",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "114-76-2",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[113,76,2]] E-PEEL qubit 69 sector Z row_id b12 of 114-76-2",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "114-76-2",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[113,76,2]] E-PEEL qubit 11 sector Z row_id b12 of 114-76-2",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "114-76-2",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[113,76,2]] E-PEEL qubit 89 sector X row_id a14 of 114-76-2",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "114-76-2",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[114,77,2]] C-DELETE-CHECK row_id b12 of 114-76-2",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "114-76-2",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[114,77,2]] C-DELETE-CHECK row_id b2 of 114-76-2",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "114-76-2",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[114,77,2]] C-DELETE-CHECK row_id b4 of 114-76-2",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "114-76-2",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[114,77,2]] C-DELETE-CHECK row_id a9 of 114-76-2",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "114-76-2",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[115,58,2]] E-PEEL qubit 110 sector X row_id a24 of 116-58-2",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "116-58-2",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[115,58,2]] E-PEEL qubit 61 sector Z row_id b4 of 116-58-2",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "116-58-2",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[115,58,2]] E-PEEL qubit 24 sector Z row_id b25 of 116-58-2",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "116-58-2",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[115,58,2]] E-PEEL qubit 81 sector X row_id a24 of 116-58-2",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "116-58-2",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[116,59,2]] C-DELETE-CHECK row_id b2 of 116-58-2",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "116-58-2",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[116,59,2]] C-DELETE-CHECK row_id a21 of 116-58-2",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "116-58-2",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[116,59,2]] C-DELETE-CHECK row_id b25 of 116-58-2",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "116-58-2",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[116,59,2]] C-DELETE-CHECK row_id b24 of 116-58-2",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "116-58-2",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[119,11,16]] E-PUNCTURE qubit 42 of 120-4-16",
+        "d_claimed": 16,
+        "d_verified": 4,
+        "parent": "120-4-16",
+        "stage": "screen",
+        "trials": 520000
+      },
+      {
+        "candidate": "[[119,11,16]] E-PUNCTURE qubit 25 of 120-4-16",
+        "d_claimed": 16,
+        "d_verified": 4,
+        "parent": "120-4-16",
+        "stage": "screen",
+        "trials": 520000
+      },
+      {
+        "candidate": "[[119,11,16]] E-PUNCTURE qubit 52 of 120-4-16",
+        "d_claimed": 16,
+        "d_verified": 4,
+        "parent": "120-4-16",
+        "stage": "screen",
+        "trials": 520000
+      },
+      {
+        "candidate": "[[119,11,16]] E-PUNCTURE qubit 48 of 120-4-16",
+        "d_claimed": 16,
+        "d_verified": 4,
+        "parent": "120-4-16",
+        "stage": "screen",
+        "trials": 520000
+      },
+      {
+        "candidate": "[[119,10,16]] E-PUNCTURE qubit 101 of 120-4-16",
+        "d_claimed": 16,
+        "d_verified": 4,
+        "parent": "120-4-16",
+        "stage": "screen",
+        "trials": 520000
+      },
+      {
+        "candidate": "[[119,10,16]] E-PUNCTURE qubit 67 of 120-4-16",
+        "d_claimed": 16,
+        "d_verified": 4,
+        "parent": "120-4-16",
+        "stage": "screen",
+        "trials": 520000
+      },
+      {
+        "candidate": "[[119,10,16]] E-PUNCTURE qubit 115 of 120-4-16",
+        "d_claimed": 16,
+        "d_verified": 4,
+        "parent": "120-4-16",
+        "stage": "screen",
+        "trials": 520000
+      },
+      {
+        "candidate": "[[119,10,16]] E-PUNCTURE qubit 27 of 120-4-16",
+        "d_claimed": 16,
+        "d_verified": 4,
+        "parent": "120-4-16",
+        "stage": "screen",
+        "trials": 520000
+      },
+      {
+        "candidate": "[[120,5,16]] C-DELETE-CHECK row_id a32 of 120-4-16",
+        "d_claimed": 16,
+        "d_verified": 8,
+        "parent": "120-4-16",
+        "stage": "screen",
+        "trials": 520000
+      },
+      {
+        "candidate": "[[120,5,16]] C-DELETE-CHECK row_id b48 of 120-4-16",
+        "d_claimed": 16,
+        "d_verified": 8,
+        "parent": "120-4-16",
+        "stage": "screen",
+        "trials": 520000
+      },
+      {
+        "candidate": "[[120,5,16]] C-DELETE-CHECK row_id a1 of 120-4-16",
+        "d_claimed": 16,
+        "d_verified": 7,
+        "parent": "120-4-16",
+        "stage": "screen",
+        "trials": 520000
+      },
+      {
+        "candidate": "[[120,5,16]] C-DELETE-CHECK row_id a4 of 120-4-16",
+        "d_claimed": 16,
+        "d_verified": 8,
+        "parent": "120-4-16",
+        "stage": "screen",
+        "trials": 520000
+      },
+      {
+        "candidate": "[[127,41,6]] E-PUNCTURE qubit 69 of 128-36-6",
+        "d_claimed": 6,
+        "d_verified": 3,
+        "parent": "128-36-6",
+        "stage": "screen",
+        "trials": 14000
+      },
+      {
+        "candidate": "[[127,41,6]] E-PUNCTURE qubit 114 of 128-36-6",
+        "d_claimed": 6,
+        "d_verified": 2,
+        "parent": "128-36-6",
+        "stage": "screen",
+        "trials": 14000
+      },
+      {
+        "candidate": "[[127,41,6]] E-PUNCTURE qubit 127 of 128-36-6",
+        "d_claimed": 6,
+        "d_verified": 1,
+        "parent": "128-36-6",
+        "stage": "screen",
+        "trials": 14000
+      },
+      {
+        "candidate": "[[127,41,6]] E-PUNCTURE qubit 34 of 128-36-6",
+        "d_claimed": 6,
+        "d_verified": 4,
+        "parent": "128-36-6",
+        "stage": "screen",
+        "trials": 14000
+      },
+      {
+        "candidate": "[[127,40,6]] E-PUNCTURE qubit 47 of 128-36-6",
+        "d_claimed": 6,
+        "d_verified": 1,
+        "parent": "128-36-6",
+        "stage": "screen",
+        "trials": 14000
+      },
+      {
+        "candidate": "[[127,40,6]] E-PUNCTURE qubit 48 of 128-36-6",
+        "d_claimed": 6,
+        "d_verified": 2,
+        "parent": "128-36-6",
+        "stage": "screen",
+        "trials": 14000
+      },
+      {
+        "candidate": "[[127,40,6]] E-PUNCTURE qubit 66 of 128-36-6",
+        "d_claimed": 6,
+        "d_verified": 2,
+        "parent": "128-36-6",
+        "stage": "screen",
+        "trials": 14000
+      },
+      {
+        "candidate": "[[127,40,6]] E-PUNCTURE qubit 39 of 128-36-6",
+        "d_claimed": 6,
+        "d_verified": 3,
+        "parent": "128-36-6",
+        "stage": "screen",
+        "trials": 14000
+      },
+      {
+        "candidate": "[[127,39,6]] E-PUNCTURE qubit 97 of 128-36-6",
+        "d_claimed": 6,
+        "d_verified": 4,
+        "parent": "128-36-6",
+        "stage": "screen",
+        "trials": 14000
+      },
+      {
+        "candidate": "[[127,39,6]] E-PUNCTURE qubit 5 of 128-36-6",
+        "d_claimed": 6,
+        "d_verified": 3,
+        "parent": "128-36-6",
+        "stage": "screen",
+        "trials": 14000
+      },
+      {
+        "candidate": "[[127,39,6]] E-PUNCTURE qubit 46 of 128-36-6",
+        "d_claimed": 6,
+        "d_verified": 4,
+        "parent": "128-36-6",
+        "stage": "screen",
+        "trials": 14000
+      },
+      {
+        "candidate": "[[127,36,6]] E-PEEL qubit 97 sector X row_id a1 of 128-36-6",
+        "d_claimed": 6,
+        "d_verified": 5,
+        "parent": "128-36-6",
+        "stage": "screen",
+        "trials": 14000
+      },
+      {
+        "candidate": "[[127,36,6]] E-GRAFT qubit 97 sector X ordered_row_ids ['a1'] of 128-36-6",
+        "d_claimed": 6,
+        "d_verified": 5,
+        "parent": "128-36-6",
+        "stage": "screen",
+        "trials": 14000
+      },
+      {
+        "candidate": "[[127,36,6]] E-GRAFT qubit 89 sector Z ordered_row_ids ['b8', 'b25', 'b34'] of 128-36-6",
+        "d_claimed": 6,
+        "d_verified": 5,
+        "parent": "128-36-6",
+        "stage": "screen",
+        "trials": 14000
+      },
+      {
+        "candidate": "[[127,36,6]] E-GRAFT qubit 41 sector Z ordered_row_ids ['b2', 'b19', 'b44'] of 128-36-6",
+        "d_claimed": 6,
+        "d_verified": 5,
+        "parent": "128-36-6",
+        "stage": "screen",
+        "trials": 14000
+      },
+      {
+        "candidate": "[[127,36,6]] E-GRAFT qubit 118 sector Z ordered_row_ids ['b10', 'b25', 'b45'] of 128-36-6",
+        "d_claimed": 6,
+        "d_verified": 5,
+        "parent": "128-36-6",
+        "stage": "screen",
+        "trials": 14000
+      },
+      {
+        "candidate": "[[127,36,6]] E-GRAFT qubit 31 sector Z ordered_row_ids ['b1', 'b25', 'b45'] of 128-36-6",
+        "d_claimed": 6,
+        "d_verified": 5,
+        "parent": "128-36-6",
+        "stage": "screen",
+        "trials": 14000
+      },
+      {
+        "candidate": "[[127,36,6]] E-GRAFT qubit 46 sector X ordered_row_ids ['a14', 'a18'] of 128-36-6",
+        "d_claimed": 6,
+        "d_verified": 5,
+        "parent": "128-36-6",
+        "stage": "screen",
+        "trials": 14000
+      },
+      {
+        "candidate": "[[127,36,6]] E-GRAFT qubit 40 sector X ordered_row_ids ['a7', 'a27'] of 128-36-6",
+        "d_claimed": 6,
+        "d_verified": 5,
+        "parent": "128-36-6",
+        "stage": "screen",
+        "trials": 14000
+      },
+      {
+        "candidate": "[[127,36,6]] E-GRAFT qubit 106 sector X ordered_row_ids ['a2', 'a28'] of 128-36-6",
+        "d_claimed": 6,
+        "d_verified": 5,
+        "parent": "128-36-6",
+        "stage": "screen",
+        "trials": 14000
+      },
+      {
+        "candidate": "[[137,92,2]] E-PEEL qubit 104 sector X row_id a13 of 138-92-2",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "138-92-2",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[137,92,2]] E-PEEL qubit 57 sector Z row_id b11 of 138-92-2",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "138-92-2",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[137,92,2]] E-PEEL qubit 115 sector Z row_id b22 of 138-92-2",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "138-92-2",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[137,92,2]] E-PEEL qubit 66 sector X row_id a21 of 138-92-2",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "138-92-2",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[138,93,2]] C-DELETE-CHECK row_id a19 of 138-92-2",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "138-92-2",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[138,93,2]] C-DELETE-CHECK row_id a20 of 138-92-2",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "138-92-2",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[138,93,2]] C-DELETE-CHECK row_id b13 of 138-92-2",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "138-92-2",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[138,93,2]] C-DELETE-CHECK row_id a11 of 138-92-2",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "138-92-2",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[147,74,2]] E-PEEL qubit 30 sector Z row_id b31 of 148-74-2",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "148-74-2",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[147,74,2]] E-PEEL qubit 33 sector Z row_id b34 of 148-74-2",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "148-74-2",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[147,74,2]] E-PEEL qubit 25 sector X row_id a26 of 148-74-2",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "148-74-2",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[147,74,2]] E-PEEL qubit 143 sector X row_id a33 of 148-74-2",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "148-74-2",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[148,75,2]] C-DELETE-CHECK row_id a11 of 148-74-2",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "148-74-2",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[148,75,2]] C-DELETE-CHECK row_id a30 of 148-74-2",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "148-74-2",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[148,75,2]] C-DELETE-CHECK row_id a27 of 148-74-2",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "148-74-2",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[148,75,2]] C-DELETE-CHECK row_id b20 of 148-74-2",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "148-74-2",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[163,82,2]] E-PEEL qubit 32 sector X row_id a33 of 164-82-2",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "164-82-2",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[163,82,2]] E-PEEL qubit 84 sector X row_id a3 of 164-82-2",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "164-82-2",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[163,82,2]] E-PEEL qubit 12 sector Z row_id b13 of 164-82-2",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "164-82-2",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[163,82,2]] E-PEEL qubit 23 sector Z row_id b24 of 164-82-2",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "164-82-2",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[164,83,2]] C-DELETE-CHECK row_id b1 of 164-82-2",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "164-82-2",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[164,83,2]] C-DELETE-CHECK row_id b10 of 164-82-2",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "164-82-2",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[164,83,2]] C-DELETE-CHECK row_id a2 of 164-82-2",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "164-82-2",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[164,83,2]] C-DELETE-CHECK row_id a34 of 164-82-2",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "164-82-2",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[185,124,2]] E-PEEL qubit 84 sector X row_id a21 of 186-124-2",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "186-124-2",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[185,124,2]] E-PEEL qubit 101 sector X row_id a6 of 186-124-2",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "186-124-2",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[185,124,2]] E-PEEL qubit 90 sector X row_id a27 of 186-124-2",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "186-124-2",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[185,124,2]] E-PEEL qubit 129 sector X row_id a2 of 186-124-2",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "186-124-2",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[186,125,2]] C-DELETE-CHECK row_id b1 of 186-124-2",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "186-124-2",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[186,125,2]] C-DELETE-CHECK row_id a12 of 186-124-2",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "186-124-2",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[186,125,2]] C-DELETE-CHECK row_id a30 of 186-124-2",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "186-124-2",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[186,125,2]] C-DELETE-CHECK row_id b5 of 186-124-2",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "186-124-2",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[221,148,2]] E-PEEL qubit 195 sector X row_id a9 of 222-148-2",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "222-148-2",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[221,148,2]] E-PEEL qubit 188 sector X row_id a2 of 222-148-2",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "222-148-2",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[221,148,2]] E-PEEL qubit 100 sector X row_id a26 of 222-148-2",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "222-148-2",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[221,148,2]] E-PEEL qubit 218 sector Z row_id b34 of 222-148-2",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "222-148-2",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[222,149,2]] C-DELETE-CHECK row_id b33 of 222-148-2",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "222-148-2",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[222,149,2]] C-DELETE-CHECK row_id a1 of 222-148-2",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "222-148-2",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[222,149,2]] C-DELETE-CHECK row_id b26 of 222-148-2",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "222-148-2",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[222,149,2]] C-DELETE-CHECK row_id a5 of 222-148-2",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "222-148-2",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[245,164,2]] E-PEEL qubit 118 sector Z row_id b37 of 246-164-2",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "246-164-2",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[245,164,2]] E-PEEL qubit 139 sector X row_id a14 of 246-164-2",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "246-164-2",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[245,164,2]] E-PEEL qubit 14 sector Z row_id b15 of 246-164-2",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "246-164-2",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[245,164,2]] E-PEEL qubit 208 sector Z row_id b3 of 246-164-2",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "246-164-2",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[246,165,2]] C-DELETE-CHECK row_id b38 of 246-164-2",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "246-164-2",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[246,165,2]] C-DELETE-CHECK row_id b23 of 246-164-2",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "246-164-2",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[246,165,2]] C-DELETE-CHECK row_id a10 of 246-164-2",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "246-164-2",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[246,165,2]] C-DELETE-CHECK row_id b17 of 246-164-2",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "246-164-2",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[247,186,2]] E-PEEL qubit 123 sector X row_id a31 of 248-186-2",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "248-186-2",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[247,186,2]] E-PEEL qubit 165 sector Z row_id b10 of 248-186-2",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "248-186-2",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[247,186,2]] E-PEEL qubit 44 sector X row_id a14 of 248-186-2",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "248-186-2",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[247,186,2]] E-PEEL qubit 243 sector Z row_id b26 of 248-186-2",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "248-186-2",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[248,187,2]] C-DELETE-CHECK row_id a26 of 248-186-2",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "248-186-2",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[248,187,2]] C-DELETE-CHECK row_id a4 of 248-186-2",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "248-186-2",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[248,187,2]] C-DELETE-CHECK row_id a10 of 248-186-2",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "248-186-2",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[248,187,2]] C-DELETE-CHECK row_id a15 of 248-186-2",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "248-186-2",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[255,73,12]] E-PUNCTURE qubit 202 of 256-68-12-b",
+        "d_claimed": 12,
+        "d_verified": 7,
+        "parent": "256-68-12-b",
+        "stage": "screen",
+        "trials": 440000
+      },
+      {
+        "candidate": "[[255,73,12]] E-PUNCTURE qubit 180 of 256-68-12-b",
+        "d_claimed": 12,
+        "d_verified": 6,
+        "parent": "256-68-12-b",
+        "stage": "screen",
+        "trials": 440000
+      },
+      {
+        "candidate": "[[255,73,12]] E-PUNCTURE qubit 154 of 256-68-12-b",
+        "d_claimed": 12,
+        "d_verified": 6,
+        "parent": "256-68-12-b",
+        "stage": "screen",
+        "trials": 440000
+      },
+      {
+        "candidate": "[[255,73,12]] E-PUNCTURE qubit 110 of 256-68-12-b",
+        "d_claimed": 12,
+        "d_verified": 6,
+        "parent": "256-68-12-b",
+        "stage": "screen",
+        "trials": 440000
+      },
+      {
+        "candidate": "[[255,72,12]] E-PUNCTURE qubit 174 of 256-68-12-b",
+        "d_claimed": 12,
+        "d_verified": 5,
+        "parent": "256-68-12-b",
+        "stage": "screen",
+        "trials": 440000
+      },
+      {
+        "candidate": "[[255,72,12]] E-PUNCTURE qubit 121 of 256-68-12-b",
+        "d_claimed": 12,
+        "d_verified": 6,
+        "parent": "256-68-12-b",
+        "stage": "screen",
+        "trials": 440000
+      },
+      {
+        "candidate": "[[255,72,12]] E-PUNCTURE qubit 103 of 256-68-12-b",
+        "d_claimed": 12,
+        "d_verified": 6,
+        "parent": "256-68-12-b",
+        "stage": "screen",
+        "trials": 440000
+      },
+      {
+        "candidate": "[[255,72,12]] E-PUNCTURE qubit 23 of 256-68-12-b",
+        "d_claimed": 12,
+        "d_verified": 6,
+        "parent": "256-68-12-b",
+        "stage": "screen",
+        "trials": 440000
+      },
+      {
+        "candidate": "[[255,71,12]] E-PUNCTURE qubit 19 of 256-68-12-b",
+        "d_claimed": 12,
+        "d_verified": 7,
+        "parent": "256-68-12-b",
+        "stage": "screen",
+        "trials": 440000
+      },
+      {
+        "candidate": "[[255,71,12]] E-PUNCTURE qubit 37 of 256-68-12-b",
+        "d_claimed": 12,
+        "d_verified": 6,
+        "parent": "256-68-12-b",
+        "stage": "screen",
+        "trials": 440000
+      },
+      {
+        "candidate": "[[256,134,10]] E-PUNCTURE qubit 0 of 257-121-10",
+        "d_claimed": 10,
+        "d_verified": 6,
+        "parent": "257-121-10",
+        "stage": "screen",
+        "trials": 400000
+      },
+      {
+        "candidate": "[[256,134,10]] E-PUNCTURE qubit 2 of 257-121-10",
+        "d_claimed": 10,
+        "d_verified": 4,
+        "parent": "257-121-10",
+        "stage": "screen",
+        "trials": 400000
+      },
+      {
+        "candidate": "[[256,134,10]] E-PUNCTURE qubit 8 of 257-121-10",
+        "d_claimed": 10,
+        "d_verified": 5,
+        "parent": "257-121-10",
+        "stage": "screen",
+        "trials": 400000
+      },
+      {
+        "candidate": "[[256,134,10]] E-PUNCTURE qubit 1 of 257-121-10",
+        "d_claimed": 10,
+        "d_verified": 4,
+        "parent": "257-121-10",
+        "stage": "screen",
+        "trials": 400000
+      },
+      {
+        "candidate": "[[256,131,10]] E-PUNCTURE qubit 187 of 257-121-10",
+        "d_claimed": 10,
+        "d_verified": 6,
+        "parent": "257-121-10",
+        "stage": "screen",
+        "trials": 400000
+      },
+      {
+        "candidate": "[[256,131,10]] E-PUNCTURE qubit 111 of 257-121-10",
+        "d_claimed": 10,
+        "d_verified": 6,
+        "parent": "257-121-10",
+        "stage": "screen",
+        "trials": 400000
+      },
+      {
+        "candidate": "[[256,131,10]] E-PUNCTURE qubit 247 of 257-121-10",
+        "d_claimed": 10,
+        "d_verified": 1,
+        "parent": "257-121-10",
+        "stage": "screen",
+        "trials": 400000
+      },
+      {
+        "candidate": "[[256,131,10]] E-PUNCTURE qubit 86 of 257-121-10",
+        "d_claimed": 10,
+        "d_verified": 1,
+        "parent": "257-121-10",
+        "stage": "screen",
+        "trials": 400000
+      },
+      {
+        "candidate": "[[256,130,10]] E-PUNCTURE qubit 157 of 257-121-10",
+        "d_claimed": 10,
+        "d_verified": 5,
+        "parent": "257-121-10",
+        "stage": "screen",
+        "trials": 400000
+      },
+      {
+        "candidate": "[[256,130,10]] E-PUNCTURE qubit 244 of 257-121-10",
+        "d_claimed": 10,
+        "d_verified": 6,
+        "parent": "257-121-10",
+        "stage": "screen",
+        "trials": 400000
+      },
+      {
+        "candidate": "[[256,130,10]] E-PUNCTURE qubit 177 of 257-121-10",
+        "d_claimed": 10,
+        "d_verified": 5,
+        "parent": "257-121-10",
+        "stage": "screen",
+        "trials": 400000
+      },
+      {
+        "candidate": "[[256,130,10]] E-PUNCTURE qubit 95 of 257-121-10",
+        "d_claimed": 10,
+        "d_verified": 6,
+        "parent": "257-121-10",
+        "stage": "screen",
+        "trials": 400000
+      },
+      {
+        "candidate": "[[256,129,10]] E-PUNCTURE qubit 189 of 257-121-10",
+        "d_claimed": 10,
+        "d_verified": 6,
+        "parent": "257-121-10",
+        "stage": "screen",
+        "trials": 400000
+      },
+      {
+        "candidate": "[[256,129,10]] E-PUNCTURE qubit 147 of 257-121-10",
+        "d_claimed": 10,
+        "d_verified": 6,
+        "parent": "257-121-10",
+        "stage": "screen",
+        "trials": 400000
+      },
+      {
+        "candidate": "[[256,129,10]] E-PUNCTURE qubit 51 of 257-121-10",
+        "d_claimed": 10,
+        "d_verified": 5,
+        "parent": "257-121-10",
+        "stage": "screen",
+        "trials": 400000
+      },
+      {
+        "candidate": "[[256,129,10]] E-PUNCTURE qubit 225 of 257-121-10",
+        "d_claimed": 10,
+        "d_verified": 1,
+        "parent": "257-121-10",
+        "stage": "screen",
+        "trials": 400000
+      },
+      {
+        "candidate": "[[256,128,10]] E-PUNCTURE qubit 202 of 257-121-10",
+        "d_claimed": 10,
+        "d_verified": 6,
+        "parent": "257-121-10",
+        "stage": "screen",
+        "trials": 400000
+      },
+      {
+        "candidate": "[[256,128,10]] E-PUNCTURE qubit 76 of 257-121-10",
+        "d_claimed": 10,
+        "d_verified": 6,
+        "parent": "257-121-10",
+        "stage": "screen",
+        "trials": 400000
+      },
+      {
+        "candidate": "[[256,128,10]] E-PUNCTURE qubit 64 of 257-121-10",
+        "d_claimed": 10,
+        "d_verified": 6,
+        "parent": "257-121-10",
+        "stage": "screen",
+        "trials": 400000
+      },
+      {
+        "candidate": "[[256,128,10]] E-PUNCTURE qubit 191 of 257-121-10",
+        "d_claimed": 10,
+        "d_verified": 7,
+        "parent": "257-121-10",
+        "stage": "screen",
+        "trials": 400000
+      },
+      {
+        "candidate": "[[256,69,12]] C-DELETE-CHECK row_id a48 of 256-68-12-b",
+        "d_claimed": 12,
+        "d_verified": 8,
+        "parent": "256-68-12-b",
+        "stage": "screen",
+        "trials": 440000
+      },
+      {
+        "candidate": "[[256,69,12]] C-DELETE-CHECK row_id b52 of 256-68-12-b",
+        "d_claimed": 12,
+        "d_verified": 8,
+        "parent": "256-68-12-b",
+        "stage": "screen",
+        "trials": 440000
+      },
+      {
+        "candidate": "[[256,69,12]] C-DELETE-CHECK row_id b22 of 256-68-12-b",
+        "d_claimed": 12,
+        "d_verified": 8,
+        "parent": "256-68-12-b",
+        "stage": "screen",
+        "trials": 440000
+      },
+      {
+        "candidate": "[[256,69,12]] C-DELETE-CHECK row_id a16 of 256-68-12-b",
+        "d_claimed": 12,
+        "d_verified": 5,
+        "parent": "256-68-12-b",
+        "stage": "screen",
+        "trials": 440000
+      },
+      {
+        "candidate": "[[275,105,32]] E-PUNCTURE qubit 73 of 276-98-14-b",
+        "d_claimed": 32,
+        "d_verified": 9,
+        "parent": "276-98-14-b",
+        "stage": "screen",
+        "trials": 840000
+      },
+      {
+        "candidate": "[[275,105,32]] E-PUNCTURE qubit 221 of 276-98-14-b",
+        "d_claimed": 32,
+        "d_verified": 8,
+        "parent": "276-98-14-b",
+        "stage": "screen",
+        "trials": 840000
+      },
+      {
+        "candidate": "[[275,105,32]] E-PUNCTURE qubit 44 of 276-98-14-b",
+        "d_claimed": 32,
+        "d_verified": 8,
+        "parent": "276-98-14-b",
+        "stage": "screen",
+        "trials": 840000
+      },
+      {
+        "candidate": "[[275,105,32]] E-PUNCTURE qubit 46 of 276-98-14-b",
+        "d_claimed": 32,
+        "d_verified": 8,
+        "parent": "276-98-14-b",
+        "stage": "screen",
+        "trials": 840000
+      },
+      {
+        "candidate": "[[275,105,14]] E-PUNCTURE qubit 254 of 276-98-14-b",
+        "d_claimed": 14,
+        "d_verified": 8,
+        "parent": "276-98-14-b",
+        "stage": "screen",
+        "trials": 480000
+      },
+      {
+        "candidate": "[[275,105,14]] E-PUNCTURE qubit 189 of 276-98-14-b",
+        "d_claimed": 14,
+        "d_verified": 7,
+        "parent": "276-98-14-b",
+        "stage": "screen",
+        "trials": 840000
+      },
+      {
+        "candidate": "[[275,105,14]] E-PUNCTURE qubit 204 of 276-98-14-b",
+        "d_claimed": 14,
+        "d_verified": 8,
+        "parent": "276-98-14-b",
+        "stage": "screen",
+        "trials": 840000
+      },
+      {
+        "candidate": "[[275,105,14]] E-PUNCTURE qubit 237 of 276-98-14-b",
+        "d_claimed": 14,
+        "d_verified": 8,
+        "parent": "276-98-14-b",
+        "stage": "screen",
+        "trials": 480000
+      },
+      {
+        "candidate": "[[275,104,32]] E-PUNCTURE qubit 0 of 276-98-14-b",
+        "d_claimed": 32,
+        "d_verified": 8,
+        "parent": "276-98-14-b",
+        "stage": "screen",
+        "trials": 840000
+      },
+      {
+        "candidate": "[[275,104,32]] E-PUNCTURE qubit 125 of 276-98-14-b",
+        "d_claimed": 32,
+        "d_verified": 9,
+        "parent": "276-98-14-b",
+        "stage": "screen",
+        "trials": 840000
+      },
+      {
+        "candidate": "[[275,104,32]] E-PUNCTURE qubit 82 of 276-98-14-b",
+        "d_claimed": 32,
+        "d_verified": 8,
+        "parent": "276-98-14-b",
+        "stage": "screen",
+        "trials": 840000
+      },
+      {
+        "candidate": "[[275,104,14]] E-PUNCTURE qubit 110 of 276-98-14-b",
+        "d_claimed": 14,
+        "d_verified": 8,
+        "parent": "276-98-14-b",
+        "stage": "screen",
+        "trials": 840000
+      },
+      {
+        "candidate": "[[275,104,14]] E-PUNCTURE qubit 80 of 276-98-14-b",
+        "d_claimed": 14,
+        "d_verified": 8,
+        "parent": "276-98-14-b",
+        "stage": "screen",
+        "trials": 840000
+      },
+      {
+        "candidate": "[[275,104,14]] E-PUNCTURE qubit 17 of 276-98-14-b",
+        "d_claimed": 14,
+        "d_verified": 8,
+        "parent": "276-98-14-b",
+        "stage": "screen",
+        "trials": 840000
+      },
+      {
+        "candidate": "[[275,104,14]] E-PUNCTURE qubit 175 of 276-98-14-b",
+        "d_claimed": 14,
+        "d_verified": 7,
+        "parent": "276-98-14-b",
+        "stage": "screen",
+        "trials": 840000
+      },
+      {
+        "candidate": "[[275,103,14]] E-PUNCTURE qubit 57 of 276-98-14-b",
+        "d_claimed": 14,
+        "d_verified": 8,
+        "parent": "276-98-14-b",
+        "stage": "screen",
+        "trials": 840000
+      },
+      {
+        "candidate": "[[275,103,14]] E-PUNCTURE qubit 249 of 276-98-14-b",
+        "d_claimed": 14,
+        "d_verified": 10,
+        "parent": "276-98-14-b",
+        "stage": "screen",
+        "trials": 480000
+      },
+      {
+        "candidate": "[[275,103,14]] E-PUNCTURE qubit 25 of 276-98-14-b",
+        "d_claimed": 14,
+        "d_verified": 8,
+        "parent": "276-98-14-b",
+        "stage": "screen",
+        "trials": 840000
+      },
+      {
+        "candidate": "[[275,103,14]] E-PUNCTURE qubit 225 of 276-98-14-b",
+        "d_claimed": 14,
+        "d_verified": 10,
+        "parent": "276-98-14-b",
+        "stage": "screen",
+        "trials": 840000
+      },
+      {
+        "candidate": "[[275,98,32]] E-GRAFT qubit 198 sector X ordered_row_ids ['a2', 'a34', 'a48', 'a83'] of 276-98-14-b",
+        "d_claimed": 32,
+        "d_verified": 13,
+        "parent": "276-98-14-b",
+        "stage": "screen",
+        "trials": 840000
+      },
+      {
+        "candidate": "[[295,222,2]] E-PEEL qubit 99 sector Z row_id b26 of 296-222-2",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "296-222-2",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[295,222,2]] E-PEEL qubit 226 sector X row_id a2 of 296-222-2",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "296-222-2",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[295,222,2]] E-PEEL qubit 107 sector Z row_id b34 of 296-222-2",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "296-222-2",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[295,222,2]] E-PEEL qubit 131 sector X row_id a20 of 296-222-2",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "296-222-2",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[296,223,2]] C-DELETE-CHECK row_id a33 of 296-222-2",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "296-222-2",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[296,223,2]] C-DELETE-CHECK row_id b7 of 296-222-2",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "296-222-2",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[296,223,2]] C-DELETE-CHECK row_id b28 of 296-222-2",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "296-222-2",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[296,223,2]] C-DELETE-CHECK row_id a19 of 296-222-2",
+        "d_claimed": 2,
+        "d_verified": 1,
+        "parent": "296-222-2",
+        "stage": "screen",
+        "trials": 6000
+      },
+      {
+        "candidate": "[[369,87,34]] E-PUNCTURE qubit 33 of 370-80-22-b",
+        "d_claimed": 34,
+        "d_verified": 9,
+        "parent": "370-80-22-b",
+        "stage": "screen",
+        "trials": 880000
+      },
+      {
+        "candidate": "[[369,87,34]] E-PUNCTURE qubit 291 of 370-80-22-b",
+        "d_claimed": 34,
+        "d_verified": 9,
+        "parent": "370-80-22-b",
+        "stage": "screen",
+        "trials": 880000
+      },
+      {
+        "candidate": "[[369,87,34]] E-PUNCTURE qubit 81 of 370-80-22-b",
+        "d_claimed": 34,
+        "d_verified": 9,
+        "parent": "370-80-22-b",
+        "stage": "screen",
+        "trials": 880000
+      },
+      {
+        "candidate": "[[369,87,34]] E-PUNCTURE qubit 174 of 370-80-22-b",
+        "d_claimed": 34,
+        "d_verified": 9,
+        "parent": "370-80-22-b",
+        "stage": "screen",
+        "trials": 880000
+      },
+      {
+        "candidate": "[[511,137,16]] E-PUNCTURE qubit 47 of 512-132-16",
+        "d_claimed": 16,
+        "d_verified": 7,
+        "parent": "512-132-16",
+        "stage": "screen",
+        "trials": 520000
+      },
+      {
+        "candidate": "[[511,137,16]] E-PUNCTURE qubit 107 of 512-132-16",
+        "d_claimed": 16,
+        "d_verified": 7,
+        "parent": "512-132-16",
+        "stage": "screen",
+        "trials": 520000
+      },
+      {
+        "candidate": "[[511,137,16]] E-PUNCTURE qubit 260 of 512-132-16",
+        "d_claimed": 16,
+        "d_verified": 5,
+        "parent": "512-132-16",
+        "stage": "screen",
+        "trials": 520000
+      },
+      {
+        "candidate": "[[511,137,16]] E-PUNCTURE qubit 384 of 512-132-16",
+        "d_claimed": 16,
+        "d_verified": 7,
+        "parent": "512-132-16",
+        "stage": "screen",
+        "trials": 520000
+      },
+      {
+        "candidate": "[[635,225,92]] E-PUNCTURE qubit 107 of 636-218-20",
+        "d_claimed": 92,
+        "d_verified": 11,
+        "parent": "636-218-20",
+        "stage": "screen",
+        "trials": 2000000
+      },
+      {
+        "candidate": "[[635,225,92]] E-PUNCTURE qubit 0 of 636-218-20",
+        "d_claimed": 92,
+        "d_verified": 11,
+        "parent": "636-218-20",
+        "stage": "screen",
+        "trials": 2000000
+      },
+      {
+        "candidate": "[[635,225,92]] E-PUNCTURE qubit 159 of 636-218-20",
+        "d_claimed": 92,
+        "d_verified": 11,
+        "parent": "636-218-20",
+        "stage": "screen",
+        "trials": 2000000
+      },
+      {
+        "candidate": "[[635,225,92]] E-PUNCTURE qubit 122 of 636-218-20",
+        "d_claimed": 92,
+        "d_verified": 11,
+        "parent": "636-218-20",
+        "stage": "screen",
+        "trials": 2000000
+      },
+      {
+        "candidate": "[[635,113,28]] E-PUNCTURE qubit 633 of 636-106-24",
+        "d_claimed": 28,
+        "d_verified": 7,
+        "parent": "636-106-24",
+        "stage": "screen",
+        "trials": 760000
+      },
+      {
+        "candidate": "[[635,113,28]] E-PUNCTURE qubit 560 of 636-106-24",
+        "d_claimed": 28,
+        "d_verified": 7,
+        "parent": "636-106-24",
+        "stage": "screen",
+        "trials": 760000
+      },
+      {
+        "candidate": "[[635,113,28]] E-PUNCTURE qubit 496 of 636-106-24",
+        "d_claimed": 28,
+        "d_verified": 7,
+        "parent": "636-106-24",
+        "stage": "screen",
+        "trials": 760000
+      },
+      {
+        "candidate": "[[635,113,28]] E-PUNCTURE qubit 482 of 636-106-24",
+        "d_claimed": 28,
+        "d_verified": 7,
+        "parent": "636-106-24",
+        "stage": "screen",
+        "trials": 760000
+      },
+      {
+        "candidate": "[[673,101,90]] E-PUNCTURE qubit 442 of 674-86-90-w16",
+        "d_claimed": 90,
+        "d_verified": 15,
+        "parent": "674-86-90-w16",
+        "stage": "screen",
+        "trials": 2000000
+      },
+      {
+        "candidate": "[[673,101,90]] E-PUNCTURE qubit 205 of 674-86-90-w16",
+        "d_claimed": 90,
+        "d_verified": 15,
+        "parent": "674-86-90-w16",
+        "stage": "screen",
+        "trials": 2000000
+      },
+      {
+        "candidate": "[[673,101,90]] E-PUNCTURE qubit 181 of 674-86-90-w16",
+        "d_claimed": 90,
+        "d_verified": 15,
+        "parent": "674-86-90-w16",
+        "stage": "screen",
+        "trials": 2000000
+      },
+      {
+        "candidate": "[[673,101,90]] E-PUNCTURE qubit 446 of 674-86-90-w16",
+        "d_claimed": 90,
+        "d_verified": 15,
+        "parent": "674-86-90-w16",
+        "stage": "screen",
+        "trials": 2000000
+      },
+      {
+        "candidate": "[[681,49,86]] E-PUNCTURE qubit 266 of 682-40-86",
+        "d_claimed": 86,
+        "d_verified": 9,
+        "parent": "682-40-86",
+        "stage": "screen",
+        "trials": 1920000
+      },
+      {
+        "candidate": "[[681,49,86]] E-PUNCTURE qubit 574 of 682-40-86",
+        "d_claimed": 86,
+        "d_verified": 9,
+        "parent": "682-40-86",
+        "stage": "screen",
+        "trials": 1920000
+      },
+      {
+        "candidate": "[[681,49,86]] E-PUNCTURE qubit 357 of 682-40-86",
+        "d_claimed": 86,
+        "d_verified": 9,
+        "parent": "682-40-86",
+        "stage": "screen",
+        "trials": 1920000
+      },
+      {
+        "candidate": "[[681,49,86]] E-PUNCTURE qubit 440 of 682-40-86",
+        "d_claimed": 86,
+        "d_verified": 9,
+        "parent": "682-40-86",
+        "stage": "screen",
+        "trials": 1920000
+      }
+    ],
+    "counts": {
+      "board_advancing": 13,
+      "children_planned": 23465,
+      "gate_passed": 13,
+      "new_slugs": [
+        "127-36-5",
+        "127-41-4",
+        "255-73-7",
+        "256-69-8",
+        "275-103-10",
+        "275-105-9",
+        "511-137-7"
+      ],
+      "prefiltered_dominated": 6865,
+      "screened": 290
+    },
+    "parents": {
+      "count": 32,
+      "selection": "the CSS entries added to codes/ between 2026-11-24 and the board commit (git log --diff-filter=A), the parents the planner can load; the stabilizer additions of the same days were skipped because the library has no loader for them",
+      "sha256": {
+        "102-68-2": "c79ec69b789db32fad772cf29e63cd0f6cfbdfed2cdad8fba64a9086b8ef9e7d",
+        "114-76-2": "d3a38610f1cb30bfcd5f999fda361258592ae2aaaa3bd1a2703be92a3764002a",
+        "116-58-2": "e3e1fb0ee3f40245fdea6e2ef01f976dcc6b5135138c4e536dd3cb8cc71a8d9a",
+        "120-4-16": "b3644a8ee3278792d2febcafb65f0aef921fc764505e2f015a35f9d9c4ec4405",
+        "128-36-6": "fcfc82f8665561e427ff5dc60b0a67ebdd371e1dcb19a51126fe9d022dd3f575",
+        "138-92-2": "019eba5f00769398b6de98f0676e7a4175c37d51240bf125564a27fa9de1b34c",
+        "148-74-2": "2ee9cc1616e9527688cfc58f51ac2a90d85ca6fb03e65b6853fb8f58b6fb80e2",
+        "164-82-2": "65d6282b85c77e2b8ad8a08b313f4025141e8696fa4a4446239d931601174316",
+        "186-124-2": "63efce36a700b08d17032d4351137ac4ed30e67846bcd643f60f07296cd2ae4e",
+        "222-148-2": "27ded04ccaaba8de491c5d72ca550c068f6385a142b347d75e0110a9a29d2ba3",
+        "246-164-2": "51699c507d370dde65d8e814d5cb3eba6d355aab90b1100018b5047c47c9f9af",
+        "248-186-2": "a1925128e7de59decc52a7990b0c42a99506802f2ae3849b0f71ab3000c2cfc1",
+        "256-68-12-b": "5e264ddd763c2c97d6d857c17d1d552b3945c6d491b4a0159f8ac90088b213ee",
+        "257-121-10": "2760bee40a55fa0115d5f7b4907d32c042addf28555d493d3af16d69ebeb84cc",
+        "276-98-14-b": "9174c60db2c6284bb3fe928d9e14ea2a4cf6f42f52c19d0c8691b0716c36df36",
+        "28-14-2-b": "b3c57aaacb31f524702757b57516e8bec1a0276bf7b666f02503eacb44130aac",
+        "296-222-2": "b18eb223c5b099169d26588b7ebb63b6a024da7cb53135b31d7ea46effa30ce9",
+        "36-18-2-b": "e30ff30e355e8cbf124b47ca128a10be1f61a9bb8dbbdf1f3d401e8ca5a1bffc",
+        "370-80-22-b": "5aa6264d70fa6d513f0bdabfd346c80d9be88b227ebb535477ba60590cffe4a7",
+        "44-22-2-b": "0b6b0d3ff95f66622e9c89e1a0490619e61600c1f63f0a436f00bce58e83824c",
+        "512-132-16": "02fcdf022d0632989a48186f43cdccfb7e13aed835da7bebcf102bdd7caee575",
+        "52-26-2-b": "fabaeb4558ec8fce384c3d4b8939a33ea9e551387f2cd6dfcc86e9aa6afa0435",
+        "54-36-2-b": "13a3df2843b81dcc7535e93babd2bbdc39a02599f37c5467e65f55b2b3ab7116",
+        "636-106-24": "f23b1e0660642edb4eb15f92080ceaa846266260def807af794b65bb9a78f94f",
+        "636-218-20": "eb1d986e45a361b7fc1f36cac972d9455862e8d4aaf47bdc4bbaadcb7b6ee93e",
+        "66-44-2-b": "f6140cc982a1248ef2e6b7d00bfa781a70fb430cbc8f3db1c5e585c6fd85a03b",
+        "674-86-90-w16": "ee0d2c5ae91aac03b9e36a7d9472f5d14e74671562abff402e1bdc185d6c6957",
+        "68-34-2-b": "ad3bdec7803c20a4af215b7658153a7de020d3795f06f57f0f8a4862b6773a86",
+        "682-40-86": "b61f47f59b44c03c87ffe825589d8c0fee855927fe6e5eb50d6745e857aed95d",
+        "76-38-2-b": "eda79405f7e5516ad6990bad03c80d854acb7d96c185d3563433da9133ed3a83",
+        "84-6-6-b": "55d3eebb8e3c28a83dfa2f12d28c3acbef51b3232ee68b51e07760cb9e786192",
+        "92-46-2-b": "0b74ecc5053fe1a71cf629f4abf570d53d741c857c089c5be9745d5b9a443a1a"
+      },
+      "slugs": [
+        "102-68-2",
+        "114-76-2",
+        "116-58-2",
+        "120-4-16",
+        "128-36-6",
+        "138-92-2",
+        "148-74-2",
+        "164-82-2",
+        "186-124-2",
+        "222-148-2",
+        "246-164-2",
+        "248-186-2",
+        "256-68-12-b",
+        "257-121-10",
+        "276-98-14-b",
+        "28-14-2-b",
+        "296-222-2",
+        "36-18-2-b",
+        "370-80-22-b",
+        "44-22-2-b",
+        "512-132-16",
+        "52-26-2-b",
+        "54-36-2-b",
+        "636-106-24",
+        "636-218-20",
+        "66-44-2-b",
+        "674-86-90-w16",
+        "68-34-2-b",
+        "682-40-86",
+        "76-38-2-b",
+        "84-6-6-b",
+        "92-46-2-b"
+      ]
+    },
+    "refusals": [
+      {
+        "candidate": "[[32,4,4]] w4 bilayer models of 2D-local SAT rung 4x4x2 G=14 t=3",
+        "count": 15,
+        "reason": "every model was a direct sum of two codes, which kit/submit.make_submission refuses",
+        "stage": "packaging"
+      }
+    ],
+    "tools": [
+      {
+        "commit": "830767f96aa31b2a1c2443d9a9ea83b00beed314",
+        "name": "code-calculus-dev",
+        "repo": "github.com/MathysRennela/code-calculus-dev",
+        "role": "machine/planner.py planner.plan with structural=True, include_disconnected=False: the single-step children of each parent"
+      }
+    ]
+  },
+  "errors": [],
+  "experiments": [
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "novel_generation",
+      "note": "code-calculus children of codes/102-68-2.json: 238 planned, 8 screened",
+      "params": {
+        "children_planned": 238,
+        "generator": "planner.plan",
+        "parent": "codes/102-68-2.json"
+      },
+      "screened": {
+        "backend": "fast",
+        "d": 1,
+        "kd2_over_n": 0.6764705882352942,
+        "trials": 6000
+      },
+      "seed": 1127,
+      "spent": {
+        "candidates_screened": 0,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.03241666666666667
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "novel_generation",
+      "note": "code-calculus children of codes/114-76-2.json: 266 planned, 8 screened",
+      "params": {
+        "children_planned": 266,
+        "generator": "planner.plan",
+        "parent": "codes/114-76-2.json"
+      },
+      "screened": {
+        "backend": "fast",
+        "d": 1,
+        "kd2_over_n": 0.6754385964912281,
+        "trials": 6000
+      },
+      "seed": 1127,
+      "spent": {
+        "candidates_screened": 0,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.03963888888888888
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "novel_generation",
+      "note": "code-calculus children of codes/116-58-2.json: 290 planned, 8 screened",
+      "params": {
+        "children_planned": 290,
+        "generator": "planner.plan",
+        "parent": "codes/116-58-2.json"
+      },
+      "screened": {
+        "backend": "fast",
+        "d": 1,
+        "kd2_over_n": 0.5086206896551724,
+        "trials": 6000
+      },
+      "seed": 1127,
+      "spent": {
+        "candidates_screened": 0,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.03125
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "novel_generation",
+      "note": "code-calculus children of codes/120-4-16.json: 476 planned, 12 screened",
+      "params": {
+        "children_planned": 476,
+        "generator": "planner.plan",
+        "parent": "codes/120-4-16.json"
+      },
+      "screened": {
+        "backend": "fast",
+        "d": 8,
+        "kd2_over_n": 2.6666666666666665,
+        "trials": 520000
+      },
+      "seed": 1127,
+      "spent": {
+        "candidates_screened": 0,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.10991666666666666
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "novel_generation",
+      "note": "code-calculus children of codes/128-36-6.json: 477 planned, 20 screened",
+      "params": {
+        "children_planned": 477,
+        "generator": "planner.plan",
+        "parent": "codes/128-36-6.json"
+      },
+      "screened": {
+        "backend": "fast",
+        "d": 5,
+        "kd2_over_n": 7.086614173228346,
+        "trials": 14000
+      },
+      "seed": 1127,
+      "spent": {
+        "candidates_screened": 0,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.09091666666666667
+      },
+      "survivors": 3,
+      "verdict": "passed",
+      "verified_kd2_over_n": 7.086614173228346
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "novel_generation",
+      "note": "code-calculus children of codes/138-92-2.json: 322 planned, 8 screened",
+      "params": {
+        "children_planned": 322,
+        "generator": "planner.plan",
+        "parent": "codes/138-92-2.json"
+      },
+      "screened": {
+        "backend": "fast",
+        "d": 1,
+        "kd2_over_n": 0.6739130434782609,
+        "trials": 6000
+      },
+      "seed": 1127,
+      "spent": {
+        "candidates_screened": 0,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.05144444444444444
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "novel_generation",
+      "note": "code-calculus children of codes/148-74-2.json: 370 planned, 8 screened",
+      "params": {
+        "children_planned": 370,
+        "generator": "planner.plan",
+        "parent": "codes/148-74-2.json"
+      },
+      "screened": {
+        "backend": "fast",
+        "d": 1,
+        "kd2_over_n": 0.5067567567567568,
+        "trials": 6000
+      },
+      "seed": 1127,
+      "spent": {
+        "candidates_screened": 0,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.04677777777777778
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "novel_generation",
+      "note": "code-calculus children of codes/164-82-2.json: 410 planned, 8 screened",
+      "params": {
+        "children_planned": 410,
+        "generator": "planner.plan",
+        "parent": "codes/164-82-2.json"
+      },
+      "screened": {
+        "backend": "fast",
+        "d": 1,
+        "kd2_over_n": 0.5060975609756098,
+        "trials": 6000
+      },
+      "seed": 1127,
+      "spent": {
+        "candidates_screened": 0,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.058
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "novel_generation",
+      "note": "code-calculus children of codes/186-124-2.json: 434 planned, 8 screened",
+      "params": {
+        "children_planned": 434,
+        "generator": "planner.plan",
+        "parent": "codes/186-124-2.json"
+      },
+      "screened": {
+        "backend": "fast",
+        "d": 1,
+        "kd2_over_n": 0.6720430107526881,
+        "trials": 6000
+      },
+      "seed": 1127,
+      "spent": {
+        "candidates_screened": 0,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.10097222222222223
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "novel_generation",
+      "note": "code-calculus children of codes/222-148-2.json: 518 planned, 8 screened",
+      "params": {
+        "children_planned": 518,
+        "generator": "planner.plan",
+        "parent": "codes/222-148-2.json"
+      },
+      "screened": {
+        "backend": "fast",
+        "d": 1,
+        "kd2_over_n": 0.6711711711711712,
+        "trials": 6000
+      },
+      "seed": 1127,
+      "spent": {
+        "candidates_screened": 0,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.14466666666666667
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "novel_generation",
+      "note": "code-calculus children of codes/246-164-2.json: 574 planned, 8 screened",
+      "params": {
+        "children_planned": 574,
+        "generator": "planner.plan",
+        "parent": "codes/246-164-2.json"
+      },
+      "screened": {
+        "backend": "fast",
+        "d": 1,
+        "kd2_over_n": 0.6707317073170732,
+        "trials": 6000
+      },
+      "seed": 1127,
+      "spent": {
+        "candidates_screened": 0,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.19375
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "novel_generation",
+      "note": "code-calculus children of codes/248-186-2.json: 558 planned, 8 screened",
+      "params": {
+        "children_planned": 558,
+        "generator": "planner.plan",
+        "parent": "codes/248-186-2.json"
+      },
+      "screened": {
+        "backend": "fast",
+        "d": 1,
+        "kd2_over_n": 0.7540322580645161,
+        "trials": 6000
+      },
+      "seed": 1127,
+      "spent": {
+        "candidates_screened": 0,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.22138888888888889
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "novel_generation",
+      "note": "code-calculus children of codes/256-68-12-b.json: 956 planned, 14 screened",
+      "params": {
+        "children_planned": 956,
+        "generator": "planner.plan",
+        "parent": "codes/256-68-12-b.json"
+      },
+      "screened": {
+        "backend": "fast",
+        "d": 5,
+        "kd2_over_n": 6.73828125,
+        "trials": 440000
+      },
+      "seed": 1127,
+      "spent": {
+        "candidates_screened": 0,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.6558333333333334
+      },
+      "survivors": 4,
+      "verdict": "passed",
+      "verified_kd2_over_n": 17.25
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "novel_generation",
+      "note": "code-calculus children of codes/257-121-10.json: 909 planned, 20 screened",
+      "params": {
+        "children_planned": 909,
+        "generator": "planner.plan",
+        "parent": "codes/257-121-10.json"
+      },
+      "screened": {
+        "backend": "fast",
+        "d": 7,
+        "kd2_over_n": 24.5,
+        "trials": 400000
+      },
+      "seed": 1127,
+      "spent": {
+        "candidates_screened": 0,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 1.2078888888888888
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "novel_generation",
+      "note": "code-calculus children of codes/276-98-14-b.json: 1006 planned, 20 screened",
+      "params": {
+        "children_planned": 1006,
+        "generator": "planner.plan",
+        "parent": "codes/276-98-14-b.json"
+      },
+      "screened": {
+        "backend": "fast",
+        "d": 13,
+        "kd2_over_n": 60.22545454545455,
+        "trials": 840000
+      },
+      "seed": 1127,
+      "spent": {
+        "candidates_screened": 0,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 2.365638888888889
+      },
+      "survivors": 3,
+      "verdict": "passed",
+      "verified_kd2_over_n": 37.45454545454545
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "novel_generation",
+      "note": "code-calculus children of codes/28-14-2-b.json: 70 planned, 8 screened",
+      "params": {
+        "children_planned": 70,
+        "generator": "planner.plan",
+        "parent": "codes/28-14-2-b.json"
+      },
+      "screened": {
+        "backend": "fast",
+        "d": 1,
+        "kd2_over_n": 0.5357142857142857,
+        "trials": 6000
+      },
+      "seed": 1127,
+      "spent": {
+        "candidates_screened": 0,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.004111111111111111
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "novel_generation",
+      "note": "code-calculus children of codes/296-222-2.json: 666 planned, 8 screened",
+      "params": {
+        "children_planned": 666,
+        "generator": "planner.plan",
+        "parent": "codes/296-222-2.json"
+      },
+      "screened": {
+        "backend": "fast",
+        "d": 1,
+        "kd2_over_n": 0.7533783783783784,
+        "trials": 6000
+      },
+      "seed": 1127,
+      "spent": {
+        "candidates_screened": 0,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.37577777777777777
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "novel_generation",
+      "note": "code-calculus children of codes/36-18-2-b.json: 90 planned, 8 screened",
+      "params": {
+        "children_planned": 90,
+        "generator": "planner.plan",
+        "parent": "codes/36-18-2-b.json"
+      },
+      "screened": {
+        "backend": "fast",
+        "d": 1,
+        "kd2_over_n": 0.5277777777777778,
+        "trials": 6000
+      },
+      "seed": 1127,
+      "spent": {
+        "candidates_screened": 0,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.004916666666666666
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "novel_generation",
+      "note": "code-calculus children of codes/370-80-22-b.json: 1401 planned, 4 screened",
+      "params": {
+        "children_planned": 1401,
+        "generator": "planner.plan",
+        "parent": "codes/370-80-22-b.json"
+      },
+      "screened": {
+        "backend": "fast",
+        "d": 9,
+        "kd2_over_n": 19.097560975609756,
+        "trials": 880000
+      },
+      "seed": 1127,
+      "spent": {
+        "candidates_screened": 0,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.7321388888888888
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "novel_generation",
+      "note": "code-calculus children of codes/44-22-2-b.json: 110 planned, 8 screened",
+      "params": {
+        "children_planned": 110,
+        "generator": "planner.plan",
+        "parent": "codes/44-22-2-b.json"
+      },
+      "screened": {
+        "backend": "fast",
+        "d": 1,
+        "kd2_over_n": 0.5227272727272727,
+        "trials": 6000
+      },
+      "seed": 1127,
+      "spent": {
+        "candidates_screened": 0,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.006666666666666667
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "novel_generation",
+      "note": "code-calculus children of codes/512-132-16.json: 1916 planned, 4 screened",
+      "params": {
+        "children_planned": 1916,
+        "generator": "planner.plan",
+        "parent": "codes/512-132-16.json"
+      },
+      "screened": {
+        "backend": "fast",
+        "d": 7,
+        "kd2_over_n": 13.136986301369863,
+        "trials": 520000
+      },
+      "seed": 1127,
+      "spent": {
+        "candidates_screened": 0,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.9004722222222221
+      },
+      "survivors": 3,
+      "verdict": "passed",
+      "verified_kd2_over_n": 13.136986301369863
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "novel_generation",
+      "note": "code-calculus children of codes/52-26-2-b.json: 130 planned, 8 screened",
+      "params": {
+        "children_planned": 130,
+        "generator": "planner.plan",
+        "parent": "codes/52-26-2-b.json"
+      },
+      "screened": {
+        "backend": "fast",
+        "d": 1,
+        "kd2_over_n": 0.5192307692307693,
+        "trials": 6000
+      },
+      "seed": 1127,
+      "spent": {
+        "candidates_screened": 0,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.007888888888888888
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "novel_generation",
+      "note": "code-calculus children of codes/54-36-2-b.json: 126 planned, 8 screened",
+      "params": {
+        "children_planned": 126,
+        "generator": "planner.plan",
+        "parent": "codes/54-36-2-b.json"
+      },
+      "screened": {
+        "backend": "fast",
+        "d": 1,
+        "kd2_over_n": 0.6851851851851852,
+        "trials": 6000
+      },
+      "seed": 1127,
+      "spent": {
+        "candidates_screened": 0,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.00977777777777778
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "novel_generation",
+      "note": "code-calculus children of codes/636-106-24.json: 2438 planned, 4 screened",
+      "params": {
+        "children_planned": 2438,
+        "generator": "planner.plan",
+        "parent": "codes/636-106-24.json"
+      },
+      "screened": {
+        "backend": "fast",
+        "d": 7,
+        "kd2_over_n": 8.719685039370079,
+        "trials": 760000
+      },
+      "seed": 1127,
+      "spent": {
+        "candidates_screened": 0,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 1.7180277777777777
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "novel_generation",
+      "note": "code-calculus children of codes/636-218-20.json: 2326 planned, 4 screened",
+      "params": {
+        "children_planned": 2326,
+        "generator": "planner.plan",
+        "parent": "codes/636-218-20.json"
+      },
+      "screened": {
+        "backend": "fast",
+        "d": 11,
+        "kd2_over_n": 42.874015748031496,
+        "trials": 2000000
+      },
+      "seed": 1127,
+      "spent": {
+        "candidates_screened": 0,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 5.040722222222222
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "novel_generation",
+      "note": "code-calculus children of codes/66-44-2-b.json: 154 planned, 8 screened",
+      "params": {
+        "children_planned": 154,
+        "generator": "planner.plan",
+        "parent": "codes/66-44-2-b.json"
+      },
+      "screened": {
+        "backend": "fast",
+        "d": 1,
+        "kd2_over_n": 0.6818181818181818,
+        "trials": 6000
+      },
+      "seed": 1127,
+      "spent": {
+        "candidates_screened": 0,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.013583333333333333
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "novel_generation",
+      "note": "code-calculus children of codes/674-86-90-w16.json: 2610 planned, 4 screened",
+      "params": {
+        "children_planned": 2610,
+        "generator": "planner.plan",
+        "parent": "codes/674-86-90-w16.json"
+      },
+      "screened": {
+        "backend": "fast",
+        "d": 15,
+        "kd2_over_n": 33.7667161961367,
+        "trials": 2000000
+      },
+      "seed": 1127,
+      "spent": {
+        "candidates_screened": 0,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 4.409083333333333
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "novel_generation",
+      "note": "code-calculus children of codes/68-34-2-b.json: 170 planned, 8 screened",
+      "params": {
+        "children_planned": 170,
+        "generator": "planner.plan",
+        "parent": "codes/68-34-2-b.json"
+      },
+      "screened": {
+        "backend": "fast",
+        "d": 1,
+        "kd2_over_n": 0.5147058823529411,
+        "trials": 6000
+      },
+      "seed": 1127,
+      "spent": {
+        "candidates_screened": 0,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.012277777777777778
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "novel_generation",
+      "note": "code-calculus children of codes/682-40-86.json: 2688 planned, 4 screened",
+      "params": {
+        "children_planned": 2688,
+        "generator": "planner.plan",
+        "parent": "codes/682-40-86.json"
+      },
+      "screened": {
+        "backend": "fast",
+        "d": 9,
+        "kd2_over_n": 5.828193832599119,
+        "trials": 1920000
+      },
+      "seed": 1127,
+      "spent": {
+        "candidates_screened": 0,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 3.2391388888888892
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "novel_generation",
+      "note": "code-calculus children of codes/76-38-2-b.json: 190 planned, 8 screened",
+      "params": {
+        "children_planned": 190,
+        "generator": "planner.plan",
+        "parent": "codes/76-38-2-b.json"
+      },
+      "screened": {
+        "backend": "fast",
+        "d": 1,
+        "kd2_over_n": 0.5131578947368421,
+        "trials": 6000
+      },
+      "seed": 1127,
+      "spent": {
+        "candidates_screened": 0,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.014861111111111111
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "novel_generation",
+      "note": "code-calculus children of codes/84-6-6-b.json: 346 planned, 20 screened",
+      "params": {
+        "children_planned": 346,
+        "generator": "planner.plan",
+        "parent": "codes/84-6-6-b.json"
+      },
+      "screened": {
+        "backend": "fast",
+        "d": 1,
+        "kd2_over_n": 0.08333333333333333,
+        "trials": 14000
+      },
+      "seed": 1127,
+      "spent": {
+        "candidates_screened": 0,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.03641666666666667
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "novel_generation",
+      "note": "code-calculus children of codes/92-46-2-b.json: 230 planned, 8 screened",
+      "params": {
+        "children_planned": 230,
+        "generator": "planner.plan",
+        "parent": "codes/92-46-2-b.json"
+      },
+      "screened": {
+        "backend": "fast",
+        "d": 1,
+        "kd2_over_n": 0.5108695652173914,
+        "trials": 6000
+      },
+      "seed": 1127,
+      "spent": {
+        "candidates_screened": 0,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.02225
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "enumeration",
+      "note": "2D-local SAT rung 6x6 G=8 w8 t=2: walled",
+      "params": {
+        "G": 8,
+        "anchor_radius": 2.0,
+        "conflict_cap": 3000000,
+        "conflicts_total": 3000011,
+        "instance": "6x6 G=8 w8 t=2",
+        "layers": 1,
+        "max_weight": 8,
+        "n_side": 6,
+        "secs": 219.3,
+        "solver": "CaDiCaL 1.9.5 via python-sat",
+        "status": "walled",
+        "t": 2,
+        "wall_cap_hours": 0.75
+      },
+      "seed": 0,
+      "spent": {
+        "candidates_screened": 0,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.06091666666666667
+      },
+      "survivors": 0
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "enumeration",
+      "note": "2D-local SAT rung 5x5 G=6 w8 t=2: walled",
+      "params": {
+        "G": 6,
+        "anchor_radius": 2.0,
+        "conflict_cap": 3000000,
+        "conflicts_total": 3000010,
+        "instance": "5x5 G=6 w8 t=2",
+        "layers": 1,
+        "max_weight": 8,
+        "n_side": 5,
+        "secs": 220.5,
+        "solver": "CaDiCaL 1.9.5 via python-sat",
+        "status": "walled",
+        "t": 2,
+        "wall_cap_hours": 0.75
+      },
+      "seed": 0,
+      "spent": {
+        "candidates_screened": 0,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.06125
+      },
+      "survivors": 0
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "enumeration",
+      "note": "2D-local SAT rung 7x7 G=11 w8 t=2: walled",
+      "params": {
+        "G": 11,
+        "anchor_radius": 2.0,
+        "conflict_cap": 3000000,
+        "conflicts_total": 3000005,
+        "instance": "7x7 G=11 w8 t=2",
+        "layers": 1,
+        "max_weight": 8,
+        "n_side": 7,
+        "secs": 284.3,
+        "solver": "CaDiCaL 1.9.5 via python-sat",
+        "status": "walled",
+        "t": 2,
+        "wall_cap_hours": 0.75
+      },
+      "seed": 0,
+      "spent": {
+        "candidates_screened": 0,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.07897222222222222
+      },
+      "survivors": 0
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "enumeration",
+      "note": "2D-local SAT rung 5x5 G=10 w4 t=2: SAT",
+      "params": {
+        "G": 10,
+        "anchor_radius": 2.0,
+        "conflict_cap": 3000000,
+        "conflicts_total": 1750010,
+        "instance": "5x5 G=10 w4 t=2",
+        "layers": 1,
+        "max_weight": 4,
+        "n_side": 5,
+        "secs": 274.7,
+        "solver": "CaDiCaL 1.9.5 via python-sat",
+        "status": "SAT",
+        "t": 2,
+        "wall_cap_hours": 0.75
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 3,
+        "kd2_over_n": 1.8,
+        "trials": 20000
+      },
+      "seed": 0,
+      "spent": {
+        "candidates_screened": 0,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.07630555555555556
+      },
+      "survivors": 1,
+      "verdict": "passed",
+      "verified_kd2_over_n": 1.8
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "enumeration",
+      "note": "2D-local SAT rung 4x4x2 G=14 w4 t=3: SAT",
+      "params": {
+        "G": 14,
+        "anchor_radius": 3.5,
+        "conflict_cap": 3000000,
+        "conflicts_total": 250004,
+        "instance": "4x4x2 G=14 w4 t=3",
+        "layers": 2,
+        "max_weight": 4,
+        "n_side": 4,
+        "secs": 440.7,
+        "solver": "CaDiCaL 1.9.5 via python-sat",
+        "status": "SAT",
+        "t": 3,
+        "wall_cap_hours": 0.75
+      },
+      "seed": 0,
+      "spent": {
+        "candidates_screened": 0,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.12241666666666666
+      },
+      "survivors": 0
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "enumeration",
+      "note": "2D-local SAT rung 5x5 G=11 w4 t=3: walled",
+      "params": {
+        "G": 11,
+        "anchor_radius": 2.0,
+        "conflict_cap": 3000000,
+        "conflicts_total": 3000013,
+        "instance": "5x5 G=11 w4 t=3",
+        "layers": 1,
+        "max_weight": 4,
+        "n_side": 5,
+        "secs": 1467.3,
+        "solver": "CaDiCaL 1.9.5 via python-sat",
+        "status": "walled",
+        "t": 3,
+        "wall_cap_hours": 0.75
+      },
+      "seed": 0,
+      "spent": {
+        "candidates_screened": 0,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.4075833333333333
+      },
+      "survivors": 0
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "enumeration",
+      "note": "2D-local SAT rung 4x4x2 G=13 w4 t=2 connected: SAT",
+      "params": {
+        "G": 13,
+        "anchor_radius": 3.5,
+        "conflict_cap": 3000000,
+        "conflicts_total": null,
+        "instance": "4x4x2 G=13 w4 t=2 connected",
+        "layers": 2,
+        "max_weight": 4,
+        "n_side": 4,
+        "secs": 57.5,
+        "solver": "CaDiCaL 1.9.5 via python-sat",
+        "status": "SAT",
+        "t": 2,
+        "wall_cap_hours": 0.67
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 3,
+        "kd2_over_n": 1.6875,
+        "trials": 20000
+      },
+      "seed": 0,
+      "spent": {
+        "candidates_screened": 0,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.01597222222222222
+      },
+      "survivors": 1,
+      "verdict": "passed",
+      "verified_kd2_over_n": 1.6875
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "enumeration",
+      "note": "2D-local SAT rung 5x5x2 G=20 w4 t=2 connected: SAT",
+      "params": {
+        "G": 20,
+        "anchor_radius": 3.5,
+        "conflict_cap": 3000000,
+        "conflicts_total": null,
+        "instance": "5x5x2 G=20 w4 t=2 connected",
+        "layers": 2,
+        "max_weight": 4,
+        "n_side": 5,
+        "secs": 96.0,
+        "solver": "CaDiCaL 1.9.5 via python-sat",
+        "status": "SAT",
+        "t": 2,
+        "wall_cap_hours": 0.67
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 3,
+        "kd2_over_n": 1.8,
+        "trials": 20000
+      },
+      "seed": 0,
+      "spent": {
+        "candidates_screened": 0,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.02666666666666667
+      },
+      "survivors": 1,
+      "verdict": "passed",
+      "verified_kd2_over_n": 1.8
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "enumeration",
+      "note": "2D-local SAT rung 6x6 G=15 w4 t=2 connected: SAT",
+      "params": {
+        "G": 15,
+        "anchor_radius": 2.0,
+        "conflict_cap": 3000000,
+        "conflicts_total": 750007,
+        "instance": "6x6 G=15 w4 t=2 connected",
+        "layers": 1,
+        "max_weight": 4,
+        "n_side": 6,
+        "secs": 262.7,
+        "solver": "CaDiCaL 1.9.5 via python-sat",
+        "status": "SAT",
+        "t": 2,
+        "wall_cap_hours": 0.67
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 3,
+        "kd2_over_n": 1.5,
+        "trials": 20000
+      },
+      "seed": 0,
+      "spent": {
+        "candidates_screened": 0,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.07297222222222222
+      },
+      "survivors": 1,
+      "verdict": "passed",
+      "verified_kd2_over_n": 1.5
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "enumeration",
+      "note": "2D-local SAT rung 6x6 G=9 w8 t=2 connected: walled",
+      "params": {
+        "G": 9,
+        "anchor_radius": 2.0,
+        "conflict_cap": 3000000,
+        "conflicts_total": 3000008,
+        "instance": "6x6 G=9 w8 t=2 connected",
+        "layers": 1,
+        "max_weight": 8,
+        "n_side": 6,
+        "secs": 417.2,
+        "solver": "CaDiCaL 1.9.5 via python-sat",
+        "status": "walled",
+        "t": 2,
+        "wall_cap_hours": 0.67
+      },
+      "seed": 0,
+      "spent": {
+        "candidates_screened": 0,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.11588888888888889
+      },
+      "survivors": 0
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "enumeration",
+      "note": "2D-local SAT rung 7x7 G=12 w8 t=2 connected: walled",
+      "params": {
+        "G": 12,
+        "anchor_radius": 2.0,
+        "conflict_cap": 3000000,
+        "conflicts_total": 3000009,
+        "instance": "7x7 G=12 w8 t=2 connected",
+        "layers": 1,
+        "max_weight": 8,
+        "n_side": 7,
+        "secs": 576.4,
+        "solver": "CaDiCaL 1.9.5 via python-sat",
+        "status": "walled",
+        "t": 2,
+        "wall_cap_hours": 0.67
+      },
+      "seed": 0,
+      "spent": {
+        "candidates_screened": 0,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.1601111111111111
+      },
+      "survivors": 0
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "enumeration",
+      "note": "2D-local SAT rung 6x6 G=11 w8 t=3: walled",
+      "params": {
+        "G": 11,
+        "anchor_radius": 2.0,
+        "conflict_cap": 3000000,
+        "conflicts_total": 2250009,
+        "instance": "6x6 G=11 w8 t=3",
+        "layers": 1,
+        "max_weight": 8,
+        "n_side": 6,
+        "secs": 3065.6,
+        "solver": "CaDiCaL 1.9.5 via python-sat",
+        "status": "walled",
+        "t": 3,
+        "wall_cap_hours": 0.75
+      },
+      "seed": 0,
+      "spent": {
+        "candidates_screened": 0,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.8515555555555555
+      },
+      "survivors": 0
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "enumeration",
+      "note": "2D-local SAT rung 6x6 G=16 w4 t=3: walled",
+      "params": {
+        "G": 16,
+        "anchor_radius": 2.0,
+        "conflict_cap": 3000000,
+        "conflicts_total": 1500007,
+        "instance": "6x6 G=16 w4 t=3",
+        "layers": 1,
+        "max_weight": 4,
+        "n_side": 6,
+        "secs": 3075.4,
+        "solver": "CaDiCaL 1.9.5 via python-sat",
+        "status": "walled",
+        "t": 3,
+        "wall_cap_hours": 0.75
+      },
+      "seed": 0,
+      "spent": {
+        "candidates_screened": 0,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.8542777777777778
+      },
+      "survivors": 0
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "enumeration",
+      "note": "2D-local SAT rung 7x7 G=20 w4 t=2 connected: walled",
+      "params": {
+        "G": 20,
+        "anchor_radius": 2.0,
+        "conflict_cap": 3000000,
+        "conflicts_total": 3000009,
+        "instance": "7x7 G=20 w4 t=2 connected",
+        "layers": 1,
+        "max_weight": 4,
+        "n_side": 7,
+        "secs": 1048.0,
+        "solver": "CaDiCaL 1.9.5 via python-sat",
+        "status": "walled",
+        "t": 2,
+        "wall_cap_hours": 0.67
+      },
+      "seed": 0,
+      "spent": {
+        "candidates_screened": 0,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.2911111111111111
+      },
+      "survivors": 0
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "enumeration",
+      "note": "2D-local SAT rung 8x8 G=26 w4 t=2 connected: walled",
+      "params": {
+        "G": 26,
+        "anchor_radius": 2.0,
+        "conflict_cap": 3000000,
+        "conflicts_total": 3000011,
+        "instance": "8x8 G=26 w4 t=2 connected",
+        "layers": 1,
+        "max_weight": 4,
+        "n_side": 8,
+        "secs": 1812.4,
+        "solver": "CaDiCaL 1.9.5 via python-sat",
+        "status": "walled",
+        "t": 2,
+        "wall_cap_hours": 0.67
+      },
+      "seed": 0,
+      "spent": {
+        "candidates_screened": 0,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.5034444444444445
+      },
+      "survivors": 0
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "enumeration",
+      "note": "2D-local SAT rung 7x7 G=21 w4 t=2 connected: SAT",
+      "params": {
+        "G": 21,
+        "anchor_radius": 2.0,
+        "conflict_cap": 3000000,
+        "conflicts_total": 1500003,
+        "instance": "7x7 G=21 w4 t=2 connected",
+        "layers": 1,
+        "max_weight": 4,
+        "n_side": 7,
+        "secs": 616.6,
+        "solver": "CaDiCaL 1.9.5 via python-sat",
+        "status": "SAT",
+        "t": 2,
+        "wall_cap_hours": 0.6
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 3,
+        "kd2_over_n": 1.2857142857142858,
+        "trials": 20000
+      },
+      "seed": 0,
+      "spent": {
+        "candidates_screened": 0,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.17127777777777778
+      },
+      "survivors": 1,
+      "verdict": "passed",
+      "verified_kd2_over_n": 1.2857142857142858
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "enumeration",
+      "note": "2D-local SAT rung 6x6x2 G=29 w4 t=2 connected: walled",
+      "params": {
+        "G": 29,
+        "anchor_radius": 3.5,
+        "conflict_cap": 3000000,
+        "conflicts_total": 3000017,
+        "instance": "6x6x2 G=29 w4 t=2 connected",
+        "layers": 2,
+        "max_weight": 4,
+        "n_side": 6,
+        "secs": 2170.6,
+        "solver": "CaDiCaL 1.9.5 via python-sat",
+        "status": "walled",
+        "t": 2,
+        "wall_cap_hours": 0.67
+      },
+      "seed": 0,
+      "spent": {
+        "candidates_screened": 0,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.6029444444444444
+      },
+      "survivors": 0
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "enumeration",
+      "note": "2D-local SAT rung 9x9 G=33 w4 t=2 connected: walled",
+      "params": {
+        "G": 33,
+        "anchor_radius": 2.0,
+        "conflict_cap": 3000000,
+        "conflicts_total": 2500004,
+        "instance": "9x9 G=33 w4 t=2 connected",
+        "layers": 1,
+        "max_weight": 4,
+        "n_side": 9,
+        "secs": 2463.4,
+        "solver": "CaDiCaL 1.9.5 via python-sat",
+        "status": "walled",
+        "t": 2,
+        "wall_cap_hours": 0.67
+      },
+      "seed": 0,
+      "spent": {
+        "candidates_screened": 0,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.6842777777777778
+      },
+      "survivors": 0
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "enumeration",
+      "note": "2D-local SAT rung 7x7x2 G=40 w4 t=2 connected: walled",
+      "params": {
+        "G": 40,
+        "anchor_radius": 3.5,
+        "conflict_cap": 3000000,
+        "conflicts_total": 1750007,
+        "instance": "7x7x2 G=40 w4 t=2 connected",
+        "layers": 2,
+        "max_weight": 4,
+        "n_side": 7,
+        "secs": 2740.1,
+        "solver": "CaDiCaL 1.9.5 via python-sat",
+        "status": "walled",
+        "t": 2,
+        "wall_cap_hours": 0.67
+      },
+      "seed": 0,
+      "spent": {
+        "candidates_screened": 0,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.7611388888888888
+      },
+      "survivors": 0
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "enumeration",
+      "note": "2D-local SAT rung 4x4x2 G=14 w4 t=3 connected: walled",
+      "params": {
+        "G": 14,
+        "anchor_radius": 3.5,
+        "conflict_cap": 3000000,
+        "conflicts_total": 3049222,
+        "instance": "4x4x2 G=14 w4 t=3 connected",
+        "layers": 2,
+        "max_weight": 4,
+        "n_side": 4,
+        "secs": 4000.8,
+        "solver": "CaDiCaL 1.9.5 via python-sat",
+        "status": "walled",
+        "t": 3,
+        "wall_cap_hours": 0.67
+      },
+      "seed": 0,
+      "spent": {
+        "candidates_screened": 0,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 1.1113333333333333
+      },
+      "survivors": 0
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "enumeration",
+      "note": "2D-local SAT rung 8x8 G=27 w4 t=2 connected: walled",
+      "params": {
+        "G": 27,
+        "anchor_radius": 2.0,
+        "conflict_cap": 3000000,
+        "conflicts_total": 2500012,
+        "instance": "8x8 G=27 w4 t=2 connected",
+        "layers": 1,
+        "max_weight": 4,
+        "n_side": 8,
+        "secs": 1883.0,
+        "solver": "CaDiCaL 1.9.5 via python-sat",
+        "status": "walled",
+        "t": 2,
+        "wall_cap_hours": 0.5
+      },
+      "seed": 0,
+      "spent": {
+        "candidates_screened": 0,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.5230555555555556
+      },
+      "survivors": 0
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "enumeration",
+      "note": "2D-local SAT rung 7x7x2 G=41 w4 t=2 connected: walled",
+      "params": {
+        "G": 41,
+        "anchor_radius": 3.5,
+        "conflict_cap": 2000000,
+        "conflicts_total": 500004,
+        "instance": "7x7x2 G=41 w4 t=2 connected",
+        "layers": 2,
+        "max_weight": 4,
+        "n_side": 7,
+        "secs": 952.7,
+        "solver": "CaDiCaL 1.9.5 via python-sat",
+        "status": "walled",
+        "t": 2,
+        "wall_cap_hours": 0.25
+      },
+      "seed": 0,
+      "spent": {
+        "candidates_screened": 0,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.2646388888888889
+      },
+      "survivors": 0
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "enumeration",
+      "note": "2D-local SAT rung 6x6x2 G=30 w4 t=2 connected: walled",
+      "params": {
+        "G": 30,
+        "anchor_radius": 3.5,
+        "conflict_cap": 2000000,
+        "conflicts_total": 1000005,
+        "instance": "6x6x2 G=30 w4 t=2 connected",
+        "layers": 2,
+        "max_weight": 4,
+        "n_side": 6,
+        "secs": 997.0,
+        "solver": "CaDiCaL 1.9.5 via python-sat",
+        "status": "walled",
+        "t": 2,
+        "wall_cap_hours": 0.25
+      },
+      "seed": 0,
+      "spent": {
+        "candidates_screened": 0,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.27694444444444444
+      },
+      "survivors": 0
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "enumeration",
+      "note": "2D-local SAT rung 9x9 G=34 w4 t=2 connected: walled",
+      "params": {
+        "G": 34,
+        "anchor_radius": 2.0,
+        "conflict_cap": 2000000,
+        "conflicts_total": 1250004,
+        "instance": "9x9 G=34 w4 t=2 connected",
+        "layers": 1,
+        "max_weight": 4,
+        "n_side": 9,
+        "secs": 1011.1,
+        "solver": "CaDiCaL 1.9.5 via python-sat",
+        "status": "walled",
+        "t": 2,
+        "wall_cap_hours": 0.25
+      },
+      "seed": 0,
+      "spent": {
+        "candidates_screened": 0,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.2808611111111111
+      },
+      "survivors": 0
+    }
+  ],
+  "frontier_advances": 18,
+  "negative_results": [
+    {
+      "assumptions": [
+        "code-calculus planner single-step moves",
+        "parents with d=2",
+        "6000 gf2_fast RIS trials"
+      ],
+      "detail": "every C-DELETE-CHECK and E-PEEL child of the [[n,n/2,2]] and [[n,2n/3,2]] pair-partition entries merged 2026-11-24 to 2026-11-27 screened to d=1 at 6000 gf2_fast trials",
+      "revisit_if": "a move that adds a check (C-ADD-CHECK) or glues two parents, which can raise rather than lower the distance",
+      "what": "the d=2 pair-partition parents have no d>=2 single-step child"
+    },
+    {
+      "assumptions": [
+        "6x6 G=8 w8 t=2, anchor radius 2.0",
+        "CaDiCaL via python-sat, conflict cap 3000000, wall 0.75 h"
+      ],
+      "detail": "3000011 conflicts in 219.3 s, 0 models seen, best k None",
+      "family": "other",
+      "params": {
+        "G": 8,
+        "anchor_radius": 2.0,
+        "conflict_cap": 3000000,
+        "conflicts_total": 3000011,
+        "instance": "6x6 G=8 w8 t=2",
+        "layers": 1,
+        "max_weight": 8,
+        "n_side": 6,
+        "secs": 219.3,
+        "solver": "CaDiCaL 1.9.5 via python-sat",
+        "status": "walled",
+        "t": 2,
+        "wall_cap_hours": 0.75
+      },
+      "revisit_if": "a 20M-conflict budget on the same instance, or the row_sort symmetry break",
+      "what": "2D-local SAT rung 6x6 G=8 w8 t=2 ended walled"
+    },
+    {
+      "assumptions": [
+        "5x5 G=6 w8 t=2, anchor radius 2.0",
+        "CaDiCaL via python-sat, conflict cap 3000000, wall 0.75 h"
+      ],
+      "detail": "3000010 conflicts in 220.5 s, 0 models seen, best k None",
+      "family": "other",
+      "params": {
+        "G": 6,
+        "anchor_radius": 2.0,
+        "conflict_cap": 3000000,
+        "conflicts_total": 3000010,
+        "instance": "5x5 G=6 w8 t=2",
+        "layers": 1,
+        "max_weight": 8,
+        "n_side": 5,
+        "secs": 220.5,
+        "solver": "CaDiCaL 1.9.5 via python-sat",
+        "status": "walled",
+        "t": 2,
+        "wall_cap_hours": 0.75
+      },
+      "revisit_if": "a 20M-conflict budget on the same instance, or the row_sort symmetry break",
+      "what": "2D-local SAT rung 5x5 G=6 w8 t=2 ended walled"
+    },
+    {
+      "assumptions": [
+        "7x7 G=11 w8 t=2, anchor radius 2.0",
+        "CaDiCaL via python-sat, conflict cap 3000000, wall 0.75 h"
+      ],
+      "detail": "3000005 conflicts in 284.3 s, 0 models seen, best k None",
+      "family": "other",
+      "params": {
+        "G": 11,
+        "anchor_radius": 2.0,
+        "conflict_cap": 3000000,
+        "conflicts_total": 3000005,
+        "instance": "7x7 G=11 w8 t=2",
+        "layers": 1,
+        "max_weight": 8,
+        "n_side": 7,
+        "secs": 284.3,
+        "solver": "CaDiCaL 1.9.5 via python-sat",
+        "status": "walled",
+        "t": 2,
+        "wall_cap_hours": 0.75
+      },
+      "revisit_if": "a 20M-conflict budget on the same instance, or the row_sort symmetry break",
+      "what": "2D-local SAT rung 7x7 G=11 w8 t=2 ended walled"
+    },
+    {
+      "assumptions": [
+        "4x4x2 G=14 w4 t=3, anchor radius 3.5",
+        "CaDiCaL via python-sat, conflict cap 3000000, wall 0.75 h"
+      ],
+      "detail": "250004 conflicts in 440.7 s, 1 models seen, best k 4",
+      "family": "other",
+      "params": {
+        "G": 14,
+        "anchor_radius": 3.5,
+        "conflict_cap": 3000000,
+        "conflicts_total": 250004,
+        "instance": "4x4x2 G=14 w4 t=3",
+        "layers": 2,
+        "max_weight": 4,
+        "n_side": 4,
+        "secs": 440.7,
+        "solver": "CaDiCaL 1.9.5 via python-sat",
+        "status": "SAT",
+        "t": 3,
+        "wall_cap_hours": 0.75
+      },
+      "revisit_if": "a 20M-conflict budget on the same instance, or the row_sort symmetry break",
+      "what": "2D-local SAT rung 4x4x2 G=14 w4 t=3 ended SAT"
+    },
+    {
+      "assumptions": [
+        "5x5 G=11 w4 t=3, anchor radius 2.0",
+        "CaDiCaL via python-sat, conflict cap 3000000, wall 0.75 h"
+      ],
+      "detail": "3000013 conflicts in 1467.3 s, 0 models seen, best k None",
+      "family": "other",
+      "params": {
+        "G": 11,
+        "anchor_radius": 2.0,
+        "conflict_cap": 3000000,
+        "conflicts_total": 3000013,
+        "instance": "5x5 G=11 w4 t=3",
+        "layers": 1,
+        "max_weight": 4,
+        "n_side": 5,
+        "secs": 1467.3,
+        "solver": "CaDiCaL 1.9.5 via python-sat",
+        "status": "walled",
+        "t": 3,
+        "wall_cap_hours": 0.75
+      },
+      "revisit_if": "a 20M-conflict budget on the same instance, or the row_sort symmetry break",
+      "what": "2D-local SAT rung 5x5 G=11 w4 t=3 ended walled"
+    },
+    {
+      "assumptions": [
+        "6x6 G=9 w8 t=2 connected, anchor radius 2.0",
+        "CaDiCaL via python-sat, conflict cap 3000000, wall 0.67 h"
+      ],
+      "detail": "3000008 conflicts in 417.2 s, 0 models seen, best k None",
+      "family": "other",
+      "params": {
+        "G": 9,
+        "anchor_radius": 2.0,
+        "conflict_cap": 3000000,
+        "conflicts_total": 3000008,
+        "instance": "6x6 G=9 w8 t=2 connected",
+        "layers": 1,
+        "max_weight": 8,
+        "n_side": 6,
+        "secs": 417.2,
+        "solver": "CaDiCaL 1.9.5 via python-sat",
+        "status": "walled",
+        "t": 2,
+        "wall_cap_hours": 0.67
+      },
+      "revisit_if": "a 20M-conflict budget on the same instance, or the row_sort symmetry break",
+      "what": "2D-local SAT rung 6x6 G=9 w8 t=2 connected ended walled"
+    },
+    {
+      "assumptions": [
+        "7x7 G=12 w8 t=2 connected, anchor radius 2.0",
+        "CaDiCaL via python-sat, conflict cap 3000000, wall 0.67 h"
+      ],
+      "detail": "3000009 conflicts in 576.4 s, 0 models seen, best k None",
+      "family": "other",
+      "params": {
+        "G": 12,
+        "anchor_radius": 2.0,
+        "conflict_cap": 3000000,
+        "conflicts_total": 3000009,
+        "instance": "7x7 G=12 w8 t=2 connected",
+        "layers": 1,
+        "max_weight": 8,
+        "n_side": 7,
+        "secs": 576.4,
+        "solver": "CaDiCaL 1.9.5 via python-sat",
+        "status": "walled",
+        "t": 2,
+        "wall_cap_hours": 0.67
+      },
+      "revisit_if": "a 20M-conflict budget on the same instance, or the row_sort symmetry break",
+      "what": "2D-local SAT rung 7x7 G=12 w8 t=2 connected ended walled"
+    },
+    {
+      "assumptions": [
+        "6x6 G=11 w8 t=3, anchor radius 2.0",
+        "CaDiCaL via python-sat, conflict cap 3000000, wall 0.75 h"
+      ],
+      "detail": "2250009 conflicts in 3065.6 s, 0 models seen, best k None",
+      "family": "other",
+      "params": {
+        "G": 11,
+        "anchor_radius": 2.0,
+        "conflict_cap": 3000000,
+        "conflicts_total": 2250009,
+        "instance": "6x6 G=11 w8 t=3",
+        "layers": 1,
+        "max_weight": 8,
+        "n_side": 6,
+        "secs": 3065.6,
+        "solver": "CaDiCaL 1.9.5 via python-sat",
+        "status": "walled",
+        "t": 3,
+        "wall_cap_hours": 0.75
+      },
+      "revisit_if": "a 20M-conflict budget on the same instance, or the row_sort symmetry break",
+      "what": "2D-local SAT rung 6x6 G=11 w8 t=3 ended walled"
+    },
+    {
+      "assumptions": [
+        "6x6 G=16 w4 t=3, anchor radius 2.0",
+        "CaDiCaL via python-sat, conflict cap 3000000, wall 0.75 h"
+      ],
+      "detail": "1500007 conflicts in 3075.4 s, 0 models seen, best k None",
+      "family": "other",
+      "params": {
+        "G": 16,
+        "anchor_radius": 2.0,
+        "conflict_cap": 3000000,
+        "conflicts_total": 1500007,
+        "instance": "6x6 G=16 w4 t=3",
+        "layers": 1,
+        "max_weight": 4,
+        "n_side": 6,
+        "secs": 3075.4,
+        "solver": "CaDiCaL 1.9.5 via python-sat",
+        "status": "walled",
+        "t": 3,
+        "wall_cap_hours": 0.75
+      },
+      "revisit_if": "a 20M-conflict budget on the same instance, or the row_sort symmetry break",
+      "what": "2D-local SAT rung 6x6 G=16 w4 t=3 ended walled"
+    },
+    {
+      "assumptions": [
+        "7x7 G=20 w4 t=2 connected, anchor radius 2.0",
+        "CaDiCaL via python-sat, conflict cap 3000000, wall 0.67 h"
+      ],
+      "detail": "3000009 conflicts in 1048.0 s, 0 models seen, best k None",
+      "family": "other",
+      "params": {
+        "G": 20,
+        "anchor_radius": 2.0,
+        "conflict_cap": 3000000,
+        "conflicts_total": 3000009,
+        "instance": "7x7 G=20 w4 t=2 connected",
+        "layers": 1,
+        "max_weight": 4,
+        "n_side": 7,
+        "secs": 1048.0,
+        "solver": "CaDiCaL 1.9.5 via python-sat",
+        "status": "walled",
+        "t": 2,
+        "wall_cap_hours": 0.67
+      },
+      "revisit_if": "a 20M-conflict budget on the same instance, or the row_sort symmetry break",
+      "what": "2D-local SAT rung 7x7 G=20 w4 t=2 connected ended walled"
+    },
+    {
+      "assumptions": [
+        "8x8 G=26 w4 t=2 connected, anchor radius 2.0",
+        "CaDiCaL via python-sat, conflict cap 3000000, wall 0.67 h"
+      ],
+      "detail": "3000011 conflicts in 1812.4 s, 0 models seen, best k None",
+      "family": "other",
+      "params": {
+        "G": 26,
+        "anchor_radius": 2.0,
+        "conflict_cap": 3000000,
+        "conflicts_total": 3000011,
+        "instance": "8x8 G=26 w4 t=2 connected",
+        "layers": 1,
+        "max_weight": 4,
+        "n_side": 8,
+        "secs": 1812.4,
+        "solver": "CaDiCaL 1.9.5 via python-sat",
+        "status": "walled",
+        "t": 2,
+        "wall_cap_hours": 0.67
+      },
+      "revisit_if": "a 20M-conflict budget on the same instance, or the row_sort symmetry break",
+      "what": "2D-local SAT rung 8x8 G=26 w4 t=2 connected ended walled"
+    },
+    {
+      "assumptions": [
+        "6x6x2 G=29 w4 t=2 connected, anchor radius 3.5",
+        "CaDiCaL via python-sat, conflict cap 3000000, wall 0.67 h"
+      ],
+      "detail": "3000017 conflicts in 2170.6 s, 0 models seen, best k None",
+      "family": "other",
+      "params": {
+        "G": 29,
+        "anchor_radius": 3.5,
+        "conflict_cap": 3000000,
+        "conflicts_total": 3000017,
+        "instance": "6x6x2 G=29 w4 t=2 connected",
+        "layers": 2,
+        "max_weight": 4,
+        "n_side": 6,
+        "secs": 2170.6,
+        "solver": "CaDiCaL 1.9.5 via python-sat",
+        "status": "walled",
+        "t": 2,
+        "wall_cap_hours": 0.67
+      },
+      "revisit_if": "a 20M-conflict budget on the same instance, or the row_sort symmetry break",
+      "what": "2D-local SAT rung 6x6x2 G=29 w4 t=2 connected ended walled"
+    },
+    {
+      "assumptions": [
+        "9x9 G=33 w4 t=2 connected, anchor radius 2.0",
+        "CaDiCaL via python-sat, conflict cap 3000000, wall 0.67 h"
+      ],
+      "detail": "2500004 conflicts in 2463.4 s, 0 models seen, best k None",
+      "family": "other",
+      "params": {
+        "G": 33,
+        "anchor_radius": 2.0,
+        "conflict_cap": 3000000,
+        "conflicts_total": 2500004,
+        "instance": "9x9 G=33 w4 t=2 connected",
+        "layers": 1,
+        "max_weight": 4,
+        "n_side": 9,
+        "secs": 2463.4,
+        "solver": "CaDiCaL 1.9.5 via python-sat",
+        "status": "walled",
+        "t": 2,
+        "wall_cap_hours": 0.67
+      },
+      "revisit_if": "a 20M-conflict budget on the same instance, or the row_sort symmetry break",
+      "what": "2D-local SAT rung 9x9 G=33 w4 t=2 connected ended walled"
+    },
+    {
+      "assumptions": [
+        "7x7x2 G=40 w4 t=2 connected, anchor radius 3.5",
+        "CaDiCaL via python-sat, conflict cap 3000000, wall 0.67 h"
+      ],
+      "detail": "1750007 conflicts in 2740.1 s, 0 models seen, best k None",
+      "family": "other",
+      "params": {
+        "G": 40,
+        "anchor_radius": 3.5,
+        "conflict_cap": 3000000,
+        "conflicts_total": 1750007,
+        "instance": "7x7x2 G=40 w4 t=2 connected",
+        "layers": 2,
+        "max_weight": 4,
+        "n_side": 7,
+        "secs": 2740.1,
+        "solver": "CaDiCaL 1.9.5 via python-sat",
+        "status": "walled",
+        "t": 2,
+        "wall_cap_hours": 0.67
+      },
+      "revisit_if": "a 20M-conflict budget on the same instance, or the row_sort symmetry break",
+      "what": "2D-local SAT rung 7x7x2 G=40 w4 t=2 connected ended walled"
+    },
+    {
+      "assumptions": [
+        "4x4x2 G=14 w4 t=3 connected, anchor radius 3.5",
+        "CaDiCaL via python-sat, conflict cap 3000000, wall 0.67 h"
+      ],
+      "detail": "3049222 conflicts in 4000.8 s, 15 models seen, best k 4",
+      "family": "other",
+      "params": {
+        "G": 14,
+        "anchor_radius": 3.5,
+        "conflict_cap": 3000000,
+        "conflicts_total": 3049222,
+        "instance": "4x4x2 G=14 w4 t=3 connected",
+        "layers": 2,
+        "max_weight": 4,
+        "n_side": 4,
+        "secs": 4000.8,
+        "solver": "CaDiCaL 1.9.5 via python-sat",
+        "status": "walled",
+        "t": 3,
+        "wall_cap_hours": 0.67
+      },
+      "revisit_if": "a 20M-conflict budget on the same instance, or the row_sort symmetry break",
+      "what": "2D-local SAT rung 4x4x2 G=14 w4 t=3 connected ended walled"
+    },
+    {
+      "assumptions": [
+        "8x8 G=27 w4 t=2 connected, anchor radius 2.0",
+        "CaDiCaL via python-sat, conflict cap 3000000, wall 0.5 h"
+      ],
+      "detail": "2500012 conflicts in 1883.0 s, 0 models seen, best k None",
+      "family": "other",
+      "params": {
+        "G": 27,
+        "anchor_radius": 2.0,
+        "conflict_cap": 3000000,
+        "conflicts_total": 2500012,
+        "instance": "8x8 G=27 w4 t=2 connected",
+        "layers": 1,
+        "max_weight": 4,
+        "n_side": 8,
+        "secs": 1883.0,
+        "solver": "CaDiCaL 1.9.5 via python-sat",
+        "status": "walled",
+        "t": 2,
+        "wall_cap_hours": 0.5
+      },
+      "revisit_if": "a 20M-conflict budget on the same instance, or the row_sort symmetry break",
+      "what": "2D-local SAT rung 8x8 G=27 w4 t=2 connected ended walled"
+    },
+    {
+      "assumptions": [
+        "7x7x2 G=41 w4 t=2 connected, anchor radius 3.5",
+        "CaDiCaL via python-sat, conflict cap 2000000, wall 0.25 h"
+      ],
+      "detail": "500004 conflicts in 952.7 s, 0 models seen, best k None",
+      "family": "other",
+      "params": {
+        "G": 41,
+        "anchor_radius": 3.5,
+        "conflict_cap": 2000000,
+        "conflicts_total": 500004,
+        "instance": "7x7x2 G=41 w4 t=2 connected",
+        "layers": 2,
+        "max_weight": 4,
+        "n_side": 7,
+        "secs": 952.7,
+        "solver": "CaDiCaL 1.9.5 via python-sat",
+        "status": "walled",
+        "t": 2,
+        "wall_cap_hours": 0.25
+      },
+      "revisit_if": "a 20M-conflict budget on the same instance, or the row_sort symmetry break",
+      "what": "2D-local SAT rung 7x7x2 G=41 w4 t=2 connected ended walled"
+    },
+    {
+      "assumptions": [
+        "6x6x2 G=30 w4 t=2 connected, anchor radius 3.5",
+        "CaDiCaL via python-sat, conflict cap 2000000, wall 0.25 h"
+      ],
+      "detail": "1000005 conflicts in 997.0 s, 0 models seen, best k None",
+      "family": "other",
+      "params": {
+        "G": 30,
+        "anchor_radius": 3.5,
+        "conflict_cap": 2000000,
+        "conflicts_total": 1000005,
+        "instance": "6x6x2 G=30 w4 t=2 connected",
+        "layers": 2,
+        "max_weight": 4,
+        "n_side": 6,
+        "secs": 997.0,
+        "solver": "CaDiCaL 1.9.5 via python-sat",
+        "status": "walled",
+        "t": 2,
+        "wall_cap_hours": 0.25
+      },
+      "revisit_if": "a 20M-conflict budget on the same instance, or the row_sort symmetry break",
+      "what": "2D-local SAT rung 6x6x2 G=30 w4 t=2 connected ended walled"
+    },
+    {
+      "assumptions": [
+        "9x9 G=34 w4 t=2 connected, anchor radius 2.0",
+        "CaDiCaL via python-sat, conflict cap 2000000, wall 0.25 h"
+      ],
+      "detail": "1250004 conflicts in 1011.1 s, 0 models seen, best k None",
+      "family": "other",
+      "params": {
+        "G": 34,
+        "anchor_radius": 2.0,
+        "conflict_cap": 2000000,
+        "conflicts_total": 1250004,
+        "instance": "9x9 G=34 w4 t=2 connected",
+        "layers": 1,
+        "max_weight": 4,
+        "n_side": 9,
+        "secs": 1011.1,
+        "solver": "CaDiCaL 1.9.5 via python-sat",
+        "status": "walled",
+        "t": 2,
+        "wall_cap_hours": 0.25
+      },
+      "revisit_if": "a 20M-conflict budget on the same instance, or the row_sort symmetry break",
+      "what": "2D-local SAT rung 9x9 G=34 w4 t=2 connected ended walled"
+    }
+  ],
+  "non_frontier_survivors": 0,
+  "objective": {
+    "direction": "maximize",
+    "metric": "kd2_over_n"
+  },
+  "params": {},
+  "report": "report.md",
+  "required_outputs": [],
+  "retracted": [],
+  "run_contract": null,
+  "screen_quality": [
+    {
+      "family": "other",
+      "note": "undefined: the rows carry no spread in the screen or in the verdict",
+      "pairs": 9,
+      "spearman": null
+    }
+  ],
+  "snapshot": {
+    "branch": "HEAD",
+    "diff_sha256": null,
+    "dirty": false,
+    "head": "e43a53888c07c3758002bd5b075d00b1f2e7b99a",
+    "untracked_count": 0
+  },
+  "status": "completed",
+  "stopped_by": {
+    "detail": "walltime_hours reached 30.2745 of 3",
+    "type": "budget_exhausted"
+  },
+  "summary_version": 1,
+  "survivors": [
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-8",
+        "unrestricted"
+      ],
+      "d": 4,
+      "dominated_by": [],
+      "fingerprint": "bd91297f1de7d78a",
+      "k": 41,
+      "labels": [
+        "advances the weight-8 x unrestricted board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 127,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-8",
+        "unrestricted"
+      ],
+      "d": 5,
+      "dominated_by": [],
+      "fingerprint": "4145fdea69455567",
+      "k": 36,
+      "labels": [
+        "advances the weight-8 x unrestricted board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 127,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-8",
+        "unrestricted"
+      ],
+      "d": 5,
+      "dominated_by": [],
+      "fingerprint": "4145fdea69455567",
+      "k": 36,
+      "labels": [
+        "advances the weight-8 x unrestricted board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 127,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-8",
+        "unrestricted"
+      ],
+      "d": 7,
+      "dominated_by": [],
+      "fingerprint": "2372e184c8004aa1",
+      "k": 73,
+      "labels": [
+        "advances the weight-8 x unrestricted board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 255,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-8",
+        "unrestricted"
+      ],
+      "d": 8,
+      "dominated_by": [],
+      "fingerprint": "6592cf232b85af4c",
+      "k": 69,
+      "labels": [
+        "advances the weight-8 x unrestricted board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 256,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-8",
+        "unrestricted"
+      ],
+      "d": 8,
+      "dominated_by": [],
+      "fingerprint": "7d64656b024a07f1",
+      "k": 69,
+      "labels": [
+        "advances the weight-8 x unrestricted board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 256,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-8",
+        "unrestricted"
+      ],
+      "d": 8,
+      "dominated_by": [],
+      "fingerprint": "35809b6c8cfa37e0",
+      "k": 69,
+      "labels": [
+        "advances the weight-8 x unrestricted board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 256,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-9plus",
+        "unrestricted"
+      ],
+      "d": 9,
+      "dominated_by": [],
+      "fingerprint": "e581c373e7fed4c7",
+      "k": 105,
+      "labels": [
+        "advances the weight-9plus x unrestricted board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 275,
+      "weight_class": "weight-9plus"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-9plus",
+        "unrestricted"
+      ],
+      "d": 10,
+      "dominated_by": [],
+      "fingerprint": "888ce9706f603e3b",
+      "k": 103,
+      "labels": [
+        "advances the weight-9plus x unrestricted board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 275,
+      "weight_class": "weight-9plus"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-9plus",
+        "unrestricted"
+      ],
+      "d": 10,
+      "dominated_by": [],
+      "fingerprint": "9ab4bbcf23925f32",
+      "k": 103,
+      "labels": [
+        "advances the weight-9plus x unrestricted board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 275,
+      "weight_class": "weight-9plus"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-8",
+        "unrestricted"
+      ],
+      "d": 7,
+      "dominated_by": [],
+      "fingerprint": "9d4b58f374ad4cf2",
+      "k": 137,
+      "labels": [
+        "advances the weight-8 x unrestricted board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 511,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-8",
+        "unrestricted"
+      ],
+      "d": 7,
+      "dominated_by": [],
+      "fingerprint": "a81572415f49b5f9",
+      "k": 137,
+      "labels": [
+        "advances the weight-8 x unrestricted board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 511,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-8",
+        "unrestricted"
+      ],
+      "d": 7,
+      "dominated_by": [],
+      "fingerprint": "8c26c4deb73069b3",
+      "k": 137,
+      "labels": [
+        "advances the weight-8 x unrestricted board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 511,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-4",
+        "local-2d-single"
+      ],
+      "d": 3,
+      "dominated_by": [],
+      "fingerprint": "e006d5ce7bfb1301",
+      "k": 5,
+      "labels": [
+        "advances the weight-4 x local-2d-single board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 25,
+      "weight_class": "weight-4"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-4",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "dominated_by": [],
+      "fingerprint": "49cf1ce473fc9e14",
+      "k": 6,
+      "labels": [
+        "advances the weight-4 x local-2d-bilayer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 32,
+      "weight_class": "weight-4"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-4",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "dominated_by": [],
+      "fingerprint": "bd57262fd8f6c5ab",
+      "k": 10,
+      "labels": [
+        "advances the weight-4 x local-2d-bilayer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 50,
+      "weight_class": "weight-4"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-4",
+        "local-2d-single"
+      ],
+      "d": 3,
+      "dominated_by": [],
+      "fingerprint": "413fd64dec9ea65f",
+      "k": 6,
+      "labels": [
+        "advances the weight-4 x local-2d-single board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 36,
+      "weight_class": "weight-4"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-4",
+        "local-2d-single"
+      ],
+      "d": 3,
+      "dominated_by": [],
+      "fingerprint": "0bb7e950274ee874",
+      "k": 7,
+      "labels": [
+        "advances the weight-4 x local-2d-single board on d, k, n; its gain over [[49,7,2]] w=4 49-7-2.json is d-only: distance is the suspect axis; re-measure the peer and this candidate at matched depth (research/audits/leader_audit.py pair) before submitting; a caution, not a rejection",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 49,
+      "weight_class": "weight-4"
+    }
+  ]
+}

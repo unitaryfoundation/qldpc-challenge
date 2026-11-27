@@ -315,6 +315,53 @@ Any campaign whose numbers appear in `notes/` or `fieldnotes/` commits its
 manifest beside the note, and the note cites it. A campaign that submits
 nothing does not need one.
 
+## Code-discovery campaigns: the discovery block
+
+A campaign that derives its candidates from existing entries (code-calculus
+children, punctures, relabelings) owes one more thing than a family sweep
+does: the parents it started from, pinned, and the funnel from the
+constructor to the board as data, so whether the constructor was worth
+running is read off the summary and not the prose (issue #7445).
+`summary.json` carries it as an optional top-level `discovery` object, typed
+under `$defs/discovery` in `schema/campaign_summary.schema.json`; a
+family sweep has no parents and leaves it out.
+
+```python
+from campaign import discovery_block
+
+block = discovery_block(
+    ["256-68-12-b", "276-98-14-b"],            # parent slugs
+    board_commit="e43a53888c07...",            # the commit whose codes/ they were read from
+    selection="CSS entries added to codes/ between 2026-11-24 and the board commit",
+    tools=[{"name": "code-calculus-dev", "repo": "github.com/MathysRennela/code-calculus-dev",
+            "commit": "830767f96aa3", "role": "planner.plan: the single-step children"}],
+    counts={"children_planned": 23465, "prefiltered_dominated": 6865, "screened": 290,
+            "gate_passed": 13, "board_advancing": 13, "new_slugs": ["255-73-7", "256-69-8"]},
+    corrections=[{"candidate": "[[255,71,12]] E-PUNCTURE qubit 7 of 256-68-12-b", "parent": "256-68-12-b",
+                  "stage": "screen", "d_claimed": 12, "d_verified": 7, "trials": 440000}],
+    collisions=[{"candidate": "[[127,39,6]] ...", "with": "[[127,41,4]] w=8 128-36-6.json", "kind": "within-batch"}],
+    refusals=[{"candidate": "[[32,4,4]] models of rung 4x4x2 G=14 t=3", "stage": "packaging",
+               "reason": "direct sum", "count": 15}],
+)
+led.record_discovery(block)
+```
+
+| field | what it pins |
+|---|---|
+| `board_commit`, `parents` | the parents are `codes/<slug>.json` at that commit, not the board of the day the summary is read; `discovery_block` hashes each parent's bytes at the commit into `parents.sha256`, and `check_parent_snapshot(block)` reads them back and names any parent that moved. `parents.selection` is the filter a later session reruns to get the same set |
+| `tools` | code outside this repository, by commit: the planner, a constructor library, a certifier |
+| `counts` | the funnel, counted in candidates: planned, dropped before screening because the board dominates them at the constructor's own bound, screened, gate-passed, board-advancing, and the distinct new points as slugs |
+| `corrections` | where the search landed below the constructor's bound: `d_claimed` against `d_verified`, with the stage and depth. The distribution of the drop is the measure of how far the constructor's bounds can be trusted on the family |
+| `collisions` | candidates that were something already present: a board entry by bytes or by Weisfeiler-Leman equivalence, a sibling of the batch at a better point, a sibling at the same point |
+| `refusals` | what a stage refused outright rather than screened out: a direct sum at packaging, a document the prescreen refused, a gate refusal |
+
+The block is validated when it is built and again with the summary.
+`research/test_campaign.py` validates every committed `summary.json` against
+the schema and, for each one that carries a discovery block, checks that the
+parents reproduce from the recorded commit (skipped where the commit is not
+in the checkout's history, as in a shallow clone). The first conforming
+report is `autoresearch-2026-11-27-cc-children-and-local-sat/`.
+
 ## The screening registry
 
 `research/candidates/` is gitignored, so a family screened and discarded
