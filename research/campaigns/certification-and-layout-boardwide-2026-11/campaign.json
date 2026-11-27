@@ -64,7 +64,7 @@
       "surviving_candidates"
     ],
     "schema_version": 1,
-    "status": "draft",
+    "status": "completed",
     "stopping": [
       {
         "type": "budget_exhausted"
