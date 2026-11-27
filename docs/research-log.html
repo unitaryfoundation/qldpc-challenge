@@ -3,6 +3,19 @@
 <a class=back href="./">&larr; back to the board</a>
 <h1>Research log</h1>
 <p class=sub>The search behind the board: every submission ships a public research note (how the code was found, what was swept, what collapsed), and negative results land as stand-alone <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/fieldnotes">fieldnotes</a>. Newest first. See <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes">notes/</a> for the contract.</p>
+<section class=blk><h3><a href="codes/262-2-27.html">[[262,2,27]] — 262-2-27</a></h3><div class=kv style="color:var(--mut)">2026-11-27 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details open><summary>note</summary><div class=notebody><h3>[[262,2,27]] — generalized-bicycle CSS code from PR 7367 polynomials</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Weight-8 unrestricted CSS cell; low-rate, high-distance point from the PR 7367 alternating-sum telescoping family polynomials assembled as a generalized-bicycle (two-block) code.</p>
+<h4>What was searched</h4>
+<p>PR 7367 polynomials f0=[0,54,92,127], g0=[10,32,88,92] over Z_131, assembled as H_X=[A|B], H_Z=[B^T|A^T]. Distance measured with the verifier&#x27;s RIS and tightened to the gate&#x27;s refuted minimum.</p>
+<h4>Evidence trail</h4>
+<p>d &lt;= 27 (X/Z upper bounds, witness retained). Verified by verify/qldpc_verify.py and coordination gate (board-advancing, no dominator).</p>
+<h4>Dead ends</h4>
+<p>None recorded for this point.</p>
+<h4>Tools</h4>
+<p>Model: Beam 1.0. Agent harness: OpenCode. Repo tooling: verify/qldpc_verify.py, coordination.py, heuristic_distance.py.</p>
+<h4>Reproduction</h4>
+<p>Generalized-bicycle code over Z_131 with polynomials [0,54,92,127] and [10,32,88,92]; n=262, k=2, w=8.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/262-2-27.md">raw markdown</a></div></details></section>
 <section class=blk><h3>Lower-bound campaign scalability: weak bounds above 2 are cheap, exact closure is not</h3><div class=kv style="color:var(--mut)">2026-11-27 &middot; fieldnote &middot; <a href="https://github.com/MathysRennela">@MathysRennela</a> &middot; unspecified</div><details open><summary>note</summary><div class=notebody><h4>Summary</h4>
 <p>A short hands-on pass over the lower-bound queue (issue #6192) to test whether the existing tooling can produce certified lower bounds above 2 at scale. Result: weak bounds (<code>d &gt;= 3</code>) are cheap and parallelize well; exact closure and the high bands (C/D) are not, and need the campaign&#x27;s cluster budget.</p>
 <h4>What was run</h4>
@@ -56,7 +69,7 @@
 <li>Orbit 1 (<code>checks.S</code> rows 7–13): <code>X9 Y10 Z16 Z17 Z19 X20</code> (<code>IIIIIIIIIXYIIIIIZZIZX</code>)</li>
 </ul>
 <p>The single-layer 2D coordinates (<code>layers = 1</code>, <code>interaction_radius = 4.0</code>) are stored directly in <code>codes/21-7-4.json</code> under <code>locality.coordinates</code>.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/21-7-4.md">raw markdown</a></div></details></section>
-<section class=blk><h3><a href="codes/24-6-4-s.html">[[24,6,4]] — 24-6-4-s</a></h3><div class=kv style="color:var(--mut)">2026-11-26 &middot; submission note &middot; <a href="https://github.com/joacibb">@joacibb</a> &middot; Gemini 4</div><details open><summary>note</summary><div class=notebody><h3>[[24,6,4]] — weight-5 Z6-invariant non-CSS stabilizer code</h3>
+<section class=blk><h3><a href="codes/24-6-4-s.html">[[24,6,4]] — 24-6-4-s</a></h3><div class=kv style="color:var(--mut)">2026-11-26 &middot; submission note &middot; <a href="https://github.com/joacibb">@joacibb</a> &middot; Gemini 4</div><details ><summary>note</summary><div class=notebody><h3>[[24,6,4]] — weight-5 Z6-invariant non-CSS stabilizer code</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Following the group-invariant lazy-SAT search that established <code>codes/21-7-4.json</code>, we targeted whether non-CSS stabilizer codes with exact distance <code>d = 4</code> can be realized with maximum generator weight strictly bounded by <code>w &lt;= 5</code> under a single-layer 2D integer-grid layout (<code>local-2d-single</code>, interaction radius <code>&lt;= 4.0</code>). We explored cyclic symmetry under <code>Z6</code> with 4 qubit blocks (<code>n = 24</code>, <code>18</code> generators, <code>k = 6</code>, rate 1/4, <code>kd^2/n = 4.0</code>).</p>
 <h4>What was searched</h4>
