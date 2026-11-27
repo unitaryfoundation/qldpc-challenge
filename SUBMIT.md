@@ -42,6 +42,24 @@ Machine mode: always pass `--json`. Exit code 0 = success. On failure, `res.erro
 - `--slug 32-14-4-b` — suffixed slug when (n,k,d) collides with an existing entry.
 - `--dry-run` — build + verify, write nothing; record carries full `doc`.
 
+## Bulk submission
+
+One command for a batch (issue #7449). It loads every candidate, drops the
+duplicates inside the batch (the same code, or a probable permutation of one)
+and the codes already on the board, runs each survivor through `submit` with
+the shared flags, and with `--open-pr` files each one as its own PR from
+`--base-ref` (default `origin/main`):
+
+```bash
+./qldpc submit-batch research/candidates/<run>/*.json --authors @yourhandle --open-pr --json --summary-file batch.json
+```
+
+- Code tier only by default (`--circuit` adds circuits); the accelerator pass runs at `submit`'s own depth. `--fast-trials 0` files shallow claims knowingly, and CI refutes shallow claims.
+- A second code with the same (n, k, d, w) as one already filed in the batch is dropped as a `parameter-tie` (one PR per (n, k, d, w)); `--keep-parameter-ties` files it.
+- `--against-open-prs` also dedups against the codes in open PRs (fetched with `gh`).
+- `--note-dir DIR` passes `DIR/<candidate stem>.md` as the note when it exists.
+- The record lists every candidate with a status: `filed`, `written`, `dry-run`, `duplicate`, `parameter-tie`, `refused`, `error`, or `not-run`. An `--open-pr` failure stops the batch, because the files it wrote are in the tree unfiled; finish that one by hand and re-run on the `not-run` ones. Exit 0 when every candidate was filed, written, or dropped as a duplicate.
+
 ## Before pushing
 
 ```bash
@@ -82,4 +100,4 @@ Both must exit 0. In a fork, add `upstream` first:
 - Do not edit anything under `verify/` in a submission PR.
 - Do not claim `"human"` for a model-produced code.
 - Do not put a distance in the filename the JSON does not support.
-- Do not open multiple PRs for the same `(n,k,d)`; run `research/kit/dedup_submissions.py` first.
+- Do not open multiple PRs for the same `(n,k,d)`; run `research/kit/dedup_submissions.py` first, or let `./qldpc submit-batch` do the dedup.
