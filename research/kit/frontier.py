@@ -73,32 +73,67 @@ def in_cell(candidate, entry):
     )
 
 
-def dominators(candidate, board):
-    """Return the board entries that dominate the candidate, as the gate names them.
+def novelty(candidate, board):
+    """Return the gate's novelty block for a candidate row over board rows.
 
-    An entry dominates when it is in the candidate's cell and no worse on every
-    axis (n no larger, k no smaller, d no smaller, max check weight no larger)
-    and strictly better on at least one. A tie on all four is not dominance:
-    two codes at the same point share the frontier. A row with no recorded
-    weight cannot be compared and is skipped, as the peer-audit rule skips it.
+    Section 4 of ``verify/validate_candidate.py``, mirrored field for field so
+    a pre-filter and the gate cannot disagree (issue #7442):
+
+    * ``dominated_by``: the entries in the candidate's cell that are no worse
+      on every axis (n no larger, k no smaller, d no smaller, max check weight
+      no larger) and strictly better on at least one, as `describe` names
+      them. A tie on all four is not dominance: two codes at the same point
+      share the frontier. ``board_advancing`` is ``not dominated_by``.
+    * ``beaten``: ``[descriptor, gains]`` for each entry the candidate is no
+      worse than and strictly better on the axes ``gains`` lists;
+      ``advances_by`` is the sorted union of those axes.
+    * ``d_only_peers``: the beaten entries tied on n, k, and w, excluding d = 1
+      placeholders; ``d_only_gain`` says the board yielded on nothing but d
+      over such a peer (TRACKS.md keeps the two questions apart).
+
+    A row with no recorded weight cannot be compared and is skipped, as the
+    peer-audit rule skips it. The candidate row carries ``n``, ``k``, ``d``,
+    ``w``, ``code_type``, ``weight_class``, and ``locality_class``.
     """
     n, k, d, w = candidate["n"], candidate["k"], candidate["d"], candidate.get("w")
-    out = []
-    if w is None:
-        return out
-    for b in board:
-        if not in_cell(candidate, b) or b.get("w") is None:
-            continue
-        bw = b["w"]
-        if (
-            b["n"] <= n
-            and b["k"] >= k
-            and b["d"] >= d
-            and bw <= w
-            and (b["n"] < n or b["k"] > k or b["d"] > d or bw < w)
-        ):
-            out.append(describe(b))
-    return out
+    dominated_by, beaten = [], []
+    if w is not None:
+        for b in board:
+            if not in_cell(candidate, b) or b.get("w") is None:
+                continue
+            bw = b["w"]
+            if (
+                b["n"] <= n
+                and b["k"] >= k
+                and b["d"] >= d
+                and bw <= w
+                and (b["n"] < n or b["k"] > k or b["d"] > d or bw < w)
+            ):
+                dominated_by.append(describe(b))
+                continue
+            gains = [
+                ax for ax, better in (("n", b["n"] > n), ("k", b["k"] < k), ("d", b["d"] < d), ("w", bw > w)) if better
+            ]
+            if gains and b["n"] >= n and b["k"] <= k and b["d"] <= d and bw >= w:
+                beaten.append((b, gains))
+    board_advancing = not dominated_by
+    advances_by = sorted({ax for _, gains in beaten for ax in gains})
+    d_only_peers = [describe(b) for b, gains in beaten if gains == ["d"] and b.get("d", 0) > 1]
+    return {
+        "cell": [candidate.get("weight_class"), candidate.get("locality_class")],
+        "board": candidate.get("code_type", "CSS"),
+        "board_advancing": board_advancing,
+        "dominated_by": dominated_by,
+        "advances_by": advances_by,
+        "d_only_gain": bool(board_advancing and advances_by == ["d"] and d_only_peers),
+        "d_only_peers": d_only_peers,
+        "beaten": [[describe(b), gains] for b, gains in beaten],
+    }
+
+
+def dominators(candidate, board):
+    """Return the board entries that dominate the candidate, as the gate names them (`novelty`'s ``dominated_by``)."""
+    return novelty(candidate, board)["dominated_by"]
 
 
 def blockers(dominated_by, board_advancing, *, allowed=False, attach=""):

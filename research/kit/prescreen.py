@@ -63,6 +63,7 @@ import numpy as np
 
 _HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(_HERE, "..", "..", "verify"))
+import frontier  # noqa: E402
 import qldpc_verify  # noqa: E402
 import validate_candidate  # noqa: E402
 
@@ -366,7 +367,7 @@ def _family_contradictions(doc):
     return out
 
 
-def preflight(doc):
+def preflight(doc, report=None):
     """Run the verifier's structural half on a packaged document.
 
     ``qldpc_verify.verify(doc, refute=False)``, read for its failed checks.
@@ -383,9 +384,10 @@ def preflight(doc):
     function and excludes the same one check, ``distance_not_refuted``,
     which ``refute=False`` never records. A document that fails here fails
     the gate's verify step, and one that passes here can still be refuted
-    there, so this decides nothing the gate would not.
+    there, so this decides nothing the gate would not. ``report`` is a
+    ``qldpc_verify.verify(doc, refute=False)`` result already in hand.
     """
-    rep = qldpc_verify.verify(doc, refute=False)
+    rep = qldpc_verify.verify(doc, refute=False) if report is None else report
     failed = [
         {"check": c["check"], "detail": c.get("detail", ""), "kind": kind_of(c["check"], c.get("detail", ""))}
         for c in rep["checks"]
@@ -415,6 +417,166 @@ def describe_preflight(result):
         else "the document is wrong and the code may be fine; fix the document and save it again"
     )
     return "\n".join(lines)
+
+
+def family_tag(doc):
+    """Return ``{"declared", "ok", "contradictions"}``: the self-declared family against the construction text.
+
+    The rule is ``verify/test_family_tag_consistency.py``'s, mirrored in
+    `_family_contradictions`; a contradiction fails CI on the submission.
+    """
+    contradictions = _family_contradictions(doc)
+    return {"declared": doc.get("family"), "ok": not contradictions, "contradictions": contradictions}
+
+
+def _board_rows():
+    """Return the board rows the gate's novelty block reads (memoized by the verifier)."""
+    out = []
+    for b in validate_candidate._board_entries():
+        row = dict(b)
+        name = str(b.get("name") or "")
+        row["slug"] = name[:-5] if name.endswith(".json") else name
+        out.append(row)
+    return out
+
+
+def candidate_row(doc, report):
+    """Return the candidate as a frontier row: what the verifier computed, and the document's claimed d."""
+    comp = report.get("computed") or {}
+    distance = doc.get("distance") or {}
+    d = distance.get("d")
+    if d is None and isinstance(distance.get("X"), dict):
+        d = distance["X"].get("value")
+    return {
+        "n": comp.get("n", doc.get("n")),
+        "k": comp.get("k", doc.get("k")),
+        "d": d,
+        "w": comp.get("max_check_weight"),
+        "code_type": comp.get("code_type", doc.get("code_type", "CSS")),
+        "weight_class": comp.get("weight_class"),
+        "locality_class": comp.get("locality_class"),
+    }
+
+
+def novelty_of(doc, *, report=None, rows=None):
+    """Return the gate's novelty block for a packaged document, or None when it claims no distance.
+
+    `frontier.novelty` over the board rows the gate reads, with the
+    candidate's cell as the verifier computed it (the weight class from the
+    checks, the locality class from the layout and its measured radius), so
+    the answer is the gate's own, only earlier. ``dominators`` repeats
+    ``dominated_by`` under the name issue #7442 asks for.
+    """
+    report = qldpc_verify.verify(doc, refute=False) if report is None else report
+    cand = candidate_row(doc, report)
+    if cand["d"] is None or cand["w"] is None or cand["n"] is None or cand["k"] is None:
+        return None
+    out = frontier.novelty(cand, _board_rows() if rows is None else rows)
+    out["dominators"] = list(out["dominated_by"])
+    return out
+
+
+def collisions_of(doc, *, report=None, rows=None, codes_dir=None):
+    """Return what already sits at this candidate's slug or parameters.
+
+    ``slug`` is ``n-k-d``; ``slug_taken_by`` the board file of that name when
+    it exists (a distinct code then needs ``suggested_slug``, the first free
+    suffix, issue #5732); ``same_parameters`` the entries at this (n, k, d);
+    ``ties`` those at this (n, k, d, w) in the candidate's cell, which share
+    the frontier rather than block it but are a second PR for one point.
+    ``exact`` and ``wl`` are the dedup matches `lookup` finds, repeated here
+    so one block answers "is this name or this code already taken".
+    """
+    report = qldpc_verify.verify(doc, refute=False) if report is None else report
+    cand = candidate_row(doc, report)
+    rows = _board_rows() if rows is None else rows
+    codes_dir = codes_dir or validate_candidate._CODES
+    slug = f"{cand['n']}-{cand['k']}-{cand['d']}" if cand["d"] is not None else None
+    taken_by = None
+    suggested = None
+    if slug and os.path.exists(os.path.join(codes_dir, f"{slug}.json")):
+        taken_by = f"{slug}.json"
+        suggested = next(
+            (
+                f"{slug}-{x}"
+                for x in "bcdefghijklmnopqrstuvwxyz"
+                if not os.path.exists(os.path.join(codes_dir, f"{slug}-{x}.json"))
+            ),
+            None,
+        )
+    same = [frontier.describe(b) for b in rows if (b["n"], b["k"], b["d"]) == (cand["n"], cand["k"], cand["d"])]
+    ties = [
+        frontier.describe(b)
+        for b in rows
+        if cand["w"] is not None
+        and frontier.in_cell(cand, b)
+        and (b["n"], b["k"], b["d"], b.get("w")) == (cand["n"], cand["k"], cand["d"], cand["w"])
+    ]
+    return {"slug": slug, "slug_taken_by": taken_by, "suggested_slug": suggested, "same_parameters": same, "ties": ties}
+
+
+SCHEMA_VERSION = 1
+
+
+def verdict(doc, *, board=True, index=None, rows=None, codes_dir=None):
+    """Return everything a generator can learn about a packaged candidate before the gate (issue #7442).
+
+    One record, ``schema_version`` 1; the keys are the contract and additions
+    never remove one:
+
+    * ``candidate``: n, k, d (the claimed distance, or null), w, code_type,
+      weight_class, locality_class, as the verifier computed them.
+    * ``preflight``: `preflight`'s record, the structural half of the gate's
+      verify step (family-tag contradictions are among its ``failed``).
+    * ``family_tag``: `family_tag`'s record, the same contradictions on their own.
+    * ``structure``, ``identity``, ``board``, ``reasons``, ``labels``:
+      `prescreen`'s verdict for a CSS candidate (a direct sum, an exact board
+      duplicate, a WL match); null for a stabilizer one, whose dedup the gate does.
+    * ``novelty``: `novelty_of`, the gate's block with ``board_advancing``,
+      ``advances_by``, ``dominators``, ``d_only_gain``, ``d_only_peers``,
+      ``beaten``; null when no distance is claimed.
+    * ``collisions``: `collisions_of`, plus the ``exact`` and ``wl`` dedup names.
+    * ``gate_would_refuse``: a preflight failure, a direct sum, or an exact
+      duplicate. ``frontier_submittable``: not refused, and board-advancing.
+
+    ``board=False`` skips every board read (structure and preflight only).
+    ``index`` and ``rows`` inject the dedup index and the frontier rows, for
+    tests and for a generator that holds its own snapshot.
+    """
+    report = qldpc_verify.verify(doc, refute=False)
+    pre = preflight(doc, report)
+    cand = candidate_row(doc, report)
+    stabilizer = qldpc_verify.is_stabilizer(doc)
+    out = {
+        "schema_version": SCHEMA_VERSION,
+        "candidate": cand,
+        "preflight": pre,
+        "family_tag": family_tag(doc),
+        "structure": None,
+        "identity": None,
+        "board": dict(NO_MATCH),
+        "reasons": [],
+        "labels": [],
+        "novelty": None,
+        "collisions": None,
+        "gate_would_refuse": not pre["ok"],
+        "frontier_submittable": False,
+    }
+    if not stabilizer and "X" in (doc.get("checks") or {}):
+        n = int(doc["n"])
+        HX = qldpc_verify._matrix(doc["checks"]["X"], n)
+        HZ = qldpc_verify._matrix(doc["checks"]["Z"], n)
+        pre_v = prescreen(HX, HZ, index=index, board=board)
+        for key in ("structure", "identity", "board", "reasons", "labels"):
+            out[key] = pre_v[key]
+        out["gate_would_refuse"] = out["gate_would_refuse"] or pre_v["gate_would_refuse"]
+    if board:
+        out["novelty"] = novelty_of(doc, report=report, rows=rows)
+        out["collisions"] = dict(collisions_of(doc, report=report, rows=rows, codes_dir=codes_dir), **out["board"])
+    out["frontier_submittable"] = bool(
+        not out["gate_would_refuse"] and out["novelty"] and out["novelty"]["board_advancing"]
+    )
+    return out
 
 
 def load_matrices(path):
@@ -461,31 +623,37 @@ def main(argv=None):
     if args.path.endswith(".json"):
         with open(args.path, encoding="utf-8") as f:
             doc = json.load(f)
-        pre = preflight(doc)
+        full = verdict(doc, board=not args.no_board)
+        pre = full["preflight"]
         if qldpc_verify.is_stabilizer(doc):
             # the structure and board checks here read CSS matrices; the
             # gate's own dedup covers a stabilizer candidate
             if args.json:
-                print(json.dumps({"preflight": pre, "gate_would_refuse": not pre["ok"]}, indent=1))
+                print(json.dumps(full, indent=1))
             else:
                 print(f"{args.path}: a stabilizer candidate; preflight only")
                 for line in describe_preflight(pre).split("\n"):
                     print(f"  {'REFUSE  ' if not pre['ok'] else ''}{line}")
+                _print_novelty(full)
             return 0 if pre["ok"] else 1
-    HX, HZ = load_matrices(args.path)
-    verdict = prescreen(HX, HZ, board=not args.no_board)
-    if pre is not None:
-        verdict["preflight"] = pre
-        verdict["gate_would_refuse"] = verdict["gate_would_refuse"] or not pre["ok"]
+        if args.json:
+            print(json.dumps(full, indent=1))
+            return 1 if full["gate_would_refuse"] else 0
+        HX, HZ = load_matrices(args.path)
+        result = full
+    else:
+        HX, HZ = load_matrices(args.path)
+        result = prescreen(HX, HZ, board=not args.no_board)
+        full = None
     if args.json:
-        print(json.dumps(verdict, indent=1))
+        print(json.dumps(result, indent=1))
     else:
         n = int(np.asarray(HX).shape[1])
-        print(f"{args.path}: n={n}, {describe_structure(verdict['structure'])}")
+        print(f"{args.path}: n={n}, {describe_structure(result['structure'])}")
         if pre is not None and not pre["ok"]:
             for line in describe_preflight(pre).split("\n"):
                 print(f"  REFUSE  {line}")
-        match = verdict["board"]
+        match = result["board"]
         if not args.no_board:
             if match["exact"]:
                 print(f"  board: identical to {match['exact']}")
@@ -497,14 +665,42 @@ def main(argv=None):
                 )
             else:
                 print("  board: no entry shares this fingerprint or WL signature")
-        for reason in verdict["reasons"]:
+        for reason in result["reasons"]:
             print(f"  REFUSE  {reason}")
+        if full is not None:
+            _print_novelty(full)
         print(
             "  the gate would refuse this candidate"
-            if verdict["gate_would_refuse"]
+            if result["gate_would_refuse"]
             else "  worth gating; the distance is the gate's to decide"
         )
-    return 1 if verdict["gate_would_refuse"] else 0
+    return 1 if result["gate_would_refuse"] else 0
+
+
+def _print_novelty(full):
+    """Print the novelty and collision lines of the human report."""
+    nov = full.get("novelty")
+    if nov is None:
+        print("  novelty: not assessed (no distance claimed in the document)")
+    else:
+        verb = "advances" if nov["board_advancing"] else "does not advance"
+        axes = f" on {', '.join(nov['advances_by'])}" if nov["advances_by"] else ""
+        print(f"  novelty: {verb} the {nov['cell'][0]} x {nov['cell'][1]} {nov['board']} board{axes}")
+        for desc in nov["dominators"][:5]:
+            print(f"      dominated by {desc}")
+        if nov["d_only_peers"]:
+            print(f"      d-only over {len(nov['d_only_peers'])} peer(s): a matched-depth peer audit is owed")
+    col = full.get("collisions") or {}
+    if col.get("slug_taken_by"):
+        print(
+            f"  slug {col['slug']} is taken by {col['slug_taken_by']}; "
+            f"a distinct code needs --slug {col['suggested_slug']}"
+        )
+    if col.get("ties"):
+        print(f"  ties at this (n, k, d, w): {', '.join(col['ties'][:5])}")
+    tag = full.get("family_tag") or {}
+    for c in tag.get("contradictions") or []:
+        print(f"  REFUSE  family tag: {c['detail']}")
 
 
 def _demo():

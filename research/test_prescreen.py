@@ -393,3 +393,109 @@ def test_the_validation_gate_mirrors_the_preflight_taxonomy():
         ("something_new", ""),
     ):
         assert gate.kind_of(check, detail) == P.kind_of(check, detail)
+
+
+# -- the combined verdict for external generators (issue #7442) -------------
+#
+# One record with the preflight, the dedup verdict, the gate's novelty block,
+# the collisions, and the family-tag check. The board is injected: `rows` are
+# frontier rows as `validate_candidate._board_entries()` shapes them, `index`
+# the dedup index as above.
+
+
+def _frontier_row(n, k, d, w, slug, lc="unrestricted", code_type="CSS"):
+    return {
+        "name": f"{slug}.json",
+        "slug": slug,
+        "n": n,
+        "k": k,
+        "d": d,
+        "w": w,
+        "code_type": code_type,
+        "weight_class": validate_candidate._WEIGHT_ORDER
+        and ("weight-4" if w <= 4 else "weight-6" if w <= 6 else "weight-8" if w <= 8 else "weight-9plus"),
+        "locality_class": lc,
+    }
+
+
+def test_verdict_carries_the_gate_block_the_collisions_and_the_family_tag(tmp_path):
+    doc = _packaged(*BB72)  # [[72,12,6]] w=6
+    rows = [_frontier_row(72, 12, 5, 6, "72-12-5"), _frontier_row(80, 12, 6, 6, "80-12-6")]
+    codes = tmp_path / "codes"
+    codes.mkdir()
+    (codes / "72-12-6.json").write_text("{}")
+    out = P.verdict(doc, index=[], rows=rows, codes_dir=str(codes))
+    assert out["schema_version"] == P.SCHEMA_VERSION
+    assert out["candidate"] == {
+        "n": 72,
+        "k": 12,
+        "d": 6,
+        "w": 6,
+        "code_type": "CSS",
+        "weight_class": "weight-6",
+        "locality_class": "unrestricted",
+    }
+    assert out["preflight"]["ok"] and out["family_tag"] == {
+        "declared": doc.get("family"),
+        "ok": True,
+        "contradictions": [],
+    }
+    assert out["structure"]["connected"] and out["board"] == {"exact": None, "wl": None}
+    nov = out["novelty"]
+    assert nov["board_advancing"] and nov["dominators"] == [] and nov["advances_by"] == ["d", "n"]
+    assert nov["d_only_peers"] == ["[[72,12,5]] w=6 72-12-5.json"]
+    col = out["collisions"]
+    assert col["slug"] == "72-12-6" and col["slug_taken_by"] == "72-12-6.json" and col["suggested_slug"] == "72-12-6-b"
+    assert col["same_parameters"] == [] and col["ties"] == [] and col["exact"] is None and col["wl"] is None
+    assert not out["gate_would_refuse"] and out["frontier_submittable"]
+
+
+def test_verdict_refuses_a_dominated_or_duplicate_candidate_and_reports_a_family_contradiction():
+    doc = _packaged(*BB72)
+    dominated = P.verdict(doc, index=[], rows=[_frontier_row(72, 12, 7, 6, "72-12-7")])
+    assert dominated["novelty"]["dominators"] == ["[[72,12,7]] w=6 72-12-7.json"]
+    assert not dominated["gate_would_refuse"] and not dominated["frontier_submittable"]
+    dup = P.verdict(doc, index=_index_of(("72-12-6.json", *BB72)), rows=[])
+    assert dup["board"]["exact"] == "72-12-6.json" and dup["collisions"]["exact"] == "72-12-6.json"
+    assert dup["gate_would_refuse"] and not dup["frontier_submittable"]
+    tagged = dict(
+        doc, family="other", provenance=dict(doc["provenance"], construction="bivariate bicycle over Z6 x Z6")
+    )
+    out = P.verdict(tagged, index=[], rows=[])
+    assert not out["family_tag"]["ok"] and out["family_tag"]["contradictions"][0]["check"] == "family_tag_consistency"
+    assert "family_tag_consistency" in [f["check"] for f in out["preflight"]["failed"]]
+    assert out["gate_would_refuse"]
+    assert P.verdict(doc, board=False)["novelty"] is None and P.verdict(doc, board=False)["collisions"] is None
+
+
+def test_verdict_without_a_distance_claim_has_no_novelty_block():
+    doc = _packaged(*BB72)
+    bare = {k: v for k, v in doc.items() if k != "distance"}
+    out = P.verdict(bare, index=[], rows=[])
+    assert out["novelty"] is None and out["collisions"]["slug"] is None and not out["frontier_submittable"]
+
+
+def test_cli_json_on_a_document_is_the_full_verdict(tmp_path):
+    path = tmp_path / "72-12-6.json"
+    path.write_text(json.dumps(_packaged(*BB72)))
+    proc = subprocess.run(
+        [sys.executable, os.path.join(_HERE, "kit", "prescreen.py"), str(path), "--no-board", "--json"],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert proc.returncode == 0, proc.stderr
+    out = json.loads(proc.stdout)
+    assert set(out) >= {
+        "schema_version",
+        "candidate",
+        "preflight",
+        "family_tag",
+        "structure",
+        "board",
+        "novelty",
+        "collisions",
+        "gate_would_refuse",
+        "frontier_submittable",
+    }
+    assert out["novelty"] is None  # --no-board skips every board read
