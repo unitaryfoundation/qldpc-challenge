@@ -184,6 +184,37 @@ def test_the_cert_writer_stamps_a_level_the_checker_accepts(tmp_path, monkeypatc
     assert C.evidence_problems("98-6-7", written) == []
 
 
+def test_a_checkout_without_codes_is_refused_once(tmp_path, monkeypatch, capsys):
+    """A sparse worktree that omits codes/ gets one diagnosis, not one per certificate.
+
+    Issue #7405: the per-certificate "not on the board" message is the wrong
+    diagnosis when the whole directory is absent from the checkout. The
+    binding modes refuse to run and say what to add; --level, which binds
+    nothing, still counts.
+    """
+    (tmp_path / "certs").mkdir()
+    cert = copy.deepcopy(BASE)
+    cert.update({"d": 6, "d_exact": False, "d_lower": 3, "sides": {"X": {"proved_min": 3}, "Z": {"proved_min": 3}}})
+    (tmp_path / "certs" / "72-12-6.json").write_text(json.dumps(cert), encoding="utf-8")
+    monkeypatch.setattr(C, "ROOT", str(tmp_path))
+
+    assert C.codes_dir_problem(str(tmp_path)) is not None
+    assert C.main([]) == 2
+    out = capsys.readouterr().out
+    assert "codes/ is not in this checkout" in out
+    assert "git sparse-checkout add codes" in out
+    assert "not on the board" not in out
+    assert C.main(["--checks-sha256", "72-12-6"]) == 2
+    assert C.main(["--level"]) == 0
+
+    (tmp_path / "codes").mkdir()
+    assert C.codes_dir_problem(str(tmp_path)) is None
+
+
+def test_this_tree_holds_codes():
+    assert C.codes_dir_problem() is None
+
+
 # -- the formal tier's binding (issue #2511) ---------------------------------
 
 FORMAL_REPLAY = {

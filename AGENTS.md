@@ -289,7 +289,11 @@ cp verify/gf2_fast.cpython-*.so <path>/verify/      # the built accelerator is i
 The last line matters: without the accelerator the circuit gate and the RIS
 screen fall back to a handful of trials, which is how #5094 came to be
 refuted in CI. `docs/` is generated output and is never needed in a worktree;
-add `.github` only for a workflow change.
+add `.github` only for a workflow change. Keep `codes/` in the set even on a
+certificate-only branch: `verify/check_certs.py` binds every partial and
+formal certificate to its entry in `codes/`, and in a checkout without that
+directory it refuses to run and says what to add, rather than reporting every
+certificate as missing from the board (issue #7405).
 
 Remove a worktree as soon as its branch is pushed, with `git worktree remove
 <path>`. It refuses a worktree with modified or untracked files, but it
