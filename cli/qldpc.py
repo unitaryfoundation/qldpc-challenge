@@ -1101,6 +1101,39 @@ def write_pr_body(slug, body):
 # ----------------------------------------------------------------------------
 # frontier comparison (reuses the site's own cell + Pareto logic)
 # ----------------------------------------------------------------------------
+# The board memo the CLI reads (issue #7381). verify/qldpc_verify.py memoizes
+# the structural pass per entry on disk, keyed on the entry's bytes, the
+# validator closure and the bytes of the entries it reads, so a hit is what a
+# fresh pass would compute whichever checkout wrote it. The verifier's own
+# default directory sits inside the checkout, so every new git worktree starts
+# cold: about 44 s over the board before any submission logic, a third of a
+# harness's 120 s budget. The CLI therefore points the memo at one per-user
+# directory outside any checkout, shared by every checkout and worktree on the
+# machine, unless the caller set QLDPC_BOARD_CACHE (an empty value turns the
+# memo off, as the test suite does) or CI is set (a runner is answered only by
+# a directory its job named; verify.yml does that itself).
+BOARD_MEMO_ENV = "QLDPC_BOARD_CACHE"
+COLD_BOARD_SECONDS = 10.0
+
+
+def _shared_board_memo_dir():
+    """Return the per-user memo directory: $XDG_CACHE_HOME/qldpc/boardcache, else ~/.cache/qldpc/boardcache."""
+    base = os.environ.get("XDG_CACHE_HOME") or os.path.join(os.path.expanduser("~"), ".cache")
+    return os.path.join(base, "qldpc", "boardcache")
+
+
+def _default_board_memo():
+    """Point the verifier's memo at the shared directory, unless a caller or CI already chose.
+
+    Returns the directory it set, or None when it left the environment alone.
+    """
+    if os.environ.get(BOARD_MEMO_ENV) is not None or os.environ.get("CI"):
+        return None
+    path = _shared_board_memo_dir()
+    os.environ[BOARD_MEMO_ENV] = path
+    return path
+
+
 def _load_board_entries(quiet=False):
     """The board's current entries as the site sees them (verified, earned
     distance). Returns [] if the site builder cannot be imported or the board
@@ -1109,14 +1142,16 @@ def _load_board_entries(quiet=False):
     This runs a structural verification pass over ``codes/`` and is the
     single most expensive thing the CLI does. ``verify/qldpc_verify.py`` already
     memoizes it -- per entry, on disk, keyed by the entry bytes and the
-    validator closure digest -- so a warm checkout measures ~2 s here while a
-    cold one takes minutes. The memo lives inside the checkout, which means a
-    freshly created git worktree starts cold. Either way it used to print
-    nothing until it finished, so ``targets`` looked hung; twice on a harness
-    with a 120 s limit before these two lines existed. They go to stderr, which
-    keeps stdout clean for ``--json``, and report the measured time rather than
-    an estimate, because warm-versus-cold is a hundredfold difference and the
-    reader cannot otherwise tell which one they are paying.
+    validator closure digest -- so a warm memo measures ~2 s here while a
+    cold one takes about 44 s on 3,900 entries. The memo is the shared
+    per-user directory _default_board_memo names (issue #7381), so only the
+    first run on a machine is cold, not the first run in each worktree.
+    Either way it used to print nothing until it finished, so ``targets``
+    looked hung; twice on a harness with a 120 s limit before these lines
+    existed. They go to stderr, which keeps stdout clean for ``--json``, and
+    report the measured time rather than an estimate, because warm-versus-cold
+    is a twentyfold difference and the reader cannot otherwise tell which one
+    they are paying; a cold run also says where the memo is being written.
 
     ``quiet`` suppresses them for library callers that do their own reporting.
     """
@@ -1140,7 +1175,15 @@ def _load_board_entries(quiet=False):
         )
         return []
     if not quiet:
-        print(f"  loaded {_plural(len(entries), 'entry', 'entries')} in {time.time() - t0:.1f}s", file=sys.stderr)
+        took = time.time() - t0
+        print(f"  loaded {_plural(len(entries), 'entry', 'entries')} in {took:.1f}s", file=sys.stderr)
+        memo = os.environ.get(BOARD_MEMO_ENV)
+        if took >= COLD_BOARD_SECONDS and memo:
+            print(
+                f"  (cold memo: the reports were written to {memo}, which every checkout and "
+                "worktree on this machine reads, so the next run here is seconds)",
+                file=sys.stderr,
+            )
     return entries
 
 
@@ -3560,6 +3603,7 @@ def cmd_preflight(args):
 
 
 def main(argv=None):
+    _default_board_memo()
     # Windows consoles default to a legacy code page, and the summaries print
     # "≤" (d <= 12, weight ≤ 6). Without this the run dies in the final print,
     # after the search and the verification have already succeeded.
