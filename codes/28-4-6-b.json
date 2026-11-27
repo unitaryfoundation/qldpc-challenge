@@ -330,7 +330,8 @@
    "ris_trials_per_side": 30000000,
    "cpu_hours": 3,
    "tool": "research/kit 2BGA sweep + gf2_fast on Brev n2d-highcpu-64"
-  }
+  },
+  "notes": "Layout added 2026-11-17 by @vprusso: bilayer coordinates with interaction radius 6.0828 (research/local2d/layout_sweep.py, screen stage)."
  },
  "family": "bivariate-bicycle",
  "circuit": {
@@ -369,6 +370,131 @@
    ],
    "date": "2026-11-01",
    "method": "Johnson-coil flagged interleaved two-block extraction (max_flags=4 per check, 9 data CX slots per round, X-check term slots [2, 7, 6, 1, 3, 5, 8, 4], Z-check term slots [6, 1, 2, 7, 4, 3, 0, 5] over terms A_0..A_3, B_0..B_3)"
+  }
+ },
+ "locality": {
+  "coordinates": [
+   [
+    0.0,
+    0.0
+   ],
+   [
+    0.0,
+    1.0
+   ],
+   [
+    0.0,
+    2.0
+   ],
+   [
+    0.0,
+    3.0
+   ],
+   [
+    0.0,
+    4.0
+   ],
+   [
+    0.0,
+    5.0
+   ],
+   [
+    0.0,
+    6.0
+   ],
+   [
+    1.0,
+    0.0
+   ],
+   [
+    1.0,
+    1.0
+   ],
+   [
+    1.0,
+    2.0
+   ],
+   [
+    1.0,
+    3.0
+   ],
+   [
+    1.0,
+    4.0
+   ],
+   [
+    1.0,
+    5.0
+   ],
+   [
+    1.0,
+    6.0
+   ],
+   [
+    0.0,
+    0.0
+   ],
+   [
+    0.0,
+    1.0
+   ],
+   [
+    0.0,
+    2.0
+   ],
+   [
+    0.0,
+    3.0
+   ],
+   [
+    0.0,
+    4.0
+   ],
+   [
+    0.0,
+    5.0
+   ],
+   [
+    0.0,
+    6.0
+   ],
+   [
+    1.0,
+    0.0
+   ],
+   [
+    1.0,
+    1.0
+   ],
+   [
+    1.0,
+    2.0
+   ],
+   [
+    1.0,
+    3.0
+   ],
+   [
+    1.0,
+    4.0
+   ],
+   [
+    1.0,
+    5.0
+   ],
+   [
+    1.0,
+    6.0
+   ]
+  ],
+  "layers": 2,
+  "interaction_radius": 6.0828,
+  "contributed_by": {
+   "by": [
+    "@vprusso"
+   ],
+   "date": "2026-11-17",
+   "method": "torus_grid.py: the two-block index convention read off as a Z_2 x Z_7 grid, one qubit of each block per site, no search; radius measured with the verifier's rule (research/local2d/layout_sweep.py)"
   }
  }
 }
