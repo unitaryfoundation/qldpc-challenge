@@ -1524,7 +1524,11 @@ def _peer_audit_check(doc, report, args, res, slug):
     if staged:
         print(f"  the verified document was staged at {staged} for the audit")
         res["staged"] = staged
-    res["error"] = {"stage": "peer-audit", "message": "; ".join(problems)}
+    hint = (
+        f"Run: {peer_audit.pair_command(staged or '<candidate>.json', trials=trials, pair_depth=pair_depth)}, "
+        f"then re-run submit with --peer-audit peer-audit.json"
+    )
+    res["error"] = {"stage": "peer-audit", "message": "; ".join(problems), "hint": hint}
     return 1
 
 
@@ -1652,7 +1656,12 @@ def _revision_check(doc, report, args, res, slug=None):
     print("\nsubmission refused; nothing written to the board:")
     for p in problems:
         print(f"  {p}")
-    res["error"] = {"stage": "revision", "class": "revision", "message": "; ".join(problems)}
+    res["error"] = {
+        "stage": "revision",
+        "class": "revision",
+        "message": "; ".join(problems),
+        "hint": "re-run with --slug %s" % _suggested_slug_doc(slug, out_dir),
+    }
     return 1
 
 
@@ -1704,7 +1713,11 @@ def _frontier_check(doc, report, args, res):
     print("\nsubmission refused; nothing written to the board:")
     for p in problems:
         print(f"  {p}")
-    res["error"] = {"stage": "frontier", "message": "; ".join(problems)}
+    res["error"] = {
+        "stage": "frontier",
+        "message": "; ".join(problems),
+        "hint": "re-run submit with --allow-non-frontier to file it as a non-frontier record",
+    }
     return 1
 
 
@@ -1840,12 +1853,46 @@ def cmd_submit(args):
             f.write(note_md)
         print(f"  wrote {note_out}")
     else:
-        print(
-            "\n  note: no --note-file given. Submissions should ship a "
-            "research note\n  (notes/{}.md) — the search story, sweep "
-            "sizes, ladder, dead ends.\n  See notes/TEMPLATE.md; the site "
-            "renders it beside your code.".format(slug)
-        )
+        # Auto-stage a minimal note stub so a one-command submission still
+        # ships a notes/<slug>.md (makes submission simple for models/harnesses).
+        # The stub carries the required [[n,k,d]] header and placeholder
+        # sections; the author replaces them before review. Only write into the
+        # repo's notes/ when submitting to the repo's own codes/ (a real
+        # submission); otherwise just warn, so tests and custom --out runs do
+        # not pollute the tree.
+        if os.path.abspath(args.out) == os.path.join(os.path.abspath(_ROOT), "codes"):
+            note_out = os.path.join(_ROOT, "notes", f"{slug}.md")
+            os.makedirs(os.path.dirname(note_out), exist_ok=True)
+            stub = (
+                "# [[{n},{k},{d}]] — submitted via qldpc submit\n\n"
+                "## Direction & hypothesis\n\n"
+                "TODO: track cell, construction family, and why this code was tried.\n\n"
+                "## What was searched\n\n"
+                "TODO: constructions, sweep sizes, screening method, seeds.\n\n"
+                "## Evidence trail\n\n"
+                "TODO: confirmation ladder (trials/side -> lightest logical found).\n\n"
+                "## Dead ends\n\n"
+                "TODO: families/approaches that screened well and collapsed.\n\n"
+                "## Tools\n\n"
+                "TODO: model/harness/tooling used.\n\n"
+                "## Reproduction\n\n"
+                "TODO: parameters to rebuild H_X, H_Z.\n"
+            ).format(n=n, k=k, d=d)
+            with open(note_out, "w", encoding="utf-8", newline="\n") as f:
+                f.write(stub)
+            print(
+                "\n  note: no --note-file given; staged a minimal stub at "
+                "{}\n  (replace the TODO sections before review; see "
+                "notes/TEMPLATE.md).".format(note_out)
+            )
+            res["note_stub"] = True
+        else:
+            print(
+                "\n  note: no --note-file given. Submissions should ship a "
+                "research note\n  (notes/{}.md) — the search story, sweep "
+                "sizes, ladder, dead ends.\n  See notes/TEMPLATE.md; the site "
+                "renders it beside your code.".format(slug)
+            )
 
     res["note_path"] = note_out
     res["stage"] = "draft"
