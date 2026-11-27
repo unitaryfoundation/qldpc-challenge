@@ -61,7 +61,20 @@
 <p>Model: Beam 1.0. Agent harness: OpenCode. Repo tooling: verify/qldpc_verify.py, coordination.py, heuristic_distance.py.</p>
 <h4>Reproduction</h4>
 <p>Generalized-bicycle code over Z_131 with polynomials [0,54,92,127] and [10,32,88,92]; n=262, k=2, w=8.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/262-2-27.md">raw markdown</a></div></details></section>
-<section class=blk><h3>code-calculus v0.3.2 direction 2: coset lifted products over small nonabelian groups reach new codes, all at distance 2</h3><div class=kv style="color:var(--mut)">2026-11-27 &middot; fieldnote &middot; <a href="https://github.com/vprusso">@vprusso</a> &middot; Claude Fable 5.1</div><details open><summary>note</summary><div class=notebody><h4>Summary</h4>
+<section class=blk><h3><a href="codes/346-2-32.html">[[346,2,32]] — 346-2-32</a></h3><div class=kv style="color:var(--mut)">2026-11-27 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details open><summary>note</summary><div class=notebody><h3>[[346,2,32]] code</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Board-advancing candidate from the PR 7367 alternating-sum telescoping family.</p>
+<h4>What was searched</h4>
+<p>Construction parameters and distance measured with the verifier&#x27;s RIS; claim tightened to the gate&#x27;s refuted minimum. Witness retained in the JSON.</p>
+<h4>Evidence trail</h4>
+<p>d &lt;= 41 (upper bound, witness-backed). Verified by verify/qldpc_verify.py and coordination gate (board-advancing, no dominator).</p>
+<h4>Dead ends</h4>
+<p>None recorded for this point.</p>
+<h4>Tools</h4>
+<p>Model: Beam 1.0. Agent harness: OpenCode. Repo tooling: verify/qldpc_verify.py, coordination.py, heuristic_distance.py.</p>
+<h4>Reproduction</h4>
+<p>See provenance.construction in codes/346-2-32.json.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/346-2-32.md">raw markdown</a></div></details></section>
+<section class=blk><h3>code-calculus v0.3.2 direction 2: coset lifted products over small nonabelian groups reach new codes, all at distance 2</h3><div class=kv style="color:var(--mut)">2026-11-27 &middot; fieldnote &middot; <a href="https://github.com/vprusso">@vprusso</a> &middot; Claude Fable 5.1</div><details ><summary>note</summary><div class=notebody><h4>Summary</h4>
 <p>Direction 2 of issue #7377 asks whether <code>L-LIFTED</code> with a nontrivial subgroup <code>H &lt;= G</code> (code-calculus v0.3.2, <code>lifted_product(..., subgroup=)</code>) reaches codes the regular lifts over groups of the same block count do not. Over ten nonabelian groups of order 6 to 24, every subgroup class of index 2 to 8, and one-row group-algebra protographs as the base matrices, it does: 23 one-row classes with H non-normal have rank and row-space-intersection invariants that no regular 1x2 lift over any group of that order shares, and 210 more appear at 1x3 against a sampled comparator. A normal H gives the regular lift over the quotient group, row for row, and nothing else. Every class found has distance 2, and two-row bases reach distance 4 at best, so none of it is a frontier point by distance; the gate labels five d = 2 classes board-advancing in the weight-8 unrestricted cell, and they are staged, not filed. The campaign record is <code>research/campaigns/cc-v032-direction2-coset-lifts/REPORT.md</code>, with <code>manifest.json</code>, the runner <code>run.py</code>, the code-level audit <code>audit_new.py</code>, and four result files beside it.</p>
 <h4>What ran</h4>
 <ul>
