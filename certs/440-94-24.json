@@ -1,0 +1,33 @@
+{
+  "d": 24,
+  "d_exact": false,
+  "d_lower": 15,
+  "encoding": "css-sides",
+  "logical_classes": 94,
+  "name": "[[440,94,24]] pair-partition CPM CSS, (J,L)=(4,10), P=44",
+  "sides": {
+    "X": {
+      "exact": false,
+      "note": "lower bound 15 after 30.0 s",
+      "proved_min": 15,
+      "secs": 30.1,
+      "status": "TIMEOUT",
+      "value": 24
+    },
+    "Z": {
+      "exact": false,
+      "note": "lower bound 15 after 30.0 s",
+      "proved_min": 15,
+      "secs": 30.1,
+      "status": "TIMEOUT",
+      "value": 24
+    }
+  },
+  "solver": "tropidist b03ec2d4077f (arXiv:2611.08247) exhaustive search",
+  "tlim_per_solve": 30.0,
+  "verification": {
+    "checks_sha256": "3870f4f3650547c898c99757a5829fa767b364fc943b8b6b58a31ab5391a0eb9",
+    "level": "solver",
+    "note": "tropidist's lower bound is exhaustion inside its kernel (cut-rank dynamic program, weight-truncated DP, weight-bounded search; completeness proved in the paper, no replayable artifact), so this is a solver verdict; the vector it returned was re-verified by verify/heuristic_distance.py"
+  }
+}
