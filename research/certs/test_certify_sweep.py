@@ -352,6 +352,121 @@ def test_the_budget_stops_opening_entries_and_reports_what_is_left(tmp_path):
     assert m["opened"] == 2 and m["selected"] == 2
 
 
+def _three_entry_run(tmp_path, certify, **kw):
+    S = _script()
+    codes, certs, out = str(tmp_path / "codes"), str(tmp_path / "certs"), str(tmp_path / "out")
+    os.makedirs(certs)
+    for slug in ("a", "b", "c"):
+        _write(os.path.join(codes, slug + ".json"), {"n": 12})
+    queue = {"entries": [_row("a"), _row("b"), _row("c")]}
+    return (
+        S,
+        out,
+        lambda: S.run_sweep(
+            queue=queue,
+            out_dir=out,
+            attempts_path=str(tmp_path / "att.jsonl"),
+            tlim=600,
+            job_seconds=1000,
+            certs_dir=certs,
+            codes_dir=codes,
+            certify=certify,
+            tools=lambda: {},
+            **kw,
+        ),
+    )
+
+
+def _read(out, name):
+    with open(os.path.join(out, name), encoding="utf-8") as f:
+        return f.read()
+
+
+def test_the_manifest_is_written_after_every_entry(tmp_path):
+    """A run killed between entries leaves run.json with what it opened so far (issue #7406)."""
+    seen = []
+
+    def certify(doc, tlim, proof_dir, slug):
+        # what the previous entry left on disk, read while this one is "running"
+        m = json.loads(_read(out, "run.json"))
+        seen.append((slug, m["status"], m["opened"], m["left"], dict(m["outcomes"])))
+        return _record()
+
+    S, out, run = _three_entry_run(tmp_path, certify)
+    m = run()
+    assert seen == [
+        ("a", "running", 0, 3, {}),
+        ("b", "running", 1, 2, {"exact": 1}),
+        ("c", "running", 2, 1, {"exact": 2}),
+    ]
+    assert m["status"] == "complete" and m["left"] == 0 and m["opened"] == 3
+    final = json.loads(_read(out, "run.json"))
+    assert final["status"] == "complete" and final["outcomes"] == {"exact": 3}
+    assert _read(out, "counts.txt").strip() == "3 opened, exact 3, partial 0, timeout 0, refuted 0, error 0"
+
+
+def test_an_interrupted_run_leaves_its_tally(tmp_path, capsys):
+    """Ctrl-C mid-run: run.json, summary.md and counts.txt say interrupted and what was opened."""
+
+    def certify(doc, tlim, proof_dir, slug):
+        if slug == "b":
+            raise KeyboardInterrupt
+        return _record()
+
+    S, out, run = _three_entry_run(tmp_path, certify)
+    with pytest.raises(KeyboardInterrupt):
+        run()
+    m = json.loads(_read(out, "run.json"))
+    assert m["status"] == "interrupted" and m["opened"] == 1 and m["left"] == 2 and m["outcomes"] == {"exact": 1}
+    assert m["results"][0]["slug"] == "a"
+    assert (
+        _read(out, "counts.txt").strip()
+        == "interrupted after 1 opened, exact 1, partial 0, timeout 0, refuted 0, error 0"
+    )
+    assert "interrupted with 2 left" in _read(out, "summary.md")
+    assert "interrupted; opened 1 of 3: exact 1" in capsys.readouterr().out
+
+
+def test_sigterm_is_handled_like_an_interrupt_and_the_handler_is_restored(tmp_path):
+    """The workflow's job budget kills with SIGTERM; the tally survives it (issue #7406)."""
+    import signal
+
+    before = signal.getsignal(signal.SIGTERM)
+
+    def certify(doc, tlim, proof_dir, slug):
+        if slug == "c":
+            os.kill(os.getpid(), signal.SIGTERM)
+        return _record()
+
+    S, out, run = _three_entry_run(tmp_path, certify)
+    with pytest.raises(KeyboardInterrupt):
+        run()
+    m = json.loads(_read(out, "run.json"))
+    assert m["status"] == "interrupted" and m["opened"] == 2 and m["left"] == 1
+    assert signal.getsignal(signal.SIGTERM) == before, "the previous SIGTERM handler is put back"
+
+
+def test_a_budget_stop_is_marked_in_the_manifest(tmp_path):
+    S = _script()
+    codes, certs, out = str(tmp_path / "codes"), str(tmp_path / "certs"), str(tmp_path / "out")
+    os.makedirs(certs)
+    for slug in ("a", "b"):
+        _write(os.path.join(codes, slug + ".json"), {"n": 12})
+    m = S.run_sweep(
+        queue={"entries": [_row("a"), _row("b")]},
+        out_dir=out,
+        attempts_path=str(tmp_path / "att.jsonl"),
+        tlim=600,
+        job_seconds=0,
+        certs_dir=certs,
+        codes_dir=codes,
+        certify=lambda *a, **k: _record(),
+        tools=lambda: {},
+    )
+    assert m["status"] == "stopped_by_budget" and m["stopped_by_budget"]
+    assert _read(out, "counts.txt").startswith(f"{m['opened']} opened"), "a budget stop keeps the plain tally"
+
+
 @pytest.mark.board
 def test_a_real_certificate_on_a_tiny_board_entry_passes_the_certificate_checker(tmp_path):
     """The certifier's record, stripped and filed, is one verify/check_certs.py accepts."""

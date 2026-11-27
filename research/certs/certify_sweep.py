@@ -76,6 +76,7 @@ import datetime
 import json
 import os
 import shutil
+import signal
 import subprocess
 import sys
 import tempfile
@@ -926,139 +927,253 @@ def run_sweep(
         "results": [],
         "staged": [],
         "stopped_by_budget": False,
-        "left": 0,
+        "left": len(chosen),
+        "status": "running",
     }
     os.makedirs(os.path.join(out_dir, "certs"), exist_ok=True)
     t_start = time.time()
-    for i, row in enumerate(chosen):
-        if time.time() - t_start > job_seconds:
-            manifest["stopped_by_budget"] = True
-            manifest["left"] = len(chosen) - i
-            break
-        slug = row["slug"]
-        path = os.path.join(codes_dir, slug + ".json")
-        stab = row.get("code_type") == "stabilizer"
-        t0 = time.time()
-        cert, error, killed, used, upgrade = None, None, False, "sat", None
-        if use_tool:
-            if "qedist" in backend:
-                used = "qedist"
-                cert, error, killed = _qedist_attempt(
-                    path,
-                    slug,
-                    tlim,
-                    qedist,
-                    threads,
-                    certify_qedist,
-                    start=row.get("start"),
-                    tropidist_root=tropidist,
-                    ladder=ladder,
-                )
-            else:
-                used = "tropidist"
-                cert, error, killed = _tropidist_attempt(
-                    path, slug, tlim, tropidist, threads, certify_tropidist, start=row.get("start")
-                )
-        # The SAT path runs alone, after a tool error, on an entry the tool
-        # closed (to carry it to proof_log), and, with a ladder, on an entry
-        # the tool left open: the ladder's rungs can be proof-checked, which
-        # the tool's bound cannot, and a bound at least as high replaces it.
-        tool_open = cert is not None and classify(cert) in ("partial", "timeout")
-        sat_after_tool = "tropidist+sat" in backend or "qedist+sat" in backend
-        if backend == "sat" or (
-            sat_after_tool
-            and not stab
-            and (error is not None or (cert is not None and classify(cert) == "exact") or (bool(ladder) and tool_open))
-        ):
-            sat_cert, sat_error, sat_killed = _sat_attempt(
-                path, slug, tlim, wall, certify, ladder=ladder, start=row.get("start", 1)
+    # The manifest is rewritten after every entry, and a SIGTERM (the job
+    # budget of the workflow, a kill from a shell) is turned into the
+    # KeyboardInterrupt a Ctrl-C raises, so that a run cut short still
+    # leaves run.json, summary.md and counts.txt saying what it opened
+    # (issue #7406). ``status`` says how the run ended: complete,
+    # stopped_by_budget, or interrupted; a file that still says running was
+    # left by a run that died without reaching either handler.
+    _flush(out_dir, _tally(manifest, t_start, reasons))
+    previous = _handle_sigterm()
+    try:
+        for i, row in enumerate(chosen):
+            if time.time() - t_start > job_seconds:
+                manifest["stopped_by_budget"] = True
+                manifest["left"] = len(chosen) - i
+                break
+            _open_entry(
+                row,
+                manifest,
+                out_dir=out_dir,
+                attempts_path=attempts_path,
+                tlim=tlim,
+                wall=wall,
+                codes_dir=codes_dir,
+                certify=certify,
+                backend=backend,
+                use_tool=use_tool,
+                tropidist=tropidist,
+                qedist=qedist,
+                threads=threads,
+                certify_tropidist=certify_tropidist,
+                certify_qedist=certify_qedist,
+                ladder=ladder,
+                date=date,
+                head=head,
+                url=url,
             )
-            if cert is None:
-                cert, error, killed, used = sat_cert, sat_error, sat_killed, "sat"
-            elif _is_proof_log(sat_cert):
-                cert, used, upgrade = sat_cert, "sat", "proof_log"
-            elif (
-                tool_open
-                and sat_cert is not None
-                and classify(sat_cert) in ("exact", "partial")
-                and (lower_bound_of(sat_cert) or 1) >= (lower_bound_of(cert) or 1)
-            ):
-                cert, used, upgrade = sat_cert, "sat", f"ladder over tropidist d >= {lower_bound_of(cert) or 1}"
-            else:
-                upgrade = "sat " + (
-                    classify(sat_cert)
-                    if sat_cert is not None
-                    else "killed"
-                    if sat_killed
-                    else f"error: {sat_error}"[:200]
-                )
-        att = attempt_row(
-            row,
-            cert,
-            tlim=tlim,
-            date=date,
-            head=head,
-            url=url,
-            secs=time.time() - t0,
-            error=error,
-            killed=killed,
-            backend=used,
-            upgrade=upgrade,
-            ladder=ladder,
-        )
-        if att["outcome"] == "timeout" and row.get("raise_from"):
-            att["note"] = (
-                f"reopened at W = {row['start']}; the run did not rise above the filed "
-                f"d >= {row['raise_from'].get('d_lower')}"
-            )
-        if att["outcome"] in ("exact", "partial"):
-            filed = certificate(cert)
-            if att["outcome"] == "partial":
-                with open(path, encoding="utf-8") as f:
-                    filed = partial_certificate(cert, json.load(f))
-            old = row.get("raise_from")
-            if old:
-                filed = raise_certificate(old, filed)
-                att["raised"] = {"from": int(old.get("d_lower") or 1), "to": lower_bound_of(filed) or filed["d"]}
-                if att["outcome"] == "partial" and att["raised"]["to"] <= att["raised"]["from"]:
-                    att["note"] = f"the run did not rise above the filed d >= {att['raised']['from']}"
-                    filed = None
-                else:
-                    att["d_lower"] = lower_bound_of(filed)
-                    att["level"] = filed["verification"]["level"]
-            if filed is not None:
-                _write_json(os.path.join(out_dir, "certs", slug + ".json"), filed)
-                br = batch_row(slug, row["n"], cert)
-                if br and filed["verification"].get("level") == "proof_log":
-                    append_jsonl(os.path.join(out_dir, "certs", BATCH_LOG), br)
-                manifest["staged"].append(slug)
-        append_jsonl(attempts_path, att)
-        manifest["results"].append(att)
-        print(
-            f"{slug}: {att['outcome']}"
-            + (f" d >= {att['d_lower']}" if att.get("d_lower") else "")
-            + (f" ({att['level']})" if att.get("level") else "")
-            + f" in {att['secs']} s"
-            + (f"; {att['note']}" if att.get("note") else ""),
-            flush=True,
-        )
+            manifest["left"] = len(chosen) - i - 1
+            _flush(out_dir, _tally(manifest, t_start, reasons))
+        else:
+            manifest["left"] = 0
+    except KeyboardInterrupt:
+        manifest["status"] = "interrupted"
+        _flush(out_dir, _tally(manifest, t_start, reasons))
+        print("interrupted; " + tally_line(manifest, out_dir), flush=True)
+        raise
+    finally:
+        _restore_sigterm(previous)
+    manifest["status"] = "stopped_by_budget" if manifest["stopped_by_budget"] else "complete"
+    _flush(out_dir, _tally(manifest, t_start, reasons))
+    return manifest
+
+
+def _handle_sigterm():
+    """Make SIGTERM raise KeyboardInterrupt in the main thread; return the previous handler."""
+
+    def raise_interrupt(signum, frame):
+        raise KeyboardInterrupt(f"signal {signum}")
+
+    try:
+        return signal.signal(signal.SIGTERM, raise_interrupt)
+    except (ValueError, OSError):  # not the main thread, or no such signal here
+        return None
+
+
+def _restore_sigterm(previous):
+    if previous is None:
+        return
+    try:
+        signal.signal(signal.SIGTERM, previous)
+    except (ValueError, OSError):
+        pass
+
+
+def _tally(manifest, t_start, reasons):
+    """Fill the derived fields of the manifest from what has been opened so far."""
     manifest["opened"] = len(manifest["results"])
     manifest["seconds"] = round(time.time() - t_start, 1)
     manifest["outcomes"] = dict(Counter(r["outcome"] for r in manifest["results"]))
     manifest["skipped_reasons"] = {s: reasons[s] for s in list(reasons)[:200]}
+    return manifest
+
+
+def _flush(out_dir, manifest):
+    """Write run.json, summary.md and counts.txt from the manifest as it stands."""
     _write_json(os.path.join(out_dir, "run.json"), manifest)
     with open(os.path.join(out_dir, "summary.md"), "w", encoding="utf-8") as f:
         f.write(summary_markdown(manifest))
     with open(os.path.join(out_dir, "counts.txt"), "w", encoding="utf-8") as f:
         f.write(counts_line(manifest) + "\n")
-    return manifest
+
+
+def tally_line(m, out_dir):
+    """Return the one-line tally the CLI prints when a run ends, however it ends."""
+    o = m.get("outcomes", {})
+    return (
+        f"opened {m.get('opened', 0)} of {m['selected']}: exact {o.get('exact', 0)}, partial "
+        f"{o.get('partial', 0)} (staged under {os.path.relpath(out_dir, ROOT)}), timeout "
+        f"{o.get('timeout', 0)}, refuted "
+        f"{o.get('refuted', 0)}, error {o.get('error', 0)}, left {m.get('left', 0)}"
+    )
+
+
+def _open_entry(
+    row,
+    manifest,
+    *,
+    out_dir,
+    attempts_path,
+    tlim,
+    wall,
+    codes_dir,
+    certify,
+    backend,
+    use_tool,
+    tropidist,
+    qedist,
+    threads,
+    certify_tropidist,
+    certify_qedist,
+    ladder,
+    date,
+    head,
+    url,
+):
+    """Open one queue entry: run the backends, file what closes, log the attempt, extend the manifest."""
+    slug = row["slug"]
+    path = os.path.join(codes_dir, slug + ".json")
+    stab = row.get("code_type") == "stabilizer"
+    t0 = time.time()
+    cert, error, killed, used, upgrade = None, None, False, "sat", None
+    if use_tool:
+        if "qedist" in backend:
+            used = "qedist"
+            cert, error, killed = _qedist_attempt(
+                path,
+                slug,
+                tlim,
+                qedist,
+                threads,
+                certify_qedist,
+                start=row.get("start"),
+                tropidist_root=tropidist,
+                ladder=ladder,
+            )
+        else:
+            used = "tropidist"
+            cert, error, killed = _tropidist_attempt(
+                path, slug, tlim, tropidist, threads, certify_tropidist, start=row.get("start")
+            )
+    # The SAT path runs alone, after a tool error, on an entry the tool
+    # closed (to carry it to proof_log), and, with a ladder, on an entry
+    # the tool left open: the ladder's rungs can be proof-checked, which
+    # the tool's bound cannot, and a bound at least as high replaces it.
+    tool_open = cert is not None and classify(cert) in ("partial", "timeout")
+    sat_after_tool = "tropidist+sat" in backend or "qedist+sat" in backend
+    if backend == "sat" or (
+        sat_after_tool
+        and not stab
+        and (error is not None or (cert is not None and classify(cert) == "exact") or (bool(ladder) and tool_open))
+    ):
+        sat_cert, sat_error, sat_killed = _sat_attempt(
+            path, slug, tlim, wall, certify, ladder=ladder, start=row.get("start", 1)
+        )
+        if cert is None:
+            cert, error, killed, used = sat_cert, sat_error, sat_killed, "sat"
+        elif _is_proof_log(sat_cert):
+            cert, used, upgrade = sat_cert, "sat", "proof_log"
+        elif (
+            tool_open
+            and sat_cert is not None
+            and classify(sat_cert) in ("exact", "partial")
+            and (lower_bound_of(sat_cert) or 1) >= (lower_bound_of(cert) or 1)
+        ):
+            cert, used, upgrade = sat_cert, "sat", f"ladder over tropidist d >= {lower_bound_of(cert) or 1}"
+        else:
+            upgrade = "sat " + (
+                classify(sat_cert) if sat_cert is not None else "killed" if sat_killed else f"error: {sat_error}"[:200]
+            )
+    att = attempt_row(
+        row,
+        cert,
+        tlim=tlim,
+        date=date,
+        head=head,
+        url=url,
+        secs=time.time() - t0,
+        error=error,
+        killed=killed,
+        backend=used,
+        upgrade=upgrade,
+        ladder=ladder,
+    )
+    if att["outcome"] == "timeout" and row.get("raise_from"):
+        att["note"] = (
+            f"reopened at W = {row['start']}; the run did not rise above the filed "
+            f"d >= {row['raise_from'].get('d_lower')}"
+        )
+    if att["outcome"] in ("exact", "partial"):
+        filed = certificate(cert)
+        if att["outcome"] == "partial":
+            with open(path, encoding="utf-8") as f:
+                filed = partial_certificate(cert, json.load(f))
+        old = row.get("raise_from")
+        if old:
+            filed = raise_certificate(old, filed)
+            att["raised"] = {"from": int(old.get("d_lower") or 1), "to": lower_bound_of(filed) or filed["d"]}
+            if att["outcome"] == "partial" and att["raised"]["to"] <= att["raised"]["from"]:
+                att["note"] = f"the run did not rise above the filed d >= {att['raised']['from']}"
+                filed = None
+            else:
+                att["d_lower"] = lower_bound_of(filed)
+                att["level"] = filed["verification"]["level"]
+        if filed is not None:
+            _write_json(os.path.join(out_dir, "certs", slug + ".json"), filed)
+            br = batch_row(slug, row["n"], cert)
+            if br and filed["verification"].get("level") == "proof_log":
+                append_jsonl(os.path.join(out_dir, "certs", BATCH_LOG), br)
+            manifest["staged"].append(slug)
+    append_jsonl(attempts_path, att)
+    manifest["results"].append(att)
+    print(
+        f"{slug}: {att['outcome']}"
+        + (f" d >= {att['d_lower']}" if att.get("d_lower") else "")
+        + (f" ({att['level']})" if att.get("level") else "")
+        + f" in {att['secs']} s"
+        + (f"; {att['note']}" if att.get("note") else ""),
+        flush=True,
+    )
 
 
 def counts_line(m):
-    """Return the one-line tally the workflow puts in its commit message."""
+    """Return the one-line tally the workflow puts in its commit message.
+
+    A run that did not complete says so first (``interrupted`` or ``running``,
+    the latter left by a run that died before any handler ran), so a tally
+    read from a partial run.json is never mistaken for a whole sweep.
+    """
     o = m.get("outcomes", {})
+    status = m.get("status", "complete")
+    prefix = "" if status in ("complete", "stopped_by_budget") else f"{status} after "
     return (
-        f"{m.get('opened', 0)} opened, exact {o.get('exact', 0)}, partial {o.get('partial', 0)}, "
+        f"{prefix}{m.get('opened', 0)} opened, exact {o.get('exact', 0)}, partial {o.get('partial', 0)}, "
         f"timeout {o.get('timeout', 0)}, refuted {o.get('refuted', 0)}, error {o.get('error', 0)}"
     )
 
@@ -1073,7 +1188,15 @@ def summary_markdown(m):
         + (f", ladder budget {m['ladder']} s per side" if m.get("ladder") else "")
         + f", job budget {m['job_seconds']} s. "
         f"Opened {m.get('opened', 0)} of {m['selected']} selected entries in {m.get('seconds', 0)} s"
-        + (f"; stopped by the budget with {m['left']} left for the next run." if m.get("stopped_by_budget") else "."),
+        + (
+            f"; stopped by the budget with {m['left']} left for the next run."
+            if m.get("stopped_by_budget")
+            else f"; interrupted with {m.get('left', 0)} left (issue #7406)."
+            if m.get("status") == "interrupted"
+            else f"; still running, or killed before it could say, with {m.get('left', 0)} left."
+            if m.get("status") == "running"
+            else "."
+        ),
         "",
         f"exact {o.get('exact', 0)}, partial {o.get('partial', 0)}, timeout {o.get('timeout', 0)}, "
         f"refuted {o.get('refuted', 0)}, error {o.get('error', 0)}; skipped "
@@ -1483,14 +1606,8 @@ def main(argv=None):
             max_gap=a.max_gap,
             min_gap=a.min_gap,
         )
-        o = m["outcomes"]
-        print(
-            f"opened {m['opened']} of {m['selected']}: exact {o.get('exact', 0)}, partial "
-            f"{o.get('partial', 0)} (staged under {os.path.relpath(a.out_dir, ROOT)}), timeout "
-            f"{o.get('timeout', 0)}, refuted "
-            f"{o.get('refuted', 0)}, error {o.get('error', 0)}, left {m['left']}"
-        )
-        return EXIT_REFUTED if o.get("refuted") else 0
+        print(tally_line(m, a.out_dir))
+        return EXIT_REFUTED if m["outcomes"].get("refuted") else 0
     if a.cmd == "stage":
         staged, skipped = stage(a.out_dir)
         print("staged: " + (" ".join(staged) or "nothing"))
