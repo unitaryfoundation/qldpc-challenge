@@ -571,6 +571,45 @@ def _side_summary(blk):
     return out
 
 
+# How long a certifier's process group gets to exit on SIGTERM before SIGKILL.
+# SIGTERM lets the Python tool wrappers unwind and close their records; the
+# solvers underneath ignore it, which is what the SIGKILL that follows is for.
+WALL_GRACE = 5.0
+
+
+def end_at_wall_clock(proc, slug, wall, what):
+    """End a certifier's process group that ran past its wall clock, and say so in the run log.
+
+    Issue #7403: the kill used to be a bare SIGKILL to the group with nothing
+    printed, so a run log showed an entry start and then its timeout row, and
+    on a desktop the killed tool looked like a crash. The group now gets
+    SIGTERM and ``WALL_GRACE`` seconds to exit, then SIGKILL if it is still
+    there, and one line names the entry, the wall clock, which signal ended
+    it, and that this is the expected outcome of a tool whose own time limit
+    is advisory. Returns the signal that ended the group, as its name.
+    """
+    ended = "SIGTERM"
+    try:
+        os.killpg(proc.pid, signal.SIGTERM)
+    except OSError:
+        proc.terminate()
+    try:
+        proc.communicate(timeout=WALL_GRACE)
+    except subprocess.TimeoutExpired:
+        ended = "SIGKILL"
+        try:
+            os.killpg(proc.pid, signal.SIGKILL)
+        except OSError:
+            proc.kill()
+        proc.communicate()
+    print(
+        f"{slug}: killed by wall clock after {wall:g} s ({what}); ended by {ended}. Expected when the "
+        "tool's own time limit is advisory (research/certs/README.md); recorded as a timeout, nothing staged.",
+        flush=True,
+    )
+    return ended
+
+
 def tropidist_in_subprocess(path, slug, tlim, root, threads, wall, kmin=None, script=None):
     """Run research/certs/tropidist_certify.py on one entry under a hard wall clock.
 
@@ -604,11 +643,7 @@ def tropidist_in_subprocess(path, slug, tlim, root, threads, wall, kmin=None, sc
     try:
         out, err = proc.communicate(timeout=wall)
     except subprocess.TimeoutExpired:
-        try:
-            os.killpg(proc.pid, 9)
-        except OSError:
-            proc.kill()
-        proc.communicate()
+        end_at_wall_clock(proc, slug, wall, "tropidist_certify")
         return None, None, True
     if proc.returncode not in (0, 1) or not out.strip():
         tail = (err or "").strip().splitlines()
@@ -636,11 +671,7 @@ def certify_in_subprocess(path, slug, tlim, proof_dir, wall, script=None, ladder
     try:
         out, err = proc.communicate(timeout=wall)
     except subprocess.TimeoutExpired:
-        try:
-            os.killpg(proc.pid, 9)
-        except OSError:
-            proc.kill()
-        proc.communicate()
+        end_at_wall_clock(proc, slug, wall, "sat_certify")
         return None, None, True
     if proc.returncode not in (0, 1) or not out.strip():
         tail = (err or "").strip().splitlines()
@@ -685,7 +716,7 @@ def attempt_row(
             outcome="timeout",
             level=None,
             sides={},
-            note=f"killed at the {wall} s wall clock; the solver's own limit did not hold",
+            note=f"killed by wall clock after {wall:g} s; the solver's own limit did not hold (expected, issue #7403)",
         )
         return out
     if error is not None:
@@ -775,11 +806,7 @@ def qedist_in_subprocess(
     try:
         out, err = proc.communicate(timeout=wall)
     except subprocess.TimeoutExpired:
-        try:
-            os.killpg(proc.pid, 9)
-        except OSError:
-            proc.kill()
-        proc.communicate()
+        end_at_wall_clock(proc, slug, wall, "routed_certify")
         return None, None, True
     if proc.returncode not in (0, 1) or not out.strip():
         tail = (err or "").strip().splitlines()

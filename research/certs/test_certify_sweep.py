@@ -543,7 +543,7 @@ def test_the_wall_clock_kills_a_certifier_that_ignores_its_limit(tmp_path, monke
     )
     assert time.time() - t0 < 30
     (row,) = m["results"]
-    assert row["outcome"] == "timeout" and "wall clock" in row["note"] and m["staged"] == []
+    assert row["outcome"] == "timeout" and "killed by wall clock" in row["note"] and m["staged"] == []
     rec, err, killed = S.certify_in_subprocess(
         os.path.join(codes, "slow.json"), "slow", 1, str(tmp_path / "p"), wall=0.5, script=str(stub)
     )
@@ -1296,3 +1296,33 @@ def test_qedist_backend_and_reopened_partial(tmp_path):
         os.path.join(codes, "p.json"), "p", 120, "/tmp/qedist", 1, 30, script=str(dummy)
     )
     assert err is None and not killed and rec["d_exact"] is True
+
+
+def test_a_wall_clock_kill_is_logged_and_tries_sigterm_before_sigkill(tmp_path, capsys):
+    """Issue #7403: the kill names the entry and the signal in the run log.
+
+    A tool that exits on SIGTERM is not SIGKILLed; one that ignores it is.
+    """
+    S = _script()
+    polite = tmp_path / "polite.py"
+    polite.write_text("import time\ntime.sleep(60)\n", encoding="utf-8")  # python exits on SIGTERM
+    rec, err, killed = S.certify_in_subprocess(
+        str(tmp_path / "x.json"), "x-1-1", 1, str(tmp_path / "p"), wall=0.3, script=str(polite)
+    )
+    assert killed and rec is None and err is None
+    out = capsys.readouterr().out
+    assert "x-1-1: killed by wall clock after 0.3 s (sat_certify); ended by SIGTERM" in out
+    assert "Expected" in out and "research/certs/README.md" in out
+    stubborn = tmp_path / "stubborn.py"
+    stubborn.write_text(
+        "import signal, time\nsignal.signal(signal.SIGTERM, signal.SIG_IGN)\ntime.sleep(60)\n", encoding="utf-8"
+    )
+    S.WALL_GRACE, saved = 0.5, S.WALL_GRACE
+    try:
+        rec, err, killed = S.tropidist_in_subprocess(
+            str(tmp_path / "x.json"), "x-1-1", 1, str(tmp_path), 1, wall=0.3, script=str(stubborn)
+        )
+    finally:
+        S.WALL_GRACE = saved
+    assert killed and rec is None and err is None
+    assert "x-1-1: killed by wall clock after 0.3 s (tropidist_certify); ended by SIGKILL" in capsys.readouterr().out
