@@ -12,6 +12,16 @@ if [ -n "$changed_codes" ]; then
     python3 verify/check_codes_format.py --files $changed_codes
 fi
 
+# Family tag consistency: a construction that names a family must carry that
+# tag (verify/test_family_tag_consistency.py). The selected test scans every
+# codes/*.json on disk (not just the staged ones) and reads the working tree,
+# so a contradiction anywhere in the checkout blocks the commit. It is triggered
+# only when a code file is staged, and avoids optional deps (stim) used by the
+# companion test.
+if [ -n "$changed_codes" ]; then
+    uv run --frozen python -m pytest verify/test_family_tag_consistency.py::test_a_construction_that_names_its_family_carries_that_tag -q
+fi
+
 # Validator integrity (trusted stack pin). Fast (<1s): fails if a critical file
 # changed without re-pinning verify/validator_manifest.json.
 python3 verify/check_validator_integrity.py
