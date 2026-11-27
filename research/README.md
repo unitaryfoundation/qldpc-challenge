@@ -17,6 +17,7 @@ so that two scripts that look alike are not picked by name (issue #3383).
 | `literature/` | the literature harvest | `literature/README.md` |
 | `provenance/` | the literature-novelty checker and `derived.json` | `provenance/README.md` |
 | `candidates/`, `out/`, `runs/` | gitignored working output: staging, run output, run logs | never cite them as evidence |
+| `rfcs/` | design proposals for Tier 1 changes, written for maintainer review before any code | the document itself; RFC 0001 was issue #505 |
 
 ## Top-level scripts
 

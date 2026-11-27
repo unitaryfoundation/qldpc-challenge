@@ -1,0 +1,483 @@
+{
+ "window": "closed-unmerged pull requests created 2026-06-26 to 2026-11-26 (389), read 2026-11-27",
+ "summary": {
+  "closed_unmerged_code_prs_adding_a_code": 332,
+  "added_paths": 539,
+  "refiled_same_fingerprint_paths": 197,
+  "refiled_first_prs": 105,
+  "first_pr_verify_failed": 24,
+  "first_pr_verify_passed": 77,
+  "first_pr_verify_unknown": 4,
+  "classes": {
+   "('merged later', False)": 23,
+   "('merged later', True)": 20,
+   "(False, 'unmerged', 'same', False)": 60,
+   "(False, 'unmerged', 'same', True)": 7,
+   "(True, 'unmerged', 'same', False)": 7,
+   "(True, 'unmerged', 'same', True)": 105
+  },
+  "store_targets": 112,
+  "store_targets_distinct_later_prs": 24,
+  "store_targets_later_verify_seconds": {
+   "n": 111,
+   "sum_min": 483.7,
+   "median_min": 0.6
+  },
+  "store_targets_same_author": 112,
+  "store_targets_same_blob": 106
+ },
+ "store_target_later_prs": [
+  {
+   "later_pr": 463,
+   "codes": 1,
+   "author": "MathysRennela",
+   "created": "2026-08-11T22:01:41Z",
+   "byte_identical": 1,
+   "first_prs": [
+    444
+   ],
+   "first_prs_verify_minutes": {
+    "444": 27.2
+   },
+   "later_verify_minutes": 28.2,
+   "later_verify_conclusions": {
+    "FAILURE": 1
+   }
+  },
+  {
+   "later_pr": 531,
+   "codes": 2,
+   "author": "MathysRennela",
+   "created": "2026-08-15T12:06:50Z",
+   "byte_identical": 2,
+   "first_prs": [
+    530
+   ],
+   "first_prs_verify_minutes": {
+    "530": 0.6
+   },
+   "later_verify_minutes": 0.6,
+   "later_verify_conclusions": {
+    "FAILURE": 1
+   }
+  },
+  {
+   "later_pr": 532,
+   "codes": 5,
+   "author": "MathysRennela",
+   "created": "2026-08-15T12:07:10Z",
+   "byte_identical": 5,
+   "first_prs": [
+    530,
+    531
+   ],
+   "first_prs_verify_minutes": {
+    "530": 0.6,
+    "531": 0.6
+   },
+   "later_verify_minutes": 0.6,
+   "later_verify_conclusions": {
+    "FAILURE": 1
+   }
+  },
+  {
+   "later_pr": 578,
+   "codes": 1,
+   "author": "MathysRennela",
+   "created": "2026-08-16T13:31:25Z",
+   "byte_identical": 1,
+   "first_prs": [
+    576
+   ],
+   "first_prs_verify_minutes": {
+    "576": 0.5
+   },
+   "later_verify_minutes": 119.2,
+   "later_verify_conclusions": {
+    "FAILURE": 1
+   }
+  },
+  {
+   "later_pr": 869,
+   "codes": 76,
+   "author": "MathysRennela",
+   "created": "2026-09-01T15:22:49Z",
+   "byte_identical": 76,
+   "first_prs": [
+    867
+   ],
+   "first_prs_verify_minutes": {
+    "867": 0.6
+   },
+   "later_verify_minutes": 0.6,
+   "later_verify_conclusions": {
+    "FAILURE": 2
+   }
+  },
+  {
+   "later_pr": 3973,
+   "codes": 1,
+   "author": "MathysRennela",
+   "created": "2026-10-20T14:19:53Z",
+   "byte_identical": 0,
+   "first_prs": [
+    3972
+   ],
+   "first_prs_verify_minutes": {
+    "3972": 1.2
+   },
+   "later_verify_minutes": 0.0,
+   "later_verify_conclusions": {}
+  },
+  {
+   "later_pr": 3975,
+   "codes": 1,
+   "author": "MathysRennela",
+   "created": "2026-10-20T14:45:16Z",
+   "byte_identical": 1,
+   "first_prs": [
+    3972
+   ],
+   "first_prs_verify_minutes": {
+    "3972": 1.2
+   },
+   "later_verify_minutes": 26.3,
+   "later_verify_conclusions": {
+    "SUCCESS": 1
+   }
+  },
+  {
+   "later_pr": 5654,
+   "codes": 2,
+   "author": "MathysRennela",
+   "created": "2026-11-13T17:16:22Z",
+   "byte_identical": 2,
+   "first_prs": [
+    5653
+   ],
+   "first_prs_verify_minutes": {
+    "5653": 2.8
+   },
+   "later_verify_minutes": 2.3,
+   "later_verify_conclusions": {
+    "FAILURE": 2
+   }
+  },
+  {
+   "later_pr": 5655,
+   "codes": 5,
+   "author": "MathysRennela",
+   "created": "2026-11-13T17:19:33Z",
+   "byte_identical": 5,
+   "first_prs": [
+    5653,
+    5654
+   ],
+   "first_prs_verify_minutes": {
+    "5653": 2.8,
+    "5654": 2.3
+   },
+   "later_verify_minutes": 2.3,
+   "later_verify_conclusions": {
+    "FAILURE": 2
+   }
+  },
+  {
+   "later_pr": 5740,
+   "codes": 3,
+   "author": "MathysRennela",
+   "created": "2026-11-14T01:33:59Z",
+   "byte_identical": 0,
+   "first_prs": [
+    5653,
+    5654,
+    5655
+   ],
+   "first_prs_verify_minutes": {
+    "5653": 2.8,
+    "5654": 2.3,
+    "5655": 2.3
+   },
+   "later_verify_minutes": 13.2,
+   "later_verify_conclusions": {
+    "SUCCESS": 1
+   }
+  },
+  {
+   "later_pr": 5782,
+   "codes": 2,
+   "author": "MathysRennela",
+   "created": "2026-11-14T02:11:58Z",
+   "byte_identical": 0,
+   "first_prs": [
+    5654,
+    5655
+   ],
+   "first_prs_verify_minutes": {
+    "5654": 2.3,
+    "5655": 2.3
+   },
+   "later_verify_minutes": 13.4,
+   "later_verify_conclusions": {
+    "SUCCESS": 1
+   }
+  },
+  {
+   "later_pr": 5850,
+   "codes": 1,
+   "author": "MathysRennela",
+   "created": "2026-11-17T12:13:28Z",
+   "byte_identical": 1,
+   "first_prs": [
+    5843
+   ],
+   "first_prs_verify_minutes": {
+    "5843": 2.3
+   },
+   "later_verify_minutes": 3.1,
+   "later_verify_conclusions": {
+    "FAILURE": 1
+   }
+  },
+  {
+   "later_pr": 6887,
+   "codes": 1,
+   "author": "MathysRennela",
+   "created": "2026-11-20T00:43:03Z",
+   "byte_identical": 1,
+   "first_prs": [
+    6873
+   ],
+   "first_prs_verify_minutes": {
+    "6873": 2.1
+   },
+   "later_verify_minutes": 2.3,
+   "later_verify_conclusions": {
+    "FAILURE": 1
+   }
+  },
+  {
+   "later_pr": 6889,
+   "codes": 1,
+   "author": "MathysRennela",
+   "created": "2026-11-20T00:43:17Z",
+   "byte_identical": 1,
+   "first_prs": [
+    6875
+   ],
+   "first_prs_verify_minutes": {
+    "6875": 1.8
+   },
+   "later_verify_minutes": 2.4,
+   "later_verify_conclusions": {
+    "FAILURE": 1
+   }
+  },
+  {
+   "later_pr": 6890,
+   "codes": 1,
+   "author": "MathysRennela",
+   "created": "2026-11-20T00:43:25Z",
+   "byte_identical": 1,
+   "first_prs": [
+    6876
+   ],
+   "first_prs_verify_minutes": {
+    "6876": 2.1
+   },
+   "later_verify_minutes": 2.2,
+   "later_verify_conclusions": {
+    "FAILURE": 1
+   }
+  },
+  {
+   "later_pr": 6891,
+   "codes": 1,
+   "author": "MathysRennela",
+   "created": "2026-11-20T00:43:31Z",
+   "byte_identical": 1,
+   "first_prs": [
+    6877
+   ],
+   "first_prs_verify_minutes": {
+    "6877": 1.9
+   },
+   "later_verify_minutes": 2.2,
+   "later_verify_conclusions": {
+    "FAILURE": 1
+   }
+  },
+  {
+   "later_pr": 6893,
+   "codes": 1,
+   "author": "MathysRennela",
+   "created": "2026-11-20T00:43:41Z",
+   "byte_identical": 1,
+   "first_prs": [
+    6879
+   ],
+   "first_prs_verify_minutes": {
+    "6879": 2.5
+   },
+   "later_verify_minutes": 2.4,
+   "later_verify_conclusions": {
+    "FAILURE": 1
+   }
+  },
+  {
+   "later_pr": 6894,
+   "codes": 1,
+   "author": "MathysRennela",
+   "created": "2026-11-20T00:43:46Z",
+   "byte_identical": 1,
+   "first_prs": [
+    6880
+   ],
+   "first_prs_verify_minutes": {
+    "6880": 2.4
+   },
+   "later_verify_minutes": 2.1,
+   "later_verify_conclusions": {
+    "FAILURE": 1
+   }
+  },
+  {
+   "later_pr": 6895,
+   "codes": 1,
+   "author": "MathysRennela",
+   "created": "2026-11-20T00:43:52Z",
+   "byte_identical": 1,
+   "first_prs": [
+    6881
+   ],
+   "first_prs_verify_minutes": {
+    "6881": 2.2
+   },
+   "later_verify_minutes": 2.2,
+   "later_verify_conclusions": {
+    "FAILURE": 1
+   }
+  },
+  {
+   "later_pr": 6897,
+   "codes": 1,
+   "author": "MathysRennela",
+   "created": "2026-11-20T00:44:03Z",
+   "byte_identical": 1,
+   "first_prs": [
+    6883
+   ],
+   "first_prs_verify_minutes": {
+    "6883": 2.1
+   },
+   "later_verify_minutes": 2.2,
+   "later_verify_conclusions": {
+    "FAILURE": 1
+   }
+  },
+  {
+   "later_pr": 6898,
+   "codes": 1,
+   "author": "MathysRennela",
+   "created": "2026-11-20T00:44:09Z",
+   "byte_identical": 1,
+   "first_prs": [
+    6884
+   ],
+   "first_prs_verify_minutes": {
+    "6884": 1.9
+   },
+   "later_verify_minutes": 2.2,
+   "later_verify_conclusions": {
+    "FAILURE": 1
+   }
+  },
+  {
+   "later_pr": 6899,
+   "codes": 1,
+   "author": "MathysRennela",
+   "created": "2026-11-20T00:44:14Z",
+   "byte_identical": 1,
+   "first_prs": [
+    6885
+   ],
+   "first_prs_verify_minutes": {
+    "6885": 2.2
+   },
+   "later_verify_minutes": 2.1,
+   "later_verify_conclusions": {
+    "FAILURE": 1
+   }
+  },
+  {
+   "later_pr": 7151,
+   "codes": 1,
+   "author": "Ming-yuan-Liang",
+   "created": "2026-11-21T06:39:12Z",
+   "byte_identical": 1,
+   "first_prs": [
+    6934
+   ],
+   "first_prs_verify_minutes": {
+    "6934": 66.3
+   },
+   "later_verify_minutes": 66.3,
+   "later_verify_conclusions": {
+    "FAILURE": 2
+   }
+  },
+  {
+   "later_pr": 7152,
+   "codes": 1,
+   "author": "Ming-yuan-Liang",
+   "created": "2026-11-21T06:39:14Z",
+   "byte_identical": 1,
+   "first_prs": [
+    6935
+   ],
+   "first_prs_verify_minutes": {
+    "6935": 89.8
+   },
+   "later_verify_minutes": 89.8,
+   "later_verify_conclusions": {
+    "FAILURE": 2
+   }
+  }
+ ],
+ "repeat_searches": [
+  {
+   "code": "codes/840-18-28.json",
+   "first_pr": 6934,
+   "later_pr": 7151,
+   "same_commit": true,
+   "first_run": 44784393846,
+   "later_run": 44876556318,
+   "first_minutes": 66,
+   "later_minutes": 66,
+   "verdict": "REFUTED [RIS-fast]: weight-27 logical < claimed distance 28 (both runs)",
+   "later_pr_closed_after_seconds": 81
+  },
+  {
+   "code": "codes/880-18-29.json",
+   "first_pr": 6935,
+   "later_pr": 7152,
+   "same_commit": true,
+   "first_run": 44784399170,
+   "later_run": 44876558516,
+   "first_minutes": 72,
+   "later_minutes": 90,
+   "verdict": "REFUTED [RIS-fast]: weight-27 logical < claimed distance 29 (both runs)",
+   "later_pr_closed_after_seconds": 83
+  },
+  {
+   "code": "codes/432-8-58.json",
+   "first_pr": 444,
+   "later_pr": 463,
+   "same_commit": false,
+   "same_fingerprint": true,
+   "first_minutes": 27,
+   "later_minutes": 28,
+   "verdict": "both verify runs failed; logs expired, refutation not confirmed"
+  }
+ ]
+}
