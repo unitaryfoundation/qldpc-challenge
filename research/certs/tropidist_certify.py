@@ -206,11 +206,29 @@ def check_vector(doc, side, cols):
 
 
 # ---------------------------------------------------------------------------- running the tool
+# The tool's own --time-limit is advisory: it checks the clock between search
+# phases and has run 2 to 2.5 times past it (Fanerst/tropidist#2, issue
+# #7404). So the solve is killed here, at the limit plus a tenth for the
+# tool's checkpointing and a few seconds for its start-up, and a killed side
+# is a TIMEOUT that proved nothing unless the tool had written its record.
+TLIM_GRACE = 1.1
+TLIM_FLOOR = 5.0
+
+
+def deadline(tlim):
+    """Return the wall clock one solve may use: ``--tlim`` plus the tool's slack."""
+    return TLIM_GRACE * float(tlim) + TLIM_FLOOR
+
+
 def run_cdist(H, L, *, root, tlim, threads=1, kmin=None, python=None, tag="side"):
     """Run ``python -m cdist --matrices`` on one problem and return its record.
 
     ``kmin`` starts the search at that threshold (a lower bound proved
-    earlier). Raises TropidistError when no record comes back.
+    earlier). Raises TropidistError when no record comes back. The run is
+    killed at :func:`deadline`; a killed run that left no record comes back
+    as ``{"status": "killed", ...}`` with no bound, since the tool proved
+    nothing it could report, and one that wrote its record before the kill
+    returns that record.
     """
     with tempfile.TemporaryDirectory(prefix="tropidist-") as tmp:
         h_path, l_path = os.path.join(tmp, f"{tag}.H.mtx"), os.path.join(tmp, f"{tag}.L.mtx")
@@ -233,12 +251,31 @@ def run_cdist(H, L, *, root, tlim, threads=1, kmin=None, python=None, tag="side"
         ]
         if kmin and int(kmin) > 1:
             cmd += ["--config", f"kmin={int(kmin)}"]
-        proc = subprocess.run(cmd, cwd=root, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, check=False)
-        if not os.path.exists(rec_path):
-            tail = (proc.stderr or proc.stdout or "").strip().splitlines()
-            raise TropidistError("tropidist wrote no record" + (f": {tail[-1]}" if tail else ""))
-        with open(rec_path, encoding="utf-8") as f:
-            return json.load(f)
+        t0 = time.time()
+        proc = subprocess.Popen(
+            cmd, cwd=root, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, start_new_session=True
+        )
+        killed = False
+        try:
+            out, err = proc.communicate(timeout=deadline(tlim))
+        except subprocess.TimeoutExpired:
+            killed = True
+            try:
+                os.killpg(proc.pid, 9)
+            except OSError:
+                proc.kill()
+            out, err = proc.communicate()
+        elapsed = round(time.time() - t0, 1)
+        if os.path.exists(rec_path):
+            with open(rec_path, encoding="utf-8") as f:
+                rec = json.load(f)
+            if killed:
+                rec["killed_at"] = elapsed
+            return rec
+        if killed:
+            return {"lower_bound": None, "upper_bound": None, "witness": None, "seconds": elapsed, "status": "killed"}
+        tail = (err or out or "").strip().splitlines()
+        raise TropidistError("tropidist wrote no record" + (f": {tail[-1]}" if tail else ""))
 
 
 def side_block(doc, side, claim, rec, *, tlim):
@@ -275,12 +312,13 @@ def side_block(doc, side, claim, rec, *, tlim):
     if lb is not None and int(lb) == int(claim):
         blk.update(exact=True, status="UNSAT", note=f"no logical < {claim} exists")
         return blk
-    blk.update(
-        exact=False,
-        status="TIMEOUT",
-        lower_bound=int(lb) if lb is not None else None,
-        note=(f"lower bound {lb} after {tlim} s" if lb is not None else f"nothing proved in {tlim} s"),
-    )
+    if rec.get("status") == "killed" or rec.get("killed_at") is not None:
+        note = f"killed at the {deadline(tlim):g} s deadline (the tool's own {tlim} s limit is advisory); " + (
+            f"lower bound {lb} from the record it had written" if lb is not None else "nothing proved"
+        )
+    else:
+        note = f"lower bound {lb} after {tlim} s" if lb is not None else f"nothing proved in {tlim} s"
+    blk.update(exact=False, status="TIMEOUT", lower_bound=int(lb) if lb is not None else None, note=note)
     return blk
 
 

@@ -110,7 +110,13 @@ def wall_clock(tlim, ladder=None):
 
 
 def tropidist_wall(tlim):
-    """Return the hard per-entry limit of the tropidist backend: one run of tlim per side plus setup."""
+    """Return the hard per-entry limit of the tropidist backend: one run of tlim per side plus setup.
+
+    research/certs/tropidist_certify.py kills each solve itself at its
+    deadline (tlim plus a tenth and a few seconds; the tool's own limit is
+    advisory, issue #7404), so this is the outer net for a certifier that
+    hangs outside a solve, not the limit a solve is held to.
+    """
     return 2 * tlim + WALL_FLOOR
 
 
