@@ -1,0 +1,83 @@
+{
+  "d": 4,
+  "d_exact": true,
+  "d_lower": 4,
+  "encoding": "selector",
+  "ladder": {
+    "budget_per_side": 60.0,
+    "start": 1
+  },
+  "logical_classes": 14,
+  "name": "[[32,14,4]] color code from Derks et al. (arXiv:2611.23420)",
+  "sides": {
+    "X": {
+      "exact": true,
+      "ladder": [
+        {
+          "W": 1,
+          "cnf_sha256": "dcd4a2ce0859c1baa8caebb52acc0820139f91da207476d9a89e991f021eea5f",
+          "proof": "[Errno 2] No such file or directory: 'kissat'",
+          "secs": 0.0,
+          "status": "UNSAT"
+        },
+        {
+          "W": 2,
+          "cnf_sha256": "af5f13bfdcef3d670de9e4c00aa202be0ec24704c1ab33a5eb1393d5a96ff594",
+          "proof": "[Errno 2] No such file or directory: 'kissat'",
+          "secs": 0.0,
+          "status": "UNSAT"
+        },
+        {
+          "W": 3,
+          "cnf_sha256": "79a9f63d362f6106357375074606e8fc6f7c93a81b97eb76e5ee4eda9029a3f2",
+          "proof": "[Errno 2] No such file or directory: 'kissat'",
+          "secs": 0.0,
+          "status": "UNSAT"
+        }
+      ],
+      "note": "no logical < 4 exists",
+      "proved_min": 4,
+      "secs": 0.0,
+      "status": "UNSAT",
+      "value": 4
+    },
+    "Z": {
+      "exact": true,
+      "ladder": [
+        {
+          "W": 1,
+          "cnf_sha256": "dcd4a2ce0859c1baa8caebb52acc0820139f91da207476d9a89e991f021eea5f",
+          "proof": "[Errno 2] No such file or directory: 'kissat'",
+          "secs": 0.0,
+          "status": "UNSAT"
+        },
+        {
+          "W": 2,
+          "cnf_sha256": "af5f13bfdcef3d670de9e4c00aa202be0ec24704c1ab33a5eb1393d5a96ff594",
+          "proof": "[Errno 2] No such file or directory: 'kissat'",
+          "secs": 0.0,
+          "status": "UNSAT"
+        },
+        {
+          "W": 3,
+          "cnf_sha256": "79a9f63d362f6106357375074606e8fc6f7c93a81b97eb76e5ee4eda9029a3f2",
+          "proof": "[Errno 2] No such file or directory: 'kissat'",
+          "secs": 0.0,
+          "status": "UNSAT"
+        }
+      ],
+      "note": "no logical < 4 exists",
+      "proved_min": 4,
+      "secs": 0.0,
+      "status": "UNSAT",
+      "value": 4
+    }
+  },
+  "solver": "CryptoMiniSat 5.14 SAT",
+  "symmetry": false,
+  "tlim_per_solve": 120,
+  "verification": {
+    "level": "solver",
+    "note": "proof path did not complete: [Errno 2] No such file or directory: 'kissat'"
+  }
+}
