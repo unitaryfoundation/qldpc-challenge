@@ -10,7 +10,7 @@
     "pyproject.toml": "a364fdf8a5d930596002a2cb7f1ab5f160d604a3712bfc8bbb1d582f833fba00",
     "uv.lock": "9115c5eeedb554d2ad58ea53004e4872f93add696c3510691d9e25d38ac84c5d",
     "verify/setup_gf2_fast.py": "5281f766a8fb474189e7693309e06b639c7a80e285b9597dbe4f29bd0efb02fb",
-    "verify/gf2_fast.cpp": "434919c1c2877a416ab871765129177ddfc53f8fb7ead9a5092686ff870e3cd3",
+    "verify/gf2_fast.cpp": "dd0f944e924ef36b24a37a620724e08ecef0d3b08431da7520b6d55ae7d03e57",
     "decode/distance.py": "e4a891f307bfbcfda344f7ad4fd11ea21bf8e9600fd71f6aaee999c37f0f61bb",
     "schema/cert.schema.json": "ea6600e9b13603f42f4b2681eccb153f3f68bfa272f0d0a096d139ef1005042c",
     "schema/code.schema.json": "8d3ee801c56e478e96f7a47facd9941426daf3818d5c4c26bd5cee7ca9cc9009",
