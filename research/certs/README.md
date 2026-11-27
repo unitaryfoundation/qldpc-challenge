@@ -93,7 +93,7 @@ author and the checks start on their own. The run's output directory (the
 staged certificates, `run.json`, the summary) is uploaded as a workflow
 artifact for 30 days whatever happens after the sweep, so a failed stage
 step or a closed PR loses no solving, and `stage` records what it copied in
-`staged.json`, which is what the PR body lists.
+`staged.json`, which is what the PR body lists. `run.json`, `summary.md` and `counts.txt` are rewritten after every entry and carry a `status` (`running`, `complete`, `stopped_by_budget`, `interrupted`), so a run cut short by Ctrl-C, SIGTERM or the job budget still leaves the tally of what it opened (issue #7406).
 
 ```
 uv run --extra research python research/certs/certify_sweep.py run --tlim 600 --job-seconds 14400
