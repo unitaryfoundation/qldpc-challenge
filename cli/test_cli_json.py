@@ -130,14 +130,59 @@ def test_an_existing_file_is_a_write_stage_error(npz, capsys, tmp_path):
     assert "already exists" in record["error"]["message"]
 
 
-def test_without_json_the_human_output_is_unchanged(npz, capsys, tmp_path):
+def test_without_json_the_human_output_is_unchanged(npz, capsys, tmp_path, monkeypatch):
+    monkeypatch.delenv(qldpc.JSON_TIP_ENV, raising=False)
     out = str(tmp_path / "codes")
     rc = qldpc.main(["submit", npz, "--authors", "@me", "--out", out, *FAST])
-    text = capsys.readouterr().out
+    captured = capsys.readouterr()
+    text = captured.out
     assert rc == 0
     assert "next: open a PR with this file" in text
     assert "git checkout -b submit-12-4-2" in text
     assert not text.lstrip().startswith("{")
+    # stdout under pytest is not a terminal, which is the harness case: the
+    # reminder goes to stderr and stdout carries the same prose as before
+    assert "--json" not in text and "add --json" in captured.err and captured.err.count("add --json") == 1
+
+
+# --json discoverability (issue #7382): the flag is named where a harness
+# that missed it will look, without changing stdout for anyone.
+
+
+class _Stream:
+    def __init__(self, tty):
+        self._tty = tty
+
+    def isatty(self):
+        return self._tty
+
+
+def test_the_tip_appears_only_for_a_piped_run_without_json(monkeypatch):
+    import argparse
+
+    monkeypatch.delenv(qldpc.JSON_TIP_ENV, raising=False)
+    piped, terminal = _Stream(False), _Stream(True)
+    plain = argparse.Namespace(cmd="submit", json=False)
+    tip = qldpc._json_tip(plain, stdout=piped)
+    assert tip and tip.startswith("qldpc submit:") and "--json" in tip and qldpc.JSON_TIP_ENV in tip
+    assert qldpc._json_tip(plain, stdout=terminal) is None, "a person at a terminal reads the prose"
+    assert qldpc._json_tip(argparse.Namespace(cmd="submit", json=True), stdout=piped) is None
+    assert qldpc._json_tip(argparse.Namespace(cmd="reproduce"), stdout=piped) is None, "no --json to suggest"
+    monkeypatch.setenv(qldpc.JSON_TIP_ENV, "1")
+    assert qldpc._json_tip(plain, stdout=piped) is None, "a caller that parses the prose on purpose can say so"
+    monkeypatch.setenv(qldpc.JSON_TIP_ENV, "0")
+    assert qldpc._json_tip(plain, stdout=piped)
+
+
+def test_the_top_level_help_names_json_and_the_subcommands_that_take_it(capsys):
+    with pytest.raises(SystemExit) as e:
+        qldpc.main(["--help"])
+    assert e.value.code == 0
+    text = capsys.readouterr().out
+    assert "pass --json for exactly one JSON record on stdout" in text
+    named = text.split("Taken by:\n", 1)[1].splitlines()[0].strip().split(", ")
+    assert "submit" in named and "brief" in named and "reproduce" not in named
+    assert qldpc.JSON_TIP_ENV in text
 
 
 def test_harness_flag_lands_in_provenance(npz, capsys, tmp_path):

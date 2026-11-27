@@ -3725,7 +3725,11 @@ def main(argv=None):
         if hasattr(stream, "reconfigure") and (stream.encoding or "").lower().replace("-", "") != "utf8":
             stream.reconfigure(encoding="utf-8", errors="replace")
 
-    p = argparse.ArgumentParser(prog="qldpc", description="qLDPC challenge submission tool")
+    p = argparse.ArgumentParser(
+        prog="qldpc",
+        description="qLDPC challenge submission tool",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
     sub = p.add_subparsers(dest="cmd", required=True)
 
     s = sub.add_parser("submit", help="build, verify, and prepare a code submission")
@@ -4198,10 +4202,67 @@ def main(argv=None):
     b.add_argument("--json", action="store_true", help="print one JSON record instead")
     b.set_defaults(func=cmd_brief)
 
+    p.epilog = _json_epilog(sub)
     args = p.parse_args(argv)
     if getattr(args, "json", False):
         return _run_json(args)
+    tip = _json_tip(args)
+    if tip:
+        print(tip, file=sys.stderr, flush=True)
     return args.func(args)
+
+
+# Discoverability of --json (issue #7382). A harness that does not know the
+# flag parses the prose and fails or wastes tokens, and nothing in a failed
+# parse points it at the contract. Two pointers, neither changing what a run
+# prints on stdout: the top-level --help names the flag and the subcommands
+# that take it, and a run that did not pass it while stdout is not a terminal
+# (the one signal a harness gives) gets one line on stderr. Defaulting to
+# JSON when stdout is not a terminal would change every scripted human run
+# and CI step, so it is not done.
+JSON_TIP_ENV = "QLDPC_NO_JSON_TIP"
+
+
+def _json_subcommands(sub):
+    """Return the names of the subcommands that take --json, in help order."""
+    return [
+        name
+        for name, parser in sub.choices.items()
+        if any("--json" in action.option_strings for action in parser._actions)
+    ]
+
+
+def _json_epilog(sub):
+    return (
+        "machine mode: pass --json for exactly one JSON record on stdout, with the\n"
+        "prose on stderr; a usage error is a record too, with exit code 2. Taken by:\n"
+        "  " + ", ".join(_json_subcommands(sub)) + "\n"
+        "A harness should pass it. A run that does not, while stdout is not a\n"
+        f"terminal, gets a one-line reminder on stderr ({JSON_TIP_ENV}=1 silences it)."
+    )
+
+
+def _json_tip(args, stdout=None):
+    """Return the stderr reminder for a run that could have passed --json, or None.
+
+    None when the subcommand has no --json, when it was passed, when stdout
+    is a terminal (a person is reading the prose), or when QLDPC_NO_JSON_TIP
+    is set (a caller that parses the prose on purpose).
+    """
+    if not hasattr(args, "json") or getattr(args, "json", False):
+        return None
+    if os.environ.get(JSON_TIP_ENV, "").strip() not in ("", "0"):
+        return None
+    stream = sys.stdout if stdout is None else stdout
+    try:
+        if stream.isatty():
+            return None
+    except (AttributeError, ValueError):
+        pass
+    return (
+        f"qldpc {args.cmd}: stdout is not a terminal; add --json for exactly one JSON record on "
+        f"stdout with the prose on stderr (see ./qldpc --help; {JSON_TIP_ENV}=1 silences this line)"
+    )
 
 
 def _run_json(args):
