@@ -663,6 +663,22 @@ interval `d_lower <= d <= d`. The gap is how much of the claim is unproven;
 a later witness below `d_lower` fails `verify/check_certs.py`, since one of
 the two is then wrong.
 
+A `formal` certificate (`verification.level: formal`) records a theorem in
+a Lean development and its replay recipe, and binds the theorem to this
+entry through `verification.checks_sha256`, the hash of the entry's exact
+matrix pair. The hash is of the presentation: a development that numbers
+the qubits in another order (QECLean's bivariate-bicycle complex interleaves
+them by group element where the board is block-major) has proved a theorem
+about a relabeled code, and `check_certs.py` refuses the certificate. A
+cited development therefore states its qubit numbering, and the
+certificate's note says how its definitions were checked against the entry:
+`research/formal/lean_binding.py check` decodes a development's `BitVec`
+literals and compares them with the entry row for row, `emit` generates the
+literals from `codes/<slug>.json` so a new development starts bound, and
+`relabel` writes the permutation between QECLean's numbering and the
+board's for a bivariate-bicycle entry (`research/formal/README.md`, issue
+#7254).
+
 ## Reproducing an entry
 
 Every board entry is self-verifying: anyone can run the trusted gate against `codes/<slug>.json` and re-check its structure, `k`, witnesses, layout and distance upper bound. `qldpc reproduce` re-runs the whole evidence chain instead of that one stage, and writes down what happened.

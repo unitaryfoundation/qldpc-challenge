@@ -16,6 +16,7 @@ so that two scripts that look alike are not picked by name (issue #3383).
 | `geometric_grafts/` | the affine-checkerboard contraction campaign and its reproduce scripts | the docstrings; `geometric_grafts/campaign.py` is the entry point |
 | `literature/` | the literature harvest | `literature/README.md` |
 | `provenance/` | the literature-novelty checker and `derived.json` | `provenance/README.md` |
+| `formal/` | bind a Lean development's code definition to a board entry: emit the entry's matrices as Lean literals, decode a development's literals back and compare them, and the QECLean-to-board qubit permutation for bivariate-bicycle entries (issue #7254) | `formal/README.md` |
 | `candidates/`, `out/`, `runs/` | gitignored working output: staging, run output, run logs | never cite them as evidence |
 | `rfcs/` | design proposals for Tier 1 changes, written for maintainer review before any code | the document itself; RFC 0001 was issue #505 |
 
