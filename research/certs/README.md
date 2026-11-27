@@ -67,7 +67,15 @@ measured 2 to 2.5 times the limit, Fanerst/tropidist#2), so
 `research/certs/tropidist_certify.py` kills each solve at `1.1 x tlim + 5 s`
 and records the side as `TIMEOUT` with whatever the tool had written; the
 per-entry wall clock of two solves plus five minutes stays as the outer net
-(issue #7404). Each entry
+(issue #7404). A kill at that wall clock is an expected outcome, not a fault
+(issue #7403): the sweep sends the certifier's process group SIGTERM, gives it
+five seconds, then SIGKILL, and prints one line to the run log naming the
+entry, the wall clock, and the signal that ended it (`<slug>: killed by wall
+clock after 4100 s (tropidist_certify); ended by SIGKILL ...`). The entry's
+attempt row says the same in its `note`, its outcome is `timeout`, and
+nothing of it is staged. A desktop may report the killed tool as a process
+that quit unexpectedly; that is the kill, and the run log line is the
+record of it. Each entry
 opened is one line of `attempts.jsonl`, committed to `main` by the workflow:
 
 | field | meaning |
