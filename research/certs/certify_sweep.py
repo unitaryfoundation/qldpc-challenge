@@ -287,7 +287,7 @@ def select(
         if not os.path.exists(os.path.join(codes_dir, slug + ".json")):
             skip(slug, "not_on_board", "no codes/ file: the queue is older than the board")
             continue
-        if int(r.get("d") or 0) < 2:
+        if r.get("d") is not None and int(r["d"]) < 2:
             # d = 1 is a placeholder distance (TRACKS.md): the claim is a
             # weight-1 logical, so there is no W = d - 1 >= 1 to ask about,
             # the ladder has no rung, and a record written for it carries

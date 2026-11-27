@@ -50,7 +50,8 @@ def _write(path, obj):
 def test_selection_skips_what_the_sweep_cannot_use(tmp_path):
     S = _script()
     codes, certs = str(tmp_path / "codes"), str(tmp_path / "certs")
-    for slug in ("plain", "filed", "mismatch", "timed", "errored", "refuted", "landed", "stale", "stab", "short", "one"):
+    slugs = ("plain", "filed", "mismatch", "timed", "errored", "refuted", "landed", "stale", "stab", "short", "one")
+    for slug in slugs:
         _write(os.path.join(codes, slug + ".json"), {"n": 12})
     _write(os.path.join(certs, "filed.json"), {"d_exact": True})
     queue = {
@@ -370,7 +371,7 @@ def test_a_real_certificate_on_a_tiny_board_entry_passes_the_certificate_checker
         for r in queue["entries"]
         if r["code_type"] == "CSS"
         and r["n"] <= 20
-        and r["d"] <= 3
+        and 2 <= r["d"] <= 3
         and all(v["value"] == r["d"] for v in r["sides"].values())
         and os.path.exists(os.path.join(_ROOT, "codes", r["slug"] + ".json"))
     ]
