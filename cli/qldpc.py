@@ -3717,12 +3717,25 @@ def main(argv=None):
         metavar="N",
         help="schedules screened at two rounds before the deep search settles on one (default 6)",
     )
+    # The gate searches each committed DEM for CIRCUIT_SECONDS worth of trials
+    # and stops at 1.5x that wall clock (gate_changed._circuit_budget); the
+    # deep search here runs twice the gate's trial budget under that same cap,
+    # so a witness that survives it is one the gate is unlikely to beat. The
+    # default is read from the gate so the two cannot drift (issue #7383). A
+    # shorter cap does not make the claim safer: the search finds the
+    # lightest fault set it can, so less search means a higher d_circ, which
+    # the gate then lowers.
+    from gate_changed import _circuit_budget  # noqa: E402
+
+    _, circuit_cap = _circuit_budget(1, True)
     c.add_argument(
         "--circuit-seconds",
         type=float,
-        default=180.0,
+        default=circuit_cap,
         metavar="S",
-        help="wall-clock cap per basis for the deep witness search (default 180; the CI gate targets 120)",
+        help=f"wall-clock cap per basis for the deep witness search (default {circuit_cap:g}, "
+        "the CI gate's own cap; the search runs twice the gate's trial budget under it, "
+        "so a shorter cap on a slow machine risks a d_circ the gate then lowers)",
     )
     c.add_argument("--circuit-seed", type=int, default=0)
     s.add_argument("--trials", type=int, default=20000, help="RIS trials for the distance witness search")
