@@ -744,3 +744,29 @@ job names a directory of its own.
   `provenance.notes`. If you believe your code is equivalent to an existing
   entry under a code symmetry, say so in `provenance.notes`; novelty is part of
   review.
+## Bulk submission playbook (Tier 0)
+
+Bulk submission is slow because the contract is one code per PR and each PR
+pays a deep, independent refutation search. Do not try to batch codes into
+one PR or skip the search. Instead, make every PR as cheap as possible:
+
+1. Screen locally first.
+   - Run `uv run python research/kit/coordination.py gate <candidate.json>` on
+     every candidate and keep only `passed: true`.
+   - Run `uv run python research/kit/dedup_submissions.py <candidates...>` so
+     one PR represents one distinct code.
+   - Use `scripts/bulk_candidate_triage.sh <candidates...>` to do both.
+2. Submit code-only first.
+   - `./qldpc submit code.npz --authors @handle --no-circuit --fast-trials 0 --json`
+   - Add circuits later with `research/circuit_backfill.py` or
+     `scripts/bulk_circuit_backfill.sh --by @handle <slugs...>`.
+3. Open independent PRs from one checkout.
+   - `./qldpc submit ... --open-pr --base-ref origin/main`
+   - Or `scripts/bulk_submit.sh --authors @handle --no-circuit --fast-trials 0 --open-pr -- file1.npz file2.npz`
+4. Validate before pushing.
+   - `verify/prepush_prose_check.sh <body.md>` and `./qldpc preflight`.
+5. Keep worktrees sparse and remove them after push (see AGENTS.md).
+
+What cannot be sped up without changing the contract: the per-code deep
+refutation search, the cross-PR duplicate check, and the trusted-base
+verification. Those are the guarantees the board relies on.
