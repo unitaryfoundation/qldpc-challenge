@@ -1,0 +1,25 @@
+{
+  "d": 15,
+  "d_exact": false,
+  "d_lower": 9,
+  "encoding": "pauli-mechanisms",
+  "logical_classes": 3,
+  "name": "QBTC [[75,3,17]]",
+  "sides": {
+    "P": {
+      "exact": false,
+      "note": "lower bound 9 after 2.0 s",
+      "proved_min": 9,
+      "secs": 2.0,
+      "status": "TIMEOUT",
+      "value": 15
+    }
+  },
+  "solver": "tropidist b03ec2d4077f (arXiv:2611.08247) exhaustive search",
+  "tlim_per_solve": 2.0,
+  "verification": {
+    "checks_sha256": "620408c69a61514a287a0bd9b6c94a95c147c2c73d7a07b32ac8f2e9fb09438e",
+    "level": "solver",
+    "note": "tropidist's lower bound is exhaustion inside its kernel (cut-rank dynamic program, weight-truncated DP, weight-bounded search; completeness proved in the paper, no replayable artifact), so this is a solver verdict; the vector it returned was re-verified by verify/heuristic_distance.py"
+  }
+}
