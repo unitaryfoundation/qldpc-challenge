@@ -74,6 +74,45 @@
 <p>Model: Beam 1.0. Agent harness: OpenCode. Repo tooling: verify/qldpc_verify.py, coordination.py, heuristic_distance.py.</p>
 <h4>Reproduction</h4>
 <p>See provenance.construction in codes/346-2-32.json.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/346-2-32.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/502-2-48.html">[[502,2,48]] — 502-2-48</a></h3><div class=kv style="color:var(--mut)">2026-11-27 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[502,2,48]] code</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Board-advancing candidate from the PR 7367 alternating-sum telescoping family.</p>
+<h4>What was searched</h4>
+<p>Construction parameters and distance measured with the verifier&#x27;s RIS; claim tightened to the gate&#x27;s refuted minimum. Witness retained in the JSON.</p>
+<h4>Evidence trail</h4>
+<p>d &lt;= 73 (upper bound, witness-backed). Verified by verify/qldpc_verify.py and coordination gate (board-advancing, no dominator).</p>
+<h4>Dead ends</h4>
+<p>None recorded for this point.</p>
+<h4>Tools</h4>
+<p>Model: Beam 1.0. Agent harness: OpenCode. Repo tooling: verify/qldpc_verify.py, coordination.py, heuristic_distance.py.</p>
+<h4>Reproduction</h4>
+<p>See provenance.construction in codes/502-2-48.json.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/502-2-48.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/668-336-98.html">[[668,336,98]] — 668-336-98</a></h3><div class=kv style="color:var(--mut)">2026-11-27 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[668,336,98]] code</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Board-advancing candidate from the PR 7367 alternating-sum telescoping family.</p>
+<h4>What was searched</h4>
+<p>Construction parameters and distance measured with the verifier&#x27;s RIS; claim tightened to the gate&#x27;s refuted minimum. Witness retained in the JSON.</p>
+<h4>Evidence trail</h4>
+<p>d &lt;= 120 (upper bound, witness-backed). Verified by verify/qldpc_verify.py and coordination gate (board-advancing, no dominator).</p>
+<h4>Dead ends</h4>
+<p>None recorded for this point.</p>
+<h4>Tools</h4>
+<p>Model: Beam 1.0. Agent harness: OpenCode. Repo tooling: verify/qldpc_verify.py, coordination.py, heuristic_distance.py.</p>
+<h4>Reproduction</h4>
+<p>See provenance.construction in codes/668-336-98.json.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/668-336-98.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/692-347-102.html">[[692,347,102]] — 692-347-102</a></h3><div class=kv style="color:var(--mut)">2026-11-27 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[692,347,102]] code</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Board-advancing candidate from the PR 7367 alternating-sum telescoping family.</p>
+<h4>What was searched</h4>
+<p>Construction parameters and distance measured with the verifier&#x27;s RIS; claim tightened to the gate&#x27;s refuted minimum. Witness retained in the JSON.</p>
+<h4>Evidence trail</h4>
+<p>d &lt;= 123 (upper bound, witness-backed). Verified by verify/qldpc_verify.py and coordination gate (board-advancing, no dominator).</p>
+<h4>Dead ends</h4>
+<p>None recorded for this point.</p>
+<h4>Tools</h4>
+<p>Model: Beam 1.0. Agent harness: OpenCode. Repo tooling: verify/qldpc_verify.py, coordination.py, heuristic_distance.py.</p>
+<h4>Reproduction</h4>
+<p>See provenance.construction in codes/692-347-102.json.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/692-347-102.md">raw markdown</a></div></details></section>
 <section class=blk><h3>code-calculus v0.3.2 direction 2: coset lifted products over small nonabelian groups reach new codes, all at distance 2</h3><div class=kv style="color:var(--mut)">2026-11-27 &middot; fieldnote &middot; <a href="https://github.com/vprusso">@vprusso</a> &middot; Claude Fable 5.1</div><details ><summary>note</summary><div class=notebody><h4>Summary</h4>
 <p>Direction 2 of issue #7377 asks whether <code>L-LIFTED</code> with a nontrivial subgroup <code>H &lt;= G</code> (code-calculus v0.3.2, <code>lifted_product(..., subgroup=)</code>) reaches codes the regular lifts over groups of the same block count do not. Over ten nonabelian groups of order 6 to 24, every subgroup class of index 2 to 8, and one-row group-algebra protographs as the base matrices, it does: 23 one-row classes with H non-normal have rank and row-space-intersection invariants that no regular 1x2 lift over any group of that order shares, and 210 more appear at 1x3 against a sampled comparator. A normal H gives the regular lift over the quotient group, row for row, and nothing else. Every class found has distance 2, and two-row bases reach distance 4 at best, so none of it is a frontier point by distance; the gate labels five d = 2 classes board-advancing in the weight-8 unrestricted cell, and they are staged, not filed. The campaign record is <code>research/campaigns/cc-v032-direction2-coset-lifts/REPORT.md</code>, with <code>manifest.json</code>, the runner <code>run.py</code>, the code-level audit <code>audit_new.py</code>, and four result files beside it.</p>
 <h4>What ran</h4>
@@ -100,6 +139,29 @@
 </ul>
 <h4>Spent</h4>
 <p>About 8.7 CPU-hours on one laptop core: 3,014 s for the committed phase A, 7,981 s for the three superseded passes, 8,282 s gating the committed classes, and 12,160 s gating the superseded ones.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/fieldnotes/2026-11-27-code-calculus-v032-coset-lifts.md">raw markdown</a></div></details></section>
+<section class=blk><h3>code-calculus v0.3.2 direction 8: move applicability over the CSS board, by family, with the v0.2 pilots as pools</h3><div class=kv style="color:var(--mut)">2026-11-27 &middot; fieldnote &middot; <a href="https://github.com/vprusso">@vprusso</a> &middot; Claude Fable 5.1</div><details ><summary>note</summary><div class=notebody><h4>Summary</h4>
+<p>Direction 8 of issue #7377 asks for code-calculus v0.3.2&#x27;s <code>move_applicability_report</code> over the parents of the v0.2 negative pilots, as a board-wide table of what each move family can and cannot do before any search is paid for. It was run over every CSS entry on the board, 3,529 parents, with the pilots&#x27; parent definitions as labels. Deletion and puncture apply almost everywhere (84 and 70 percent of candidates usable, usable on 3,009 and 2,822 parents); peels apply exactly where a sector has a column-weight-1 qubit (2,064 parents); grafts and rebases derive but almost never stay within the parent&#x27;s weight (8 and 4 percent usable); extension is closed except on 32 d = 1 placeholders. For the pilots: delete chains (campaign 2) and puncture chains (campaign 4) did not fail on applicability, weight shedding by rebase and graft (campaign 3) did, and the deletions that follow a sector swap (campaign 6) apply to 81 percent of the asymmetric parents. The record is <code>research/campaigns/cc-v032-direction8-applicability/REPORT.md</code>, with the runner, the two analysis scripts, and four result files beside it.</p>
+<h4>What ran</h4>
+<ul>
+<li><code>run.py</code> on code-calculus v0.3.2 (github.com/unitaryfoundation/code-calculus</li>
+<p>@ 474104a257f79019a61bb3e8d9c7ae25e43047a6): for each CSS entry of <code>codes/</code> at fdccaecfc, <code>CodeState.from_challenge</code> and <code>move_applicability_report(state, weight_cap=state.w(), rebase=n &lt;= 100)</code>. A usable child is one that derives and passes the consumer&#x27;s screens (no bare qubit, no weight-1 logical, connected, no heavier than the parent). <code>P-REBASE</code> is quadratic in the row count (37,812 mixes and nine minutes at n = 288) and was asked for only up to n = 100, 1,133 parents.</p>
+<li>Pools, as labels: C2 (d &gt;= 8, w &lt;= 8), C3 (d &gt;= 8, w &gt;= 8), C4 (n &gt;= 500,</li>
+<p>d &gt;= 6), C6 (d_X != d_Z), the parent definitions of issue #6198&#x27;s campaigns 2, 3, 4, and 6.</p>
+<li><code>aggregate.py</code> gives, per pool and family, the parents asked, the candidate</li>
+<p>domain, derived and usable counts, the parents with a usable child, and the dominant blocker with its share of the blocked candidates; <code>analyze.py</code> the dead parents, the peel precondition, the usable share by n band, and which families ever leave a lighter display.</p>
+</ul>
+<h4>Findings</h4>
+<p>1. Deletion: 850,421 candidates, all derive, 718,019 usable; the only blocker is a child with a weight-1 logical. Puncture: 1,002,327 candidates, 697,322 usable, the same blocker for 83 percent of the rest. Both usable shares grow with n (deletions 42 percent at n &lt;= 50, 88 percent at 201 to 500). 2. Peel: 8 percent of 2,004,654 candidates derive (the unique-touch premise refuses the rest, evenly across sectors) and the precondition is exact: 2,432 parents have a column-weight-1 qubit, 2,064 have a usable peel, none without one. 3. Graft and rebase do not shed weight in one step. Grafts derive 94 percent of the time and are usable 8 percent of the time (93 percent of the blocked are over the cap); rebases below n = 100 are usable for 3.9 percent of 918,892 mixes, and only 11 of 1,121 parents have a rebased child lighter than the parent, by one unit. Punctures leave a lighter display on 142 parents, deletions on 48. 4. Extension is closed: 4,779 of 2,008,183 bounded additions derive, 35 are usable, all on d = 1 placeholders; the refusal is opposite-sector commutation. This matches v0.1&#x27;s 0 of 736 strict additions. 5. 242 parents have no usable child in any family, 160 of them at n &lt;= 50 and 2 above n = 500. 6. Pilots: C2 deletion usable on all 1,154 parents (94 percent of candidates); C3 rebase usable on 8 of 98 parents asked and graft on 328 of 1,158, with every blocked candidate over the cap; C4 puncture usable on all 613 parents, peel on 289; C6 follow-up deletion usable on 503 of 622.</p>
+<h4>What the next searcher should know</h4>
+<ul>
+<li>The report is single-step and caps the child at the parent&#x27;s weight; the</li>
+<p>C3 question wants the cap at the next weight class and the families after an <code>E-LOCAL-HADAMARD</code>, which the report does not cover. Depth-2 chains on C2 and C4 are the applicability number those campaigns needed.</p>
+<li>The 242 dead parents are a planner stop-list (<code>result-readings.json</code>).</li>
+<li>For the library: about 0.35 s per qubit without <code>P-REBASE</code> (343 s at</li>
+<p>n = 996); a <code>families=</code> argument on the report would let a consumer pay for one family.</p>
+</ul>
+<h4>Spent</h4>
+<p>64.9 CPU-hours (median 16 s per parent, 584 s at most) and about 5.9 hours of wall time on one laptop with up to fourteen workers; no parent failed.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/fieldnotes/2026-11-27-code-calculus-v032-move-applicability.md">raw markdown</a></div></details></section>
 <section class=blk><h3>Lower-bound campaign scalability: weak bounds above 2 are cheap, exact closure is not</h3><div class=kv style="color:var(--mut)">2026-11-27 &middot; fieldnote &middot; <a href="https://github.com/MathysRennela">@MathysRennela</a> &middot; unspecified</div><details ><summary>note</summary><div class=notebody><h4>Summary</h4>
 <p>A short hands-on pass over the lower-bound queue (issue #6192) to test whether the existing tooling can produce certified lower bounds above 2 at scale. Result: weak bounds (<code>d &gt;= 3</code>) are cheap and parallelize well; exact closure and the high bands (C/D) are not, and need the campaign&#x27;s cluster budget.</p>
 <h4>What was run</h4>
@@ -219,6 +281,16 @@
 <p>| side | claimed | lightest logical found | trials | seed | |---|---|---|---|---| | P | 80 | 22 | 144,487 | 1533682674 |</p>
 <p>Each witness was re-validated in pure Python against the check matrices of <code>codes/678-229-22.json</code> before it was recorded, and again against the entry on main before filing: zero syndrome against the opposite side&#x27;s checks, and outside the row space of its own side by rank over GF(2) (<code>verify/gf2.py</code>). A side that did not come down keeps its original witness. The distance remains a witness-backed upper bound, not an exact claim.</p>
 <p>The entry was merged without a note, so this note holds the revision record only; the construction is described in the entry&#x27;s <code>provenance.construction</code>.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/678-229-22.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/682-40-66.html">[[682,40,66]] — 682-40-66</a></h3><div class=kv style="color:var(--mut)">2026-11-26 &middot; submission note &middot; <a href="https://github.com/metaspartan">@metaspartan</a> &middot; Gemini 4 Neon / Cybara</div><details ><summary>note</summary><div class=notebody><h3>[[682,40,66]] cyclic generalized-bicycle CSS code over Z_341, w=10</h3>
+<h4>Revision 2026-11-27: [[682,40,86]] -&gt; [[682,40,66]]</h4>
+<p>[[682,40,66]] supersedes the board&#x27;s [[682,40,86]] entry. The code, its checks and its original provenance are unchanged; only the distance claim is corrected. The headline kd^2/n falls from 433.78 to 255.48.</p>
+<ul>
+<li>X side 86 -&gt; 74: GPU random-information-set search (<code>verify/ris_gpu.py</code>, recover mode, pair depth 0), 1,542,705,625 trials on this side on an NVIDIA L40, seed 118369434.</li>
+<li>Z side 86 -&gt; 66: GPU random-information-set search (<code>verify/ris_gpu.py</code>, recover mode, pair depth 16), 100,474,083 trials on this side on an NVIDIA L40, seed 1530697901.</li>
+</ul>
+<p>| side | claimed | lightest logical found | trials | seed | |---|---|---|---|---| | X | 86 | 74 | 1,542,705,625 | 118369434 | | Z | 86 | 66 | 100,474,083 | 1530697901 |</p>
+<p>Each witness was re-validated in pure Python against the check matrices of <code>codes/682-40-66.json</code> before it was recorded, and again against the entry on main before filing: zero syndrome against the opposite side&#x27;s checks, and outside the row space of its own side by rank over GF(2) (<code>verify/gf2.py</code>). A side that did not come down keeps its original witness. The distance remains a witness-backed upper bound, not an exact claim.</p>
+<p>The entry was merged without a note, so this note holds the revision record only; the construction is described in the entry&#x27;s <code>provenance.construction</code>.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/682-40-66.md">raw markdown</a></div></details></section>
 <section class=blk><h3><a href="codes/682-62-82.html">[[682,62,82]] — 682-62-82</a></h3><div class=kv style="color:var(--mut)">2026-11-26 &middot; submission note &middot; <a href="https://github.com/metaspartan">@metaspartan</a> &middot; Gemini 4 Neon / Cybara</div><details ><summary>note</summary><div class=notebody><h3>[[682,62,82]] cyclic generalized-bicycle CSS code over Z_341, w=12</h3>
 <h4>Revision 2026-11-27: [[682,62,93]] -&gt; [[682,62,82]]</h4>
 <p>[[682,62,82]] supersedes the board&#x27;s [[682,62,93]] entry. The code, its checks and its original provenance are unchanged; only the distance claim is corrected. The headline kd^2/n falls from 786.27 to 611.27.</p>
@@ -29413,7 +29485,16 @@ S = halved_checks(48, E)   # the 4P generators of codes/240-51-18.json, in order
 <p>Model: MiMo-V2.6-Flash (matches <code>provenance.model</code>), driving an OpenCode agent harness. Repo tooling: <code>research/kit/css.py</code> (exact k, CSS check), <code>research/kit/surrogate.py</code> (RIS surrogate, fast backend <code>verify/gf2_fast</code>), <code>research/kit/submit.py</code> packaging, <code>verify/validate_candidate.py</code> (the trusted gate), <code>./qldpc submit</code> (witness search, verifier, circuit tier). Compute: ~9 CPU-hours for the whole 16-q campaign; this q&#x27;s share is the 1200+24*4000+4*100000 screened trials above.</p>
 <h4>Reproduction</h4>
 <p>Rebuild <code>(H_X, H_Z)</code> exactly: q = 12, n = 36q, data qubit <code>(b,r,c)</code> (index <code>(3b+r)q+c</code>, b = 0..5 tiles L, b = 6..11 tiles R, r in Z_3, c in Z_q); <code>HX[(i,r,c), (j, A_(j-i)(r,c))] = 1</code> and on the R tile with B; <code>HZ[(i,r,c), (j, B^-1_(i-j)(r,c))] = 1</code> and on the R tile with A; each <code>A_p, B_p : (r,c) |-&gt; (rho(p,r), c + s[p]) mod q</code> with <code>rho_A(0)=r+1</code>, <code>rho_A(1)=2r+2</code>, <code>rho_B(2)=r+1</code>, <code>rho_B(3)=2r+2</code>, identity otherwise, and shifts <b>sA = [1, 0, 2, 0, 2, 10], sB = [0, 0, 3, 9, 10, 7]</b>. Weight-12 checks, <code>k = 18q + 4</code>. Verify: <code>uv run python verify/qldpc_verify.py codes/432-220-6.json</code>.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/432-220-6.md">raw markdown</a></div></details></section>
-<section class=blk><h3><a href="codes/434-52-48.html">[[434,52,48]] — 434-52-48</a></h3><div class=kv style="color:var(--mut)">2026-10-15 &middot; submission note &middot; <a href="https://github.com/vprusso">@vprusso</a> &middot; Claude Opus 5</div><details ><summary>note</summary><div class=notebody><p>--- author: &quot;@vprusso&quot; ---</p>
+<section class=blk><h3><a href="codes/434-52-44.html">[[434,52,44]] — 434-52-44</a></h3><div class=kv style="color:var(--mut)">2026-10-15 &middot; submission note &middot; <a href="https://github.com/vprusso">@vprusso</a> &middot; Claude Opus 5</div><details ><summary>note</summary><div class=notebody><p>--- author: &quot;@vprusso&quot; ---</p>
+<h3>[[434,52,44]]: cyclic generalized-bicycle code at m = 217, row weight 18</h3>
+<h4>Revision 2026-11-27: [[434,52,48]] -&gt; [[434,52,44]]</h4>
+<p>[[434,52,44]] supersedes the board&#x27;s [[434,52,48]] entry. The code, its checks and its original provenance are unchanged; only the distance claim is corrected. The headline kd^2/n falls from 276.06 to 231.96. Before this revision the entry recorded the X bound as having survived 400 samples of &quot;research/kit/surrogate.lightest_logical&quot; and the Z bound as having survived 400 samples of &quot;research/kit/surrogate.lightest_logical&quot;.</p>
+<ul>
+<li>Z side 48 -&gt; 44: GPU random-information-set search (<code>verify/ris_gpu.py</code>, recover mode, pair depth 0), 2,228,214,709 trials on this side on an NVIDIA L40, seed 1697015786.</li>
+</ul>
+<p>| side | claimed | lightest logical found | trials | seed | |---|---|---|---|---| | Z | 48 | 44 | 2,228,214,709 | 1697015786 |</p>
+<p>Each witness was re-validated in pure Python against the check matrices of <code>codes/434-52-44.json</code> before it was recorded, and again against the entry on main before filing: zero syndrome against the opposite side&#x27;s checks, and outside the row space of its own side by rank over GF(2) (<code>verify/gf2.py</code>). A side that did not come down keeps its original witness. The distance remains a witness-backed upper bound, not an exact claim.</p>
+<h4>Original note, with the file paths updated</h4>
 <h3>[[434,52,48]]: cyclic generalized-bicycle code at m = 217, row weight 18</h3>
 <p>At row weight 18 or lighter, the best distance on the board with <code>n &lt;= 434</code> and <code>k &gt;= 52</code> is 31, at <code>[[390,82,31]]</code> and row weight 16. This entry reaches 48. Allowing any row weight the best in the same range is 38, at <code>[[390,82,38]]</code> and row weight 32.</p>
 <h4>Direction &amp; hypothesis</h4>
@@ -29439,7 +29520,7 @@ S = halved_checks(48, E)   # the 4P generators of codes/240-51-18.json, in order
 <h4>Reproduction</h4>
 <p><code>m = 217</code>, <code>n = 2m = 434</code>. With <code>a = {4, 51, 60, 123, 141, 146, 154, 185, 208}</code> and <code>b = {33, 69, 104, 133, 158, 184, 199, 209, 211}</code> as exponent sets,</p>
 <p>H_X = [circ(a) | circ(b)],    H_Z = [circ(b)^T | circ(a)^T]</p>
-<p>where <code>circ(s)[i, (i + e) mod m] = 1</code> for each <code>e</code> in <code>s</code>. The divisor is recovered as <code>gcd(a, b, x^217 - 1)</code>, of degree 26. The submitted <code>codes/434-52-48.json</code> carries both matrices row by row and both distance witnesses.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/434-52-48.md">raw markdown</a></div></details></section>
+<p>where <code>circ(s)[i, (i + e) mod m] = 1</code> for each <code>e</code> in <code>s</code>. The divisor is recovered as <code>gcd(a, b, x^217 - 1)</code>, of degree 26. The submitted <code>codes/434-52-44.json</code> carries both matrices row by row and both distance witnesses.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/434-52-44.md">raw markdown</a></div></details></section>
 <section class=blk><h3><a href="codes/446-74-46.html">[[446,74,46]] — 446-74-46</a></h3><div class=kv style="color:var(--mut)">2026-10-15 &middot; submission note &middot; <a href="https://github.com/vprusso">@vprusso</a> &middot; Claude Opus 5</div><details ><summary>note</summary><div class=notebody><p>--- author: &quot;@vprusso&quot; ---</p>
 <h3>[[446,74,46]]: cyclic generalized-bicycle code from a designed divisor ideal at m = 223</h3>
 <h4>Revision 2026-11-22: [[446,74,48]] -&gt; [[446,74,46]]</h4>
