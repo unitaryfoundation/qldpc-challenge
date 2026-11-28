@@ -1,0 +1,812 @@
+{
+  "campaign": "4",
+  "reports": [
+    {
+      "parent": {
+        "n": 1000,
+        "k": 200,
+        "w": 8,
+        "rows": {
+          "X": 400,
+          "Z": 400
+        },
+        "dependent_rows": {
+          "X": 0,
+          "Z": 0
+        },
+        "column_weight": {
+          "X": {
+            "min": 3,
+            "max": 4,
+            "histogram": {
+              "3": 800,
+              "4": 200
+            }
+          },
+          "Z": {
+            "min": 3,
+            "max": 4,
+            "histogram": {
+              "3": 800,
+              "4": 200
+            }
+          }
+        },
+        "weight_one_logicals": {
+          "X": [],
+          "Z": []
+        },
+        "components": 1
+      },
+      "families": {
+        "C-DELETE-CHECK": {
+          "enabled": true,
+          "domain": 800,
+          "derived": 800,
+          "usable": 800,
+          "refusals": {},
+          "screens": {},
+          "best_child_w": 8,
+          "blocking": null
+        },
+        "E-PEEL": {
+          "enabled": true,
+          "domain": 2000,
+          "derived": 0,
+          "usable": 0,
+          "refusals": {
+            "E-PEEL unique-touch fails: q is not in exactly one displayed X-row": 1000,
+            "E-PEEL unique-touch fails: q is not in exactly one displayed Z-row": 1000
+          },
+          "screens": {},
+          "best_child_w": null,
+          "blocking": "E-PEEL unique-touch fails: q is not in exactly one displayed X-row"
+        },
+        "E-PUNCTURE": {
+          "enabled": true,
+          "domain": 1000,
+          "derived": 1000,
+          "usable": 1000,
+          "refusals": {},
+          "screens": {},
+          "best_child_w": 8,
+          "blocking": null
+        },
+        "E-GRAFT": {
+          "enabled": true,
+          "domain": 2000,
+          "derived": 2000,
+          "usable": 0,
+          "refusals": {},
+          "screens": {
+            "over_weight_cap": 2000
+          },
+          "best_child_w": 14,
+          "blocking": "over_weight_cap"
+        },
+        "P-REBASE": {
+          "enabled": false,
+          "domain": 0,
+          "derived": 0,
+          "usable": 0,
+          "refusals": {},
+          "screens": {},
+          "best_child_w": null,
+          "blocking": null
+        },
+        "E-EXTEND": {
+          "enabled": true,
+          "domain": 2001,
+          "derived": 1,
+          "usable": 0,
+          "refusals": {
+            "E-EXTEND addition fails opposite-sector commutation": 2000
+          },
+          "screens": {
+            "bare_qubit": 1
+          },
+          "best_child_w": 8,
+          "blocking": "E-EXTEND addition fails opposite-sector commutation"
+        }
+      },
+      "weight_cap": 8,
+      "include_disconnected": false,
+      "_meta": {
+        "slug": "1000-200-29",
+        "n": 1000,
+        "k": 200,
+        "d": 29,
+        "w": 8,
+        "seconds": 432.14
+      }
+    },
+    {
+      "parent": {
+        "n": 546,
+        "k": 184,
+        "w": 6,
+        "rows": {
+          "X": 181,
+          "Z": 181
+        },
+        "dependent_rows": {
+          "X": 0,
+          "Z": 0
+        },
+        "column_weight": {
+          "X": {
+            "min": 1,
+            "max": 2,
+            "histogram": {
+              "1": 6,
+              "2": 540
+            }
+          },
+          "Z": {
+            "min": 1,
+            "max": 2,
+            "histogram": {
+              "1": 6,
+              "2": 540
+            }
+          }
+        },
+        "weight_one_logicals": {
+          "X": [],
+          "Z": []
+        },
+        "components": 1
+      },
+      "families": {
+        "C-DELETE-CHECK": {
+          "enabled": true,
+          "domain": 362,
+          "derived": 362,
+          "usable": 350,
+          "refusals": {},
+          "screens": {
+            "weight_one_logical": 12
+          },
+          "best_child_w": 6,
+          "blocking": null
+        },
+        "E-PEEL": {
+          "enabled": true,
+          "domain": 1092,
+          "derived": 12,
+          "usable": 12,
+          "refusals": {
+            "E-PEEL unique-touch fails: q is not in exactly one displayed X-row": 540,
+            "E-PEEL unique-touch fails: q is not in exactly one displayed Z-row": 540
+          },
+          "screens": {},
+          "best_child_w": 6,
+          "blocking": null
+        },
+        "E-PUNCTURE": {
+          "enabled": true,
+          "domain": 546,
+          "derived": 546,
+          "usable": 486,
+          "refusals": {},
+          "screens": {
+            "weight_one_logical": 60
+          },
+          "best_child_w": 6,
+          "blocking": null
+        },
+        "E-GRAFT": {
+          "enabled": true,
+          "domain": 1092,
+          "derived": 1092,
+          "usable": 12,
+          "refusals": {},
+          "screens": {
+            "over_weight_cap": 1080
+          },
+          "best_child_w": 6,
+          "blocking": null
+        },
+        "P-REBASE": {
+          "enabled": false,
+          "domain": 0,
+          "derived": 0,
+          "usable": 0,
+          "refusals": {},
+          "screens": {},
+          "best_child_w": null,
+          "blocking": null
+        },
+        "E-EXTEND": {
+          "enabled": true,
+          "domain": 1093,
+          "derived": 1,
+          "usable": 0,
+          "refusals": {
+            "E-EXTEND addition fails opposite-sector commutation": 1092
+          },
+          "screens": {
+            "bare_qubit": 1
+          },
+          "best_child_w": 6,
+          "blocking": "E-EXTEND addition fails opposite-sector commutation"
+        }
+      },
+      "weight_cap": 6,
+      "include_disconnected": false,
+      "_meta": {
+        "slug": "546-184-6",
+        "n": 546,
+        "k": 184,
+        "d": 6,
+        "w": 6,
+        "seconds": 75.07
+      }
+    },
+    {
+      "parent": {
+        "n": 606,
+        "k": 2,
+        "w": 8,
+        "rows": {
+          "X": 302,
+          "Z": 302
+        },
+        "dependent_rows": {
+          "X": 0,
+          "Z": 0
+        },
+        "column_weight": {
+          "X": {
+            "min": 3,
+            "max": 4,
+            "histogram": {
+              "3": 8,
+              "4": 598
+            }
+          },
+          "Z": {
+            "min": 3,
+            "max": 4,
+            "histogram": {
+              "3": 8,
+              "4": 598
+            }
+          }
+        },
+        "weight_one_logicals": {
+          "X": [],
+          "Z": []
+        },
+        "components": 1
+      },
+      "families": {
+        "C-DELETE-CHECK": {
+          "enabled": true,
+          "domain": 604,
+          "derived": 604,
+          "usable": 604,
+          "refusals": {},
+          "screens": {},
+          "best_child_w": 8,
+          "blocking": null
+        },
+        "E-PEEL": {
+          "enabled": true,
+          "domain": 1212,
+          "derived": 0,
+          "usable": 0,
+          "refusals": {
+            "E-PEEL unique-touch fails: q is not in exactly one displayed X-row": 606,
+            "E-PEEL unique-touch fails: q is not in exactly one displayed Z-row": 606
+          },
+          "screens": {},
+          "best_child_w": null,
+          "blocking": "E-PEEL unique-touch fails: q is not in exactly one displayed X-row"
+        },
+        "E-PUNCTURE": {
+          "enabled": true,
+          "domain": 606,
+          "derived": 606,
+          "usable": 606,
+          "refusals": {},
+          "screens": {},
+          "best_child_w": 8,
+          "blocking": null
+        },
+        "E-GRAFT": {
+          "enabled": true,
+          "domain": 1212,
+          "derived": 1212,
+          "usable": 0,
+          "refusals": {},
+          "screens": {
+            "over_weight_cap": 1212
+          },
+          "best_child_w": 14,
+          "blocking": "over_weight_cap"
+        },
+        "P-REBASE": {
+          "enabled": false,
+          "domain": 0,
+          "derived": 0,
+          "usable": 0,
+          "refusals": {},
+          "screens": {},
+          "best_child_w": null,
+          "blocking": null
+        },
+        "E-EXTEND": {
+          "enabled": true,
+          "domain": 1213,
+          "derived": 1,
+          "usable": 0,
+          "refusals": {
+            "E-EXTEND addition fails opposite-sector commutation": 1212
+          },
+          "screens": {
+            "bare_qubit": 1
+          },
+          "best_child_w": 8,
+          "blocking": "E-EXTEND addition fails opposite-sector commutation"
+        }
+      },
+      "weight_cap": 8,
+      "include_disconnected": false,
+      "_meta": {
+        "slug": "606-2-49",
+        "n": 606,
+        "k": 2,
+        "d": 49,
+        "w": 8,
+        "seconds": 168.94
+      }
+    },
+    {
+      "parent": {
+        "n": 648,
+        "k": 326,
+        "w": 8,
+        "rows": {
+          "X": 161,
+          "Z": 161
+        },
+        "dependent_rows": {
+          "X": 0,
+          "Z": 0
+        },
+        "column_weight": {
+          "X": {
+            "min": 1,
+            "max": 2,
+            "histogram": {
+              "1": 8,
+              "2": 640
+            }
+          },
+          "Z": {
+            "min": 1,
+            "max": 2,
+            "histogram": {
+              "1": 8,
+              "2": 640
+            }
+          }
+        },
+        "weight_one_logicals": {
+          "X": [],
+          "Z": []
+        },
+        "components": 1
+      },
+      "families": {
+        "C-DELETE-CHECK": {
+          "enabled": true,
+          "domain": 322,
+          "derived": 322,
+          "usable": 306,
+          "refusals": {},
+          "screens": {
+            "weight_one_logical": 16
+          },
+          "best_child_w": 8,
+          "blocking": null
+        },
+        "E-PEEL": {
+          "enabled": true,
+          "domain": 1296,
+          "derived": 16,
+          "usable": 16,
+          "refusals": {
+            "E-PEEL unique-touch fails: q is not in exactly one displayed X-row": 640,
+            "E-PEEL unique-touch fails: q is not in exactly one displayed Z-row": 640
+          },
+          "screens": {},
+          "best_child_w": 8,
+          "blocking": null
+        },
+        "E-PUNCTURE": {
+          "enabled": true,
+          "domain": 648,
+          "derived": 648,
+          "usable": 536,
+          "refusals": {},
+          "screens": {
+            "weight_one_logical": 112
+          },
+          "best_child_w": 8,
+          "blocking": null
+        },
+        "E-GRAFT": {
+          "enabled": true,
+          "domain": 1296,
+          "derived": 1296,
+          "usable": 16,
+          "refusals": {},
+          "screens": {
+            "over_weight_cap": 1280
+          },
+          "best_child_w": 8,
+          "blocking": null
+        },
+        "P-REBASE": {
+          "enabled": false,
+          "domain": 0,
+          "derived": 0,
+          "usable": 0,
+          "refusals": {},
+          "screens": {},
+          "best_child_w": null,
+          "blocking": null
+        },
+        "E-EXTEND": {
+          "enabled": true,
+          "domain": 1297,
+          "derived": 1,
+          "usable": 0,
+          "refusals": {
+            "E-EXTEND addition fails opposite-sector commutation": 1296
+          },
+          "screens": {
+            "bare_qubit": 1
+          },
+          "best_child_w": 8,
+          "blocking": "E-EXTEND addition fails opposite-sector commutation"
+        }
+      },
+      "weight_cap": 8,
+      "include_disconnected": false,
+      "_meta": {
+        "slug": "648-326-6",
+        "n": 648,
+        "k": 326,
+        "d": 6,
+        "w": 8,
+        "seconds": 84.34
+      }
+    },
+    {
+      "parent": {
+        "n": 682,
+        "k": 92,
+        "w": 28,
+        "rows": {
+          "X": 295,
+          "Z": 295
+        },
+        "dependent_rows": {
+          "X": 0,
+          "Z": 0
+        },
+        "column_weight": {
+          "X": {
+            "min": 9,
+            "max": 14,
+            "histogram": {
+              "9": 10,
+              "10": 32,
+              "11": 144,
+              "12": 254,
+              "13": 170,
+              "14": 72
+            }
+          },
+          "Z": {
+            "min": 9,
+            "max": 14,
+            "histogram": {
+              "9": 10,
+              "10": 32,
+              "11": 144,
+              "12": 254,
+              "13": 170,
+              "14": 72
+            }
+          }
+        },
+        "weight_one_logicals": {
+          "X": [],
+          "Z": []
+        },
+        "components": 1
+      },
+      "families": {
+        "C-DELETE-CHECK": {
+          "enabled": true,
+          "domain": 590,
+          "derived": 590,
+          "usable": 590,
+          "refusals": {},
+          "screens": {},
+          "best_child_w": 28,
+          "blocking": null
+        },
+        "E-PEEL": {
+          "enabled": true,
+          "domain": 1364,
+          "derived": 0,
+          "usable": 0,
+          "refusals": {
+            "E-PEEL unique-touch fails: q is not in exactly one displayed X-row": 682,
+            "E-PEEL unique-touch fails: q is not in exactly one displayed Z-row": 682
+          },
+          "screens": {},
+          "best_child_w": null,
+          "blocking": "E-PEEL unique-touch fails: q is not in exactly one displayed X-row"
+        },
+        "E-PUNCTURE": {
+          "enabled": true,
+          "domain": 682,
+          "derived": 682,
+          "usable": 682,
+          "refusals": {},
+          "screens": {},
+          "best_child_w": 28,
+          "blocking": null
+        },
+        "E-GRAFT": {
+          "enabled": true,
+          "domain": 1364,
+          "derived": 1364,
+          "usable": 0,
+          "refusals": {},
+          "screens": {
+            "over_weight_cap": 1364
+          },
+          "best_child_w": 54,
+          "blocking": "over_weight_cap"
+        },
+        "P-REBASE": {
+          "enabled": false,
+          "domain": 0,
+          "derived": 0,
+          "usable": 0,
+          "refusals": {},
+          "screens": {},
+          "best_child_w": null,
+          "blocking": null
+        },
+        "E-EXTEND": {
+          "enabled": true,
+          "domain": 1365,
+          "derived": 1,
+          "usable": 0,
+          "refusals": {
+            "E-EXTEND addition fails opposite-sector commutation": 1364
+          },
+          "screens": {
+            "bare_qubit": 1
+          },
+          "best_child_w": 28,
+          "blocking": "E-EXTEND addition fails opposite-sector commutation"
+        }
+      },
+      "weight_cap": 28,
+      "include_disconnected": false,
+      "_meta": {
+        "slug": "682-92-64",
+        "n": 682,
+        "k": 92,
+        "d": 64,
+        "w": 28,
+        "seconds": 250.24
+      }
+    },
+    {
+      "parent": {
+        "n": 800,
+        "k": 18,
+        "w": 8,
+        "rows": {
+          "X": 391,
+          "Z": 391
+        },
+        "dependent_rows": {
+          "X": 0,
+          "Z": 0
+        },
+        "column_weight": {
+          "X": {
+            "min": 1,
+            "max": 4,
+            "histogram": {
+              "1": 60,
+              "2": 120,
+              "3": 60,
+              "4": 560
+            }
+          },
+          "Z": {
+            "min": 1,
+            "max": 4,
+            "histogram": {
+              "1": 60,
+              "2": 120,
+              "3": 60,
+              "4": 560
+            }
+          }
+        },
+        "weight_one_logicals": {
+          "X": [],
+          "Z": []
+        },
+        "components": 1
+      },
+      "families": {
+        "C-DELETE-CHECK": {
+          "enabled": true,
+          "domain": 782,
+          "derived": 782,
+          "usable": 679,
+          "refusals": {},
+          "screens": {
+            "weight_one_logical": 103
+          },
+          "best_child_w": 8,
+          "blocking": null
+        },
+        "E-PEEL": {
+          "enabled": true,
+          "domain": 1600,
+          "derived": 120,
+          "usable": 120,
+          "refusals": {
+            "E-PEEL unique-touch fails: q is not in exactly one displayed X-row": 740,
+            "E-PEEL unique-touch fails: q is not in exactly one displayed Z-row": 740
+          },
+          "screens": {},
+          "best_child_w": 8,
+          "blocking": null
+        },
+        "E-PUNCTURE": {
+          "enabled": true,
+          "domain": 800,
+          "derived": 800,
+          "usable": 376,
+          "refusals": {},
+          "screens": {
+            "weight_one_logical": 420,
+            "bare_qubit": 4
+          },
+          "best_child_w": 8,
+          "blocking": null
+        },
+        "E-GRAFT": {
+          "enabled": true,
+          "domain": 1600,
+          "derived": 1566,
+          "usable": 113,
+          "refusals": {
+            "E-GRAFT coverage condition fails": 34
+          },
+          "screens": {
+            "over_weight_cap": 1453
+          },
+          "best_child_w": 8,
+          "blocking": null
+        },
+        "P-REBASE": {
+          "enabled": false,
+          "domain": 0,
+          "derived": 0,
+          "usable": 0,
+          "refusals": {},
+          "screens": {},
+          "best_child_w": null,
+          "blocking": null
+        },
+        "E-EXTEND": {
+          "enabled": true,
+          "domain": 1601,
+          "derived": 1,
+          "usable": 0,
+          "refusals": {
+            "E-EXTEND addition fails opposite-sector commutation": 1600
+          },
+          "screens": {
+            "bare_qubit": 1
+          },
+          "best_child_w": 8,
+          "blocking": "E-EXTEND addition fails opposite-sector commutation"
+        }
+      },
+      "weight_cap": 8,
+      "include_disconnected": false,
+      "_meta": {
+        "slug": "800-18-27",
+        "n": 800,
+        "k": 18,
+        "d": 27,
+        "w": 8,
+        "seconds": 336.32
+      }
+    }
+  ],
+  "aggregate": {
+    "C-DELETE-CHECK": {
+      "parents": 6,
+      "domain": 3460,
+      "derived": 3460,
+      "usable": 3329,
+      "refusals": {},
+      "screens": {
+        "weight_one_logical": 131
+      }
+    },
+    "E-PEEL": {
+      "parents": 6,
+      "domain": 8564,
+      "derived": 148,
+      "usable": 148,
+      "refusals": {
+        "E-PEEL unique-touch fails: q is not in exactly one displayed X-row": 4208,
+        "E-PEEL unique-touch fails: q is not in exactly one displayed Z-row": 4208
+      },
+      "screens": {}
+    },
+    "E-PUNCTURE": {
+      "parents": 6,
+      "domain": 4282,
+      "derived": 4282,
+      "usable": 3686,
+      "refusals": {},
+      "screens": {
+        "weight_one_logical": 592,
+        "bare_qubit": 4
+      }
+    },
+    "E-GRAFT": {
+      "parents": 6,
+      "domain": 8564,
+      "derived": 8530,
+      "usable": 141,
+      "refusals": {
+        "E-GRAFT coverage condition fails": 34
+      },
+      "screens": {
+        "over_weight_cap": 8389
+      }
+    },
+    "P-REBASE": {
+      "parents": 6,
+      "domain": 0,
+      "derived": 0,
+      "usable": 0,
+      "refusals": {},
+      "screens": {}
+    },
+    "E-EXTEND": {
+      "parents": 6,
+      "domain": 8570,
+      "derived": 6,
+      "usable": 0,
+      "refusals": {
+        "E-EXTEND addition fails opposite-sector commutation": 8564
+      },
+      "screens": {
+        "bare_qubit": 6
+      }
+    }
+  }
+}
