@@ -1,0 +1,31 @@
+{
+  "campaign": "cc-v032-direction8-applicability",
+  "date": "2026-11-27",
+  "author": "@vprusso",
+  "model": "Claude Fable 5.1",
+  "harness": "Claude Code",
+  "issue": 7377,
+  "direction": 8,
+  "code_snapshot": {
+    "consumer": "code-calculus @ 474104a257f79019a61bb3e8d9c7ae25e43047a6 (v0.3.2 release; machine/planner.move_applicability_report)",
+    "board": "qldpc-challenge codes/ at fdccaecfc (3,529 CSS entries) (CSS entries only)"
+  },
+  "parents": "every CSS entry of codes/; pools are labels on each record: C2 (d >= 8, w <= 8), C3 (d >= 8, w >= 8), C4 (n >= 500, d >= 6), C6 (d_X != d_Z), the parent definitions of the v0.2 campaigns 2, 3, 4, and 6 of issue #6198",
+  "weight_cap": "the parent's own displayed check weight: a usable child is no heavier than its parent",
+  "rebase": "P-REBASE asked for only up to n = 100 (quadratic in the row count: 37,812 mixes and nine minutes at n = 288); recorded as not asked for above",
+  "results_files": [
+    "result-table.json",
+    "result-readings.json",
+    "result-reports.jsonl",
+    "result-legend.json"
+  ],
+  "note": "result-reports.jsonl keeps every per-parent record (parent stats, per-family counts, blockers, seconds); result-table.json is aggregate.py's output over it. The runner is resumable; run.log carries the timing lines.",
+  "spent": {
+    "cpu_hours": 64.9,
+    "wall_hours": 5.9,
+    "parents": 3529,
+    "errors": 0,
+    "workers": "10, then 6 and 14",
+    "hardware": "one laptop, 18 cores"
+  }
+}

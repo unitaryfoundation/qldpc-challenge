@@ -1,0 +1,17 @@
+{
+ "_comment": "reason codes used by result-reports.jsonl (refusals, screens, blocking); the text is the consumer's own refusal_reason or screen name",
+ "codes": {
+  "R01": "weight_one_logical",
+  "R02": "bare_qubit",
+  "R03": "over_weight_cap",
+  "R04": "E-EXTEND addition fails opposite-sector commutation",
+  "R05": "E-PEEL unique-touch fails: q is not in exactly one displayed X-row",
+  "R06": "E-PEEL unique-touch fails: q is not in exactly one displayed Z-row",
+  "R07": "E-GRAFT coverage condition fails",
+  "R08": "disconnected",
+  "R09": "E-GRAFT grafted qubit is not in the opposite sector",
+  "R10": "E-GRAFT has no selected-sector check at q",
+  "R11": "no displayed X-row contains the qubit",
+  "R12": "no displayed Z-row contains the qubit"
+ }
+}

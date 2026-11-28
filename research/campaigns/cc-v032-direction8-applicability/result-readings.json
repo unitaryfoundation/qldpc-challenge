@@ -1,0 +1,594 @@
+{
+ "parents": 3529,
+ "dead_parents": {
+  "count": 242,
+  "by_n_band": {
+   "201-500": 21,
+   "101-200": 28,
+   "51-100": 31,
+   "1-50": 160,
+   "501-1000": 2
+  },
+  "examples": [
+   {
+    "slug": "3-2-1",
+    "n": 3,
+    "k": 2,
+    "d": 1,
+    "w": 3,
+    "blockers": {
+     "bare_qubit": 3,
+     "E-EXTEND addition fails opposite-sector commutation": 1,
+     "E-GRAFT grafted qubit is not in the opposite sector": 1,
+     "empty domain": 1
+    }
+   },
+   {
+    "slug": "4-3-1",
+    "n": 4,
+    "k": 3,
+    "d": 1,
+    "w": 4,
+    "blockers": {
+     "bare_qubit": 3,
+     "E-EXTEND addition fails opposite-sector commutation": 1,
+     "E-GRAFT grafted qubit is not in the opposite sector": 1,
+     "empty domain": 1
+    }
+   },
+   {
+    "slug": "4-2-2",
+    "n": 4,
+    "k": 2,
+    "d": 2,
+    "w": 4,
+    "blockers": {
+     "weight_one_logical": 2,
+     "E-EXTEND addition fails opposite-sector commutation": 1,
+     "E-GRAFT coverage condition fails": 1,
+     "bare_qubit": 1,
+     "empty domain": 1
+    }
+   },
+   {
+    "slug": "5-4-1",
+    "n": 5,
+    "k": 4,
+    "d": 1,
+    "w": 5,
+    "blockers": {
+     "bare_qubit": 3,
+     "E-EXTEND addition fails opposite-sector commutation": 1,
+     "E-GRAFT grafted qubit is not in the opposite sector": 1,
+     "empty domain": 1
+    }
+   },
+   {
+    "slug": "5-3-1",
+    "n": 5,
+    "k": 3,
+    "d": 1,
+    "w": 3,
+    "blockers": {
+     "bare_qubit": 2,
+     "E-EXTEND addition fails opposite-sector commutation": 1,
+     "E-GRAFT grafted qubit is not in the opposite sector": 1,
+     "no displayed Z-row contains the qubit": 1,
+     "weight_one_logical": 1
+    }
+   },
+   {
+    "slug": "6-5-1",
+    "n": 6,
+    "k": 5,
+    "d": 1,
+    "w": 6,
+    "blockers": {
+     "bare_qubit": 3,
+     "E-EXTEND addition fails opposite-sector commutation": 1,
+     "E-GRAFT grafted qubit is not in the opposite sector": 1,
+     "empty domain": 1
+    }
+   },
+   {
+    "slug": "6-4-2",
+    "n": 6,
+    "k": 4,
+    "d": 2,
+    "w": 6,
+    "blockers": {
+     "weight_one_logical": 2,
+     "E-EXTEND addition fails opposite-sector commutation": 1,
+     "E-GRAFT coverage condition fails": 1,
+     "bare_qubit": 1,
+     "empty domain": 1
+    }
+   },
+   {
+    "slug": "6-3-1",
+    "n": 6,
+    "k": 3,
+    "d": 1,
+    "w": 3,
+    "blockers": {
+     "bare_qubit": 3,
+     "E-EXTEND addition fails opposite-sector commutation": 1,
+     "E-GRAFT coverage condition fails": 1,
+     "weight_one_logical": 1
+    }
+   },
+   {
+    "slug": "7-4-1-1c4baa76c41fa671",
+    "n": 7,
+    "k": 4,
+    "d": 1,
+    "w": 4,
+    "blockers": {
+     "bare_qubit": 2,
+     "E-EXTEND addition fails opposite-sector commutation": 1,
+     "E-GRAFT grafted qubit is not in the opposite sector": 1,
+     "no displayed Z-row contains the qubit": 1,
+     "weight_one_logical": 1
+    }
+   },
+   {
+    "slug": "7-5-1-b",
+    "n": 7,
+    "k": 5,
+    "d": 1,
+    "w": 4,
+    "blockers": {
+     "bare_qubit": 2,
+     "E-EXTEND addition fails opposite-sector commutation": 1,
+     "E-GRAFT grafted qubit is not in the opposite sector": 1,
+     "no displayed Z-row contains the qubit": 1,
+     "weight_one_logical": 1
+    }
+   },
+   {
+    "slug": "7-6-1",
+    "n": 7,
+    "k": 6,
+    "d": 1,
+    "w": 7,
+    "blockers": {
+     "bare_qubit": 3,
+     "E-EXTEND addition fails opposite-sector commutation": 1,
+     "E-GRAFT grafted qubit is not in the opposite sector": 1,
+     "empty domain": 1
+    }
+   },
+   {
+    "slug": "7-4-1",
+    "n": 7,
+    "k": 4,
+    "d": 1,
+    "w": 4,
+    "blockers": {
+     "bare_qubit": 3,
+     "E-EXTEND addition fails opposite-sector commutation": 1,
+     "E-GRAFT grafted qubit is not in the opposite sector": 1,
+     "weight_one_logical": 1
+    }
+   }
+  ]
+ },
+ "usable_by_family_and_band": {
+  "C-DELETE-CHECK": {
+   "1-50": {
+    "parents": 617,
+    "with_usable": 326,
+    "usable_share_of_domain": 0.416
+   },
+   "51-100": {
+    "parents": 516,
+    "with_usable": 457,
+    "usable_share_of_domain": 0.7679
+   },
+   "101-200": {
+    "parents": 629,
+    "with_usable": 566,
+    "usable_share_of_domain": 0.8027
+   },
+   "201-500": {
+    "parents": 1014,
+    "with_usable": 942,
+    "usable_share_of_domain": 0.883
+   },
+   "501-1000": {
+    "parents": 753,
+    "with_usable": 718,
+    "usable_share_of_domain": 0.8416
+   }
+  },
+  "E-PEEL": {
+   "1-50": {
+    "parents": 617,
+    "with_usable": 347,
+    "usable_share_of_domain": 0.0925
+   },
+   "51-100": {
+    "parents": 516,
+    "with_usable": 384,
+    "usable_share_of_domain": 0.0552
+   },
+   "101-200": {
+    "parents": 629,
+    "with_usable": 395,
+    "usable_share_of_domain": 0.0548
+   },
+   "201-500": {
+    "parents": 1014,
+    "with_usable": 512,
+    "usable_share_of_domain": 0.0466
+   },
+   "501-1000": {
+    "parents": 753,
+    "with_usable": 426,
+    "usable_share_of_domain": 0.0719
+   }
+  },
+  "E-PUNCTURE": {
+   "1-50": {
+    "parents": 617,
+    "with_usable": 253,
+    "usable_share_of_domain": 0.1095
+   },
+   "51-100": {
+    "parents": 516,
+    "with_usable": 400,
+    "usable_share_of_domain": 0.3856
+   },
+   "101-200": {
+    "parents": 629,
+    "with_usable": 502,
+    "usable_share_of_domain": 0.5506
+   },
+   "201-500": {
+    "parents": 1014,
+    "with_usable": 941,
+    "usable_share_of_domain": 0.7612
+   },
+   "501-1000": {
+    "parents": 753,
+    "with_usable": 726,
+    "usable_share_of_domain": 0.7225
+   }
+  },
+  "E-GRAFT": {
+   "1-50": {
+    "parents": 617,
+    "with_usable": 357,
+    "usable_share_of_domain": 0.1867
+   },
+   "51-100": {
+    "parents": 516,
+    "with_usable": 387,
+    "usable_share_of_domain": 0.0883
+   },
+   "101-200": {
+    "parents": 629,
+    "with_usable": 397,
+    "usable_share_of_domain": 0.068
+   },
+   "201-500": {
+    "parents": 1014,
+    "with_usable": 541,
+    "usable_share_of_domain": 0.072
+   },
+   "501-1000": {
+    "parents": 753,
+    "with_usable": 425,
+    "usable_share_of_domain": 0.0827
+   }
+  },
+  "P-REBASE": {
+   "1-50": {
+    "parents": 617,
+    "with_usable": 266,
+    "usable_share_of_domain": 0.1077
+   },
+   "51-100": {
+    "parents": 516,
+    "with_usable": 163,
+    "usable_share_of_domain": 0.0282
+   }
+  },
+  "E-EXTEND": {
+   "1-50": {
+    "parents": 617,
+    "with_usable": 19,
+    "usable_share_of_domain": 0.0006
+   },
+   "51-100": {
+    "parents": 516,
+    "with_usable": 5,
+    "usable_share_of_domain": 0.0001
+   },
+   "101-200": {
+    "parents": 629,
+    "with_usable": 1,
+    "usable_share_of_domain": 0.0
+   },
+   "201-500": {
+    "parents": 1014,
+    "with_usable": 3,
+    "usable_share_of_domain": 0.0
+   },
+   "501-1000": {
+    "parents": 753,
+    "with_usable": 4,
+    "usable_share_of_domain": 0.0
+   }
+  }
+ },
+ "peel": {
+  "parents_with_a_column_weight_1_qubit": 2432,
+  "parents_with_a_usable_peel": 2064,
+  "usable_peels_without_the_precondition": 0
+ },
+ "extend": {
+  "parents_with_a_usable_extension": 32,
+  "usable_extensions": 35,
+  "examples": [
+   {
+    "slug": "14-7-1-b",
+    "n": 14,
+    "k": 7,
+    "d": 1,
+    "usable": 1
+   },
+   {
+    "slug": "15-6-1",
+    "n": 15,
+    "k": 6,
+    "d": 1,
+    "usable": 1
+   },
+   {
+    "slug": "27-12-1",
+    "n": 27,
+    "k": 12,
+    "d": 1,
+    "usable": 1
+   },
+   {
+    "slug": "30-10-1",
+    "n": 30,
+    "k": 10,
+    "d": 1,
+    "usable": 1
+   },
+   {
+    "slug": "30-5-1",
+    "n": 30,
+    "k": 5,
+    "d": 1,
+    "usable": 1
+   },
+   {
+    "slug": "30-9-1",
+    "n": 30,
+    "k": 9,
+    "d": 1,
+    "usable": 1
+   },
+   {
+    "slug": "31-22-1",
+    "n": 31,
+    "k": 22,
+    "d": 1,
+    "usable": 1
+   },
+   {
+    "slug": "32-19-1",
+    "n": 32,
+    "k": 19,
+    "d": 1,
+    "usable": 1
+   },
+   {
+    "slug": "33-7-1",
+    "n": 33,
+    "k": 7,
+    "d": 1,
+    "usable": 1
+   },
+   {
+    "slug": "34-5-1",
+    "n": 34,
+    "k": 5,
+    "d": 1,
+    "usable": 2
+   }
+  ]
+ },
+ "lighter_children": {
+  "P-REBASE": {
+   "parents_asked": 1121,
+   "parents_with_a_lighter_child": 11,
+   "examples": [
+    {
+     "slug": "41-16-4",
+     "w": 21,
+     "best_child_w": 20
+    },
+    {
+     "slug": "41-17-3",
+     "w": 21,
+     "best_child_w": 20
+    },
+    {
+     "slug": "41-21-3",
+     "w": 21,
+     "best_child_w": 20
+    },
+    {
+     "slug": "41-17-4",
+     "w": 21,
+     "best_child_w": 20
+    },
+    {
+     "slug": "41-19-3",
+     "w": 21,
+     "best_child_w": 20
+    },
+    {
+     "slug": "41-18-3",
+     "w": 21,
+     "best_child_w": 20
+    },
+    {
+     "slug": "36-19-3",
+     "w": 20,
+     "best_child_w": 19
+    },
+    {
+     "slug": "36-20-3",
+     "w": 20,
+     "best_child_w": 19
+    }
+   ]
+  },
+  "E-GRAFT": {
+   "parents_asked": 3127,
+   "parents_with_a_lighter_child": 62,
+   "examples": [
+    {
+     "slug": "469-192-11",
+     "w": 18,
+     "best_child_w": 17
+    },
+    {
+     "slug": "415-104-16",
+     "w": 18,
+     "best_child_w": 17
+    },
+    {
+     "slug": "407-216-7",
+     "w": 32,
+     "best_child_w": 31
+    },
+    {
+     "slug": "287-6-27",
+     "w": 14,
+     "best_child_w": 13
+    },
+    {
+     "slug": "281-121-4",
+     "w": 21,
+     "best_child_w": 20
+    },
+    {
+     "slug": "232-104-3",
+     "w": 19,
+     "best_child_w": 18
+    },
+    {
+     "slug": "225-104-3",
+     "w": 19,
+     "best_child_w": 18
+    },
+    {
+     "slug": "201-78-3",
+     "w": 19,
+     "best_child_w": 18
+    }
+   ]
+  },
+  "C-DELETE-CHECK": {
+   "parents_asked": 3523,
+   "parents_with_a_lighter_child": 48,
+   "examples": [
+    {
+     "slug": "415-104-16",
+     "w": 18,
+     "best_child_w": 16
+    },
+    {
+     "slug": "407-216-7",
+     "w": 32,
+     "best_child_w": 26
+    },
+    {
+     "slug": "225-104-3",
+     "w": 19,
+     "best_child_w": 18
+    },
+    {
+     "slug": "158-52-3",
+     "w": 19,
+     "best_child_w": 18
+    },
+    {
+     "slug": "158-53-3",
+     "w": 19,
+     "best_child_w": 18
+    },
+    {
+     "slug": "148-44-4",
+     "w": 20,
+     "best_child_w": 19
+    },
+    {
+     "slug": "141-44-4",
+     "w": 20,
+     "best_child_w": 19
+    },
+    {
+     "slug": "58-31-2",
+     "w": 11,
+     "best_child_w": 9
+    }
+   ]
+  },
+  "E-PUNCTURE": {
+   "parents_asked": 3470,
+   "parents_with_a_lighter_child": 142,
+   "examples": [
+    {
+     "slug": "469-192-11",
+     "w": 18,
+     "best_child_w": 10
+    },
+    {
+     "slug": "433-30-23",
+     "w": 16,
+     "best_child_w": 9
+    },
+    {
+     "slug": "421-2-36",
+     "w": 12,
+     "best_child_w": 8
+    },
+    {
+     "slug": "415-104-16",
+     "w": 18,
+     "best_child_w": 12
+    },
+    {
+     "slug": "407-216-4",
+     "w": 20,
+     "best_child_w": 15
+    },
+    {
+     "slug": "409-2-50",
+     "w": 32,
+     "best_child_w": 30
+    },
+    {
+     "slug": "407-216-7",
+     "w": 32,
+     "best_child_w": 23
+    },
+    {
+     "slug": "371-10-29",
+     "w": 14,
+     "best_child_w": 9
+    }
+   ]
+  }
+ },
+ "parents_with_weight_one_logicals": 189,
+ "seconds_total": 233721
+}
