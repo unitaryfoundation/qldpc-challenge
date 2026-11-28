@@ -85,6 +85,7 @@ def main():
     ap.add_argument("--campaign", default="3")
     ap.add_argument("--out", default=None)
     ap.add_argument("--include-disconnected", action="store_true")
+    ap.add_argument("--no-rebase", action="store_true")
     args = ap.parse_args()
 
     camp_path = os.path.join(
@@ -107,7 +108,8 @@ def main():
     for i, slug in enumerate(slugs, 1):
         print(f"[{i}/{len(slugs)}] {slug}", flush=True)
         try:
-            rep = run_one(slug, include_disconnected=args.include_disconnected)
+            rep = run_one(slug, include_disconnected=args.include_disconnected,
+                          rebase=not args.no_rebase)
         except Exception as exc:
             print(f"  ERROR {slug}: {exc!r}", flush=True)
             rep = {"_meta": {"slug": slug, "error": repr(exc)}, "families": {}}
