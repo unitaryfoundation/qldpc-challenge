@@ -1,0 +1,438 @@
+{
+ "parents": {
+  "ALL": 3529,
+  "C2": 1154,
+  "C3": 1158,
+  "C4": 613,
+  "C6": 622
+ },
+ "errors": 0,
+ "families": {
+  "C-DELETE-CHECK": {
+   "ALL": {
+    "parents_asked": 3529,
+    "domain": 850421,
+    "derived": 850421,
+    "usable": 718019,
+    "parents_with_usable": 3009,
+    "dominant_blocker": "weight_one_logical",
+    "dominant_blocker_share": 0.996,
+    "blockers": {
+     "weight_one_logical": 131905,
+     "bare_qubit": 490,
+     "disconnected": 7
+    }
+   },
+   "C2": {
+    "parents_asked": 1154,
+    "domain": 395871,
+    "derived": 395871,
+    "usable": 371778,
+    "parents_with_usable": 1154,
+    "dominant_blocker": "weight_one_logical",
+    "dominant_blocker_share": 1.0,
+    "blockers": {
+     "weight_one_logical": 24093
+    }
+   },
+   "C3": {
+    "parents_asked": 1158,
+    "domain": 387191,
+    "derived": 387191,
+    "usable": 378843,
+    "parents_with_usable": 1157,
+    "dominant_blocker": "weight_one_logical",
+    "dominant_blocker_share": 1.0,
+    "blockers": {
+     "weight_one_logical": 8348
+    }
+   },
+   "C4": {
+    "parents_asked": 613,
+    "domain": 366899,
+    "derived": 366899,
+    "usable": 347687,
+    "parents_with_usable": 613,
+    "dominant_blocker": "weight_one_logical",
+    "dominant_blocker_share": 1.0,
+    "blockers": {
+     "weight_one_logical": 19212
+    }
+   },
+   "C6": {
+    "parents_asked": 622,
+    "domain": 171920,
+    "derived": 171920,
+    "usable": 152587,
+    "parents_with_usable": 503,
+    "dominant_blocker": "weight_one_logical",
+    "dominant_blocker_share": 0.993,
+    "blockers": {
+     "weight_one_logical": 19198,
+     "bare_qubit": 135
+    }
+   }
+  },
+  "E-PEEL": {
+   "ALL": {
+    "parents_asked": 3529,
+    "domain": 2004654,
+    "derived": 168851,
+    "usable": 123401,
+    "parents_with_usable": 2064,
+    "dominant_blocker": "E-PEEL unique-touch fails: q is not in exactly one displayed X-row",
+    "dominant_blocker_share": 0.488,
+    "blockers": {
+     "E-PEEL unique-touch fails: q is not in exactly one displayed X-row": 917665,
+     "E-PEEL unique-touch fails: q is not in exactly one displayed Z-row": 916888,
+     "weight_one_logical": 33375,
+     "disconnected": 10757,
+     "bare_qubit": 1318,
+     "no displayed X-row contains the qubit": 652
+    }
+   },
+   "C2": {
+    "parents_asked": 1154,
+    "domain": 842060,
+    "derived": 30709,
+    "usable": 29734,
+    "parents_with_usable": 774,
+    "dominant_blocker": "E-PEEL unique-touch fails: q is not in exactly one displayed X-row",
+    "dominant_blocker_share": 0.499,
+    "blockers": {
+     "E-PEEL unique-touch fails: q is not in exactly one displayed X-row": 405737,
+     "E-PEEL unique-touch fails: q is not in exactly one displayed Z-row": 405614,
+     "disconnected": 975
+    }
+   },
+   "C3": {
+    "parents_asked": 1158,
+    "domain": 887236,
+    "derived": 9897,
+    "usable": 9785,
+    "parents_with_usable": 298,
+    "dominant_blocker": "E-PEEL unique-touch fails: q is not in exactly one displayed X-row",
+    "dominant_blocker_share": 0.5,
+    "blockers": {
+     "E-PEEL unique-touch fails: q is not in exactly one displayed X-row": 438820,
+     "E-PEEL unique-touch fails: q is not in exactly one displayed Z-row": 438519,
+     "disconnected": 112
+    }
+   },
+   "C4": {
+    "parents_asked": 613,
+    "domain": 823318,
+    "derived": 25306,
+    "usable": 24189,
+    "parents_with_usable": 289,
+    "dominant_blocker": "E-PEEL unique-touch fails: q is not in exactly one displayed X-row",
+    "dominant_blocker_share": 0.5,
+    "blockers": {
+     "E-PEEL unique-touch fails: q is not in exactly one displayed X-row": 399302,
+     "E-PEEL unique-touch fails: q is not in exactly one displayed Z-row": 398710,
+     "disconnected": 1117
+    }
+   },
+   "C6": {
+    "parents_asked": 622,
+    "domain": 398612,
+    "derived": 22461,
+    "usable": 14184,
+    "parents_with_usable": 317,
+    "dominant_blocker": "E-PEEL unique-touch fails: q is not in exactly one displayed Z-row",
+    "dominant_blocker_share": 0.489,
+    "blockers": {
+     "E-PEEL unique-touch fails: q is not in exactly one displayed Z-row": 187959,
+     "E-PEEL unique-touch fails: q is not in exactly one displayed X-row": 187784,
+     "weight_one_logical": 6934,
+     "disconnected": 1060,
+     "bare_qubit": 283,
+     "no displayed X-row contains the qubit": 226
+    }
+   }
+  },
+  "E-PUNCTURE": {
+   "ALL": {
+    "parents_asked": 3529,
+    "domain": 1002327,
+    "derived": 1002327,
+    "usable": 697322,
+    "parents_with_usable": 2822,
+    "dominant_blocker": "weight_one_logical",
+    "dominant_blocker_share": 0.832,
+    "blockers": {
+     "weight_one_logical": 253785,
+     "bare_qubit": 51180,
+     "disconnected": 40
+    }
+   },
+   "C2": {
+    "parents_asked": 1154,
+    "domain": 421030,
+    "derived": 421030,
+    "usable": 333432,
+    "parents_with_usable": 1132,
+    "dominant_blocker": "weight_one_logical",
+    "dominant_blocker_share": 0.976,
+    "blockers": {
+     "weight_one_logical": 85522,
+     "bare_qubit": 2050,
+     "disconnected": 26
+    }
+   },
+   "C3": {
+    "parents_asked": 1158,
+    "domain": 443618,
+    "derived": 443618,
+    "usable": 405118,
+    "parents_with_usable": 1138,
+    "dominant_blocker": "weight_one_logical",
+    "dominant_blocker_share": 0.963,
+    "blockers": {
+     "weight_one_logical": 37080,
+     "bare_qubit": 1394,
+     "disconnected": 26
+    }
+   },
+   "C4": {
+    "parents_asked": 613,
+    "domain": 411659,
+    "derived": 411659,
+    "usable": 345563,
+    "parents_with_usable": 613,
+    "dominant_blocker": "weight_one_logical",
+    "dominant_blocker_share": 0.97,
+    "blockers": {
+     "weight_one_logical": 64117,
+     "bare_qubit": 1979
+    }
+   },
+   "C6": {
+    "parents_asked": 622,
+    "domain": 199306,
+    "derived": 199306,
+    "usable": 150712,
+    "parents_with_usable": 503,
+    "dominant_blocker": "weight_one_logical",
+    "dominant_blocker_share": 0.837,
+    "blockers": {
+     "weight_one_logical": 40662,
+     "bare_qubit": 7924,
+     "disconnected": 8
+    }
+   }
+  },
+  "E-GRAFT": {
+   "ALL": {
+    "parents_asked": 3529,
+    "domain": 2004654,
+    "derived": 1882488,
+    "usable": 160060,
+    "parents_with_usable": 2107,
+    "dominant_blocker": "over_weight_cap",
+    "dominant_blocker_share": 0.933,
+    "blockers": {
+     "over_weight_cap": 1720945,
+     "E-GRAFT coverage condition fails": 119666,
+     "disconnected": 1483,
+     "E-GRAFT grafted qubit is not in the opposite sector": 1250,
+     "E-GRAFT has no selected-sector check at q": 1250
+    }
+   },
+   "C2": {
+    "parents_asked": 1154,
+    "domain": 842060,
+    "derived": 828876,
+    "usable": 30429,
+    "parents_with_usable": 776,
+    "dominant_blocker": "over_weight_cap",
+    "dominant_blocker_share": 0.984,
+    "blockers": {
+     "over_weight_cap": 798441,
+     "E-GRAFT coverage condition fails": 13184,
+     "disconnected": 6
+    }
+   },
+   "C3": {
+    "parents_asked": 1158,
+    "domain": 887236,
+    "derived": 884159,
+    "usable": 22817,
+    "parents_with_usable": 328,
+    "dominant_blocker": "over_weight_cap",
+    "dominant_blocker_share": 0.996,
+    "blockers": {
+     "over_weight_cap": 861342,
+     "E-GRAFT coverage condition fails": 3077
+    }
+   },
+   "C4": {
+    "parents_asked": 613,
+    "domain": 823318,
+    "derived": 811156,
+    "usable": 26226,
+    "parents_with_usable": 289,
+    "dominant_blocker": "over_weight_cap",
+    "dominant_blocker_share": 0.985,
+    "blockers": {
+     "over_weight_cap": 784924,
+     "E-GRAFT coverage condition fails": 12162,
+     "disconnected": 6
+    }
+   },
+   "C6": {
+    "parents_asked": 622,
+    "domain": 398612,
+    "derived": 372107,
+    "usable": 28629,
+    "parents_with_usable": 336,
+    "dominant_blocker": "over_weight_cap",
+    "dominant_blocker_share": 0.928,
+    "blockers": {
+     "over_weight_cap": 343271,
+     "E-GRAFT coverage condition fails": 25689,
+     "E-GRAFT grafted qubit is not in the opposite sector": 408,
+     "E-GRAFT has no selected-sector check at q": 408,
+     "disconnected": 207
+    }
+   }
+  },
+  "P-REBASE": {
+   "ALL": {
+    "parents_asked": 1133,
+    "domain": 918892,
+    "derived": 918892,
+    "usable": 35524,
+    "parents_with_usable": 429,
+    "dominant_blocker": "over_weight_cap",
+    "dominant_blocker_share": 0.978,
+    "blockers": {
+     "over_weight_cap": 864264,
+     "weight_one_logical": 19104
+    }
+   },
+   "C2": {
+    "parents_asked": 123,
+    "domain": 310242,
+    "derived": 310242,
+    "usable": 3014,
+    "parents_with_usable": 5,
+    "dominant_blocker": "over_weight_cap",
+    "dominant_blocker_share": 1.0,
+    "blockers": {
+     "over_weight_cap": 307228
+    }
+   },
+   "C3": {
+    "parents_asked": 98,
+    "domain": 229630,
+    "derived": 229630,
+    "usable": 6308,
+    "parents_with_usable": 8,
+    "dominant_blocker": "over_weight_cap",
+    "dominant_blocker_share": 1.0,
+    "blockers": {
+     "over_weight_cap": 223322
+    }
+   },
+   "C4": {
+    "parents_asked": 0,
+    "domain": 0,
+    "derived": 0,
+    "usable": 0,
+    "parents_with_usable": 0,
+    "dominant_blocker": null,
+    "dominant_blocker_share": null,
+    "blockers": {}
+   },
+   "C6": {
+    "parents_asked": 216,
+    "domain": 133520,
+    "derived": 133520,
+    "usable": 8270,
+    "parents_with_usable": 60,
+    "dominant_blocker": "over_weight_cap",
+    "dominant_blocker_share": 0.905,
+    "blockers": {
+     "over_weight_cap": 113380,
+     "weight_one_logical": 11870
+    }
+   }
+  },
+  "E-EXTEND": {
+   "ALL": {
+    "parents_asked": 3529,
+    "domain": 2008183,
+    "derived": 4779,
+    "usable": 35,
+    "parents_with_usable": 32,
+    "dominant_blocker": "E-EXTEND addition fails opposite-sector commutation",
+    "dominant_blocker_share": 0.998,
+    "blockers": {
+     "E-EXTEND addition fails opposite-sector commutation": 2003404,
+     "bare_qubit": 3529,
+     "weight_one_logical": 1215
+    }
+   },
+   "C2": {
+    "parents_asked": 1154,
+    "domain": 843214,
+    "derived": 1154,
+    "usable": 0,
+    "parents_with_usable": 0,
+    "dominant_blocker": "E-EXTEND addition fails opposite-sector commutation",
+    "dominant_blocker_share": 0.999,
+    "blockers": {
+     "E-EXTEND addition fails opposite-sector commutation": 842060,
+     "bare_qubit": 1154
+    }
+   },
+   "C3": {
+    "parents_asked": 1158,
+    "domain": 888394,
+    "derived": 1158,
+    "usable": 0,
+    "parents_with_usable": 0,
+    "dominant_blocker": "E-EXTEND addition fails opposite-sector commutation",
+    "dominant_blocker_share": 0.999,
+    "blockers": {
+     "E-EXTEND addition fails opposite-sector commutation": 887236,
+     "bare_qubit": 1158
+    }
+   },
+   "C4": {
+    "parents_asked": 613,
+    "domain": 823931,
+    "derived": 613,
+    "usable": 0,
+    "parents_with_usable": 0,
+    "dominant_blocker": "E-EXTEND addition fails opposite-sector commutation",
+    "dominant_blocker_share": 0.999,
+    "blockers": {
+     "E-EXTEND addition fails opposite-sector commutation": 823318,
+     "bare_qubit": 613
+    }
+   },
+   "C6": {
+    "parents_asked": 622,
+    "domain": 399234,
+    "derived": 1030,
+    "usable": 35,
+    "parents_with_usable": 32,
+    "dominant_blocker": "E-EXTEND addition fails opposite-sector commutation",
+    "dominant_blocker_share": 0.998,
+    "blockers": {
+     "E-EXTEND addition fails opposite-sector commutation": 398204,
+     "bare_qubit": 622,
+     "weight_one_logical": 373
+    }
+   }
+  }
+ },
+ "records": 3529,
+ "seconds_total": 233721,
+ "n_range": [
+  3,
+  1000
+ ]
+}
