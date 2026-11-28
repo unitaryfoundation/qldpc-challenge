@@ -31,7 +31,7 @@ def load_parents(campaign_path):
     return [r["slug"] for r in data["records"]]
 
 
-def run_one(slug, include_disconnected=False):
+def run_one(slug, include_disconnected=False, rebase=True):
     path = os.path.join(ROOT, "codes", slug + ".json")
     with open(path) as fh:
         doc = json.load(fh)
@@ -40,7 +40,7 @@ def run_one(slug, include_disconnected=False):
     if not isinstance(w, int):
         w = max(len(c) for s in doc["checks"].values() for c in s)
     t0 = time.time()
-    rep = move_applicability_report(state, weight_cap=w, include_disconnected=include_disconnected)
+    rep = move_applicability_report(state, weight_cap=w, include_disconnected=include_disconnected, rebase=rebase)
     rep["_meta"] = {
         "slug": slug,
         "n": doc["n"],
@@ -108,8 +108,7 @@ def main():
     for i, slug in enumerate(slugs, 1):
         print(f"[{i}/{len(slugs)}] {slug}", flush=True)
         try:
-            rep = run_one(slug, include_disconnected=args.include_disconnected,
-                          rebase=not args.no_rebase)
+            rep = run_one(slug, include_disconnected=args.include_disconnected, rebase=not args.no_rebase)
         except Exception as exc:
             print(f"  ERROR {slug}: {exc!r}", flush=True)
             rep = {"_meta": {"slug": slug, "error": repr(exc)}, "families": {}}
